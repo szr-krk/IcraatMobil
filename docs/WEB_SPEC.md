@@ -33,4 +33,5 @@ Tüm birimlerdeki EVK kayıtlarının tek dosyada taşınabilmesi için web sür
 
 - BIRIM_BILGI alanları tanımlanınca IndexedDB store ve form eklenecek.
 - PDF alan eşlemesi tanımlanınca ayrı fazda ele alınacak.
-- GitHub deposu ve GitHub Pages yayını kullanıcı onayıyla son aşamada bağlanacak.
+- Public kaynak deposu: `https://github.com/szr-krk/IcraatMobil`
+- GitHub Pages yayını: `https://szr-krk.github.io/IcraatMobil/`

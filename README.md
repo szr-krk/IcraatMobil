@@ -2,6 +2,8 @@
 
 HTML, CSS ve JavaScript ile yazılmış; Android ve iPhone için mobil odaklı, çevrimdışı çalışabilen EVK uygulaması.
 
+Canlı uygulama: https://szr-krk.github.io/IcraatMobil/
+
 ## Yerelde çalıştırma
 
 Bu klasörde bir HTTP sunucusu açın:
@@ -26,4 +28,4 @@ node --check domain.js
 node --check sw.js
 ```
 
-GitHub bağlantısı ve yayınlama bilinçli olarak sonraki aşamaya bırakılmıştır.
+Kaynak depo: https://github.com/szr-krk/IcraatMobil
