@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#10243f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="İcraat">
+  <meta name="description" content="Mobil, çevrimdışı Ekip Vardiya Kaydı uygulaması">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <title>İcraat</title>
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <header class="topbar">
+      <button class="icon-button back-button" id="backButton" aria-label="Ekip listesine dön" hidden>‹</button>
+      <div class="title-block">
+        <p class="eyebrow" id="pageEyebrow">BÖLGE TRAFİK</p>
+        <h1 id="pageTitle">Ekipler</h1>
+      </div>
+      <button class="icon-button" id="menuButton" aria-label="Menüyü aç" aria-expanded="false">⋮</button>
+    </header>
+
+    <main id="listScreen" class="screen" tabindex="-1">
+      <section class="summary-strip" aria-label="Kayıt özeti">
+        <div><strong id="teamCount">0</strong><span>EVK</span></div>
+        <div><strong id="unitCount">0</strong><span>Birim</span></div>
+        <div><strong id="offlineState">Hazır</strong><span>Çevrimdışı</span></div>
+      </section>
+      <section id="teamList" class="team-list" aria-live="polite"></section>
+    </main>
+
+    <main id="detailScreen" class="detail-screen" hidden>
+      <section id="detailSummary" class="detail-summary"></section>
+      <nav class="tabs" role="tablist" aria-label="EVK bölümleri">
+        <button role="tab" aria-selected="true" data-tab="penalties">Ceza Ekle</button>
+        <button role="tab" aria-selected="false" data-tab="controls">Kontroller</button>
+        <button role="tab" aria-selected="false" data-tab="accidents">Kazalar</button>
+        <button role="tab" aria-selected="false" data-tab="performance">İcraat</button>
+      </nav>
+
+      <section id="penaltiesPanel" class="tab-panel watermark-panel" role="tabpanel">
+        <div id="penaltyList" class="penalty-list"></div>
+        <form id="penaltyForm" class="penalty-composer">
+          <div id="radarOriginField" class="radar-origin" hidden>
+            <span>Kayıt Kaynağı</span>
+            <div class="choice-pills">
+              <label><input type="radio" name="radarOrigin" value="RADAR_OPERATOR" checked><span>Plakasına</span></label>
+              <label><input type="radio" name="radarOrigin" value="RADAR_TEAM"><span>Ekip Cezaları</span></label>
+            </div>
+          </div>
+          <div class="penalty-row">
+            <label class="count-field"><span>Adet</span><input id="penaltyCount" type="number" min="1" inputmode="numeric" value="1" required></label>
+            <div class="type-scroll" id="penaltyTypeGroup">
+              <label><input type="radio" name="penaltyType" value="DRIVER" checked><span>Sürücüye</span></label>
+              <label><input type="radio" name="penaltyType" value="PLATE"><span>Plakasına</span></label>
+              <label><input type="radio" name="penaltyType" value="PASSENGER"><span>Yolcuya</span></label>
+              <label><input type="radio" name="penaltyType" value="PEDESTRIAN"><span>Yayaya</span></label>
+              <label><input type="radio" name="penaltyType" value="OTHER"><span>Diğer</span></label>
+            </div>
+          </div>
+          <div class="check-row">
+            <label><input id="vehicleBan" type="checkbox"> Araç Men</label>
+            <label><input id="parking" type="checkbox"> Otoparka</label>
+            <label><input id="licenseCancel" type="checkbox"> Belge İptal</label>
+          </div>
+          <div id="selectedArticles" class="selected-articles" aria-live="polite"></div>
+          <div class="article-search-row">
+            <button type="button" class="clear-button" id="clearArticleSearch" aria-label="Madde aramasını temizle">×</button>
+            <label class="article-search"><span class="sr-only">Madde Ara</span><input id="articleSearch" inputmode="search" placeholder="Madde Ara..." autocomplete="off"></label>
+            <button class="primary-small" type="submit">KAYDET</button>
+          </div>
+          <div id="articleResults" class="article-results" hidden></div>
+        </form>
+      </section>
+
+      <section id="controlsPanel" class="tab-panel watermark-panel" role="tabpanel" hidden>
+        <p class="autosave-note">Değerler yazıldıkça bu EVK’ya kaydedilir.</p>
+        <div id="controlsGrid" class="controls-grid"></div>
+      </section>
+
+      <section id="accidentsPanel" class="tab-panel watermark-panel" role="tabpanel" hidden>
+        <p class="autosave-note">Değerler yazıldıkça bu EVK’ya kaydedilir.</p>
+        <div id="accidentFields" class="accident-fields"></div>
+      </section>
+
+      <section id="performancePanel" class="tab-panel blank-panel" role="tabpanel" hidden>
+        <div class="empty-state compact">
+          <div class="empty-mark" aria-hidden="true">İ</div>
+          <h2>İcraat bölümü hazır</h2>
+          <p>Bu sekmenin içeriği şimdilik bilerek boş bırakıldı.</p>
+        </div>
+      </section>
+    </main>
+
+    <button class="fab" id="addTeamButton" aria-label="Ekip ekle">+</button>
+  </div>
+
+  <div class="backdrop" id="menuBackdrop" hidden></div>
+  <nav class="overflow-menu" id="overflowMenu" aria-label="Uygulama menüsü" hidden>
+    <button type="button" data-action="import">JSON İçe Aktar</button>
+    <button type="button" data-action="export">Tüm EVK’leri Dışa Aktar</button>
+    <button type="button" data-action="share">Tüm EVK’leri Paylaş</button>
+    <button type="button" data-action="about">Uygulama Bilgisi</button>
+  </nav>
+
+  <dialog id="teamDialog" class="sheet-dialog">
+    <form id="teamForm" class="sheet" novalidate>
+      <header class="sheet-header">
+        <button class="icon-button" type="button" data-close-team aria-label="Kapat">‹</button>
+        <h2 id="teamDialogTitle">Ekip Ekle</h2>
+        <button class="text-button" type="submit" id="saveTeamButton">KAYDET</button>
+      </header>
+      <div class="sheet-body">
+        <label class="field"><span>Birim Seçiniz</span>
+          <select id="teamUnit" required>
+            <option value="MERKEZ">Merkez Bölge</option>
+            <option value="CORLU">Çorlu</option>
+            <option value="MALKARA">Malkara</option>
+          </select>
+        </label>
+        <label class="field"><span>Ekip Kodu</span><input id="teamCode" inputmode="numeric" pattern="[0-9]*" maxlength="12" placeholder="Örn. 59635" required></label>
+        <fieldset class="segmented" id="dutyGroup"><legend>Görev Türü</legend>
+          <label><input type="radio" name="dutyType" value="GUNDUZ" checked><span>Gündüz</span></label>
+          <label><input type="radio" name="dutyType" value="GECE"><span>Gece</span></label>
+          <label><input type="radio" name="dutyType" value="ARA_EKIP"><span>Ara Ekip</span></label>
+          <label><input type="radio" name="dutyType" value="RADAR"><span>Radar</span></label>
+        </fieldset>
+        <div class="date-grid">
+          <label class="field"><span>Başlama Tarihi</span><input id="startDate" type="date" required></label>
+          <label class="field"><span>Başlama Saati</span><input id="startTime" type="time" required></label>
+          <label class="field"><span>Bitiş Tarihi</span><input id="endDate" type="date" required></label>
+          <label class="field"><span>Bitiş Saati</span><input id="endTime" type="time" required></label>
+        </div>
+        <section class="form-section">
+          <div><h3>Görevliler</h3><button type="button" id="addOfficerButton" class="small-action">+ Ekle</button></div>
+          <div id="officerList" class="chip-list"></div>
+          <p id="officerEmpty">Henüz görevli eklenmedi.</p>
+        </section>
+        <section class="form-section">
+          <div><h3>Yollar</h3><button type="button" id="addRoadButton" class="small-action">+ Ekle</button></div>
+          <div id="roadList" class="chip-list"></div>
+          <p id="roadEmpty">Henüz yol eklenmedi.</p>
+        </section>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="officerDialog" class="mini-dialog">
+    <form id="officerForm" class="dialog-card">
+      <h2>Görevli Ekle</h2>
+      <label class="field"><span>Sicil</span><input id="officerRegistry" inputmode="numeric"></label>
+      <label class="field"><span>Ad</span><input id="officerName" autocomplete="given-name" required></label>
+      <label class="field"><span>Soyad</span><input id="officerSurname" autocomplete="family-name" required></label>
+      <div class="dialog-actions"><button type="button" class="secondary-button" data-close-officer>İptal</button><button class="primary-button" type="submit">Ekle</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="roadDialog" class="mini-dialog">
+    <form id="roadForm" class="dialog-card">
+      <h2>Yol Ekle</h2>
+      <label class="field"><span>Yol Adı</span><input id="roadName" required></label>
+      <div class="dialog-actions"><button type="button" class="secondary-button" data-close-road>İptal</button><button class="primary-button" type="submit">Ekle</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="cardMenuDialog" class="action-dialog">
+    <div class="action-card">
+      <h2 id="cardMenuTitle">Ekip işlemleri</h2>
+      <button type="button" data-card-action="edit">Ekibi Güncelle</button>
+      <button type="button" data-card-action="share">EVK’yi Paylaş</button>
+      <button type="button" class="danger-text" data-card-action="delete">EVK’yi Sil</button>
+      <button type="button" data-card-action="cancel">Vazgeç</button>
+    </div>
+  </dialog>
+
+  <dialog id="confirmDialog" class="mini-dialog">
+    <div class="dialog-card">
+      <h2 id="confirmTitle">Onay</h2>
+      <p id="confirmMessage"></p>
+      <div class="dialog-actions"><button type="button" class="secondary-button" id="confirmCancel">Vazgeç</button><button type="button" class="danger-button" id="confirmOk">Sil</button></div>
+    </div>
+  </dialog>
+
+  <dialog id="penaltyCountDialog" class="mini-dialog">
+    <form id="penaltyCountEditForm" class="dialog-card">
+      <h2>Ceza Adedini Güncelle</h2>
+      <label class="field"><span>Yeni Adet</span><input id="penaltyCountEditValue" type="number" min="1" inputmode="numeric" required></label>
+      <div class="dialog-actions"><button type="button" class="secondary-button" id="penaltyCountEditCancel">Vazgeç</button><button type="submit" class="primary-button">Güncelle</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="infoDialog" class="mini-dialog">
+    <div class="dialog-card">
+      <h2>İcraat Mobil</h2>
+      <p>EVK verileri bu cihazın tarayıcı hafızasında saklanır. Uygulama ana ekrana eklendikten sonra çevrimdışı kullanılabilir.</p>
+      <p class="small-copy">PDF üretimi bu sürümün kapsamında değildir.</p>
+      <div class="dialog-actions"><button type="button" class="primary-button" data-close-info>Tamam</button></div>
+    </div>
+  </dialog>
+
+  <input id="importInput" type="file" accept="application/json,.json" hidden>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

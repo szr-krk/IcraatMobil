@@ -1,0 +1,2345 @@
+{
+  "versiyon": "2026.03",
+  "guncelleme_tarihi": "2026-03-21T18:00:00",
+  "maddeler": [
+    {
+      "madde": "13",
+      "fiyat": 5662,
+      "yil": 2026,
+      "aciklama": "Kara yolu üzerinde trafiği aksatacak şekilde çalışma yapmak"
+    },
+    {
+      "madde": "14/1-a",
+      "fiyat": 5662,
+      "yil": 2026,
+      "aciklama": "Taşıt, yaya yolu ve karayoluna trafiği veya işaretleri engelleyecek şekilde bir şey koymak, atmak, dökmek veya bırakmak"
+    },
+    {
+      "madde": "14/1-b",
+      "fiyat": 5662,
+      "yil": 2026,
+      "aciklama": "Karayolu, trafik işaretleri ve güvenlik tesislerini yazı yazarak, çizerek, yerini değiştirerek veya kaldırarak bozmak"
+    },
+    {
+      "madde": "16",
+      "fiyat": 58945,
+      "yil": 2026,
+      "aciklama": "İzin almadan, karayolu çevresine trafiği yanıltan, engelleyen veya işaretleri görünmez kılan levha, ışık, ağaç, direk vb. koymak"
+    },
+    {
+      "madde": "17",
+      "fiyat": 58945,
+      "yil": 2026,
+      "aciklama": "Belediye sınırı dışındaki karayoluna 50 metre mesafede, izin almadan yapı veya tesis yapmak"
+    },
+    {
+      "madde": "18",
+      "fiyat": 58945,
+      "yil": 2026,
+      "aciklama": "Belediye sınırı içindeki karayolu kenarında, belediyeden izin almadan yapı veya tesis yapmak"
+    },
+    {
+      "madde": "20/1-a/1",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Aracın tescilini veya hurda durumunda tescil silmesini süresinde yapmamak"
+    },
+    {
+      "madde": "20/1-d",
+      "fiyat": 21301,
+      "yil": 2026,
+      "aciklama": "Satış ve devri 3 iş günü içinde bildirmemek, geçici belge düzenlememek veya belirlenen ücretin üzerinde ücret almak"
+    },
+    {
+      "madde": "20/1-d-8",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Kamu kurumlarından alınan araçları 1 ay içinde tescil ettirmemek"
+    },
+    {
+      "madde": "20/1-f",
+      "fiyat": 3000,
+      "yil": 2026,
+      "aciklama": "Araç  sahiplerinin  vefat  etmesi  halinde  mirasçıların,  gerekli  bilgi  ve  belgeleri sağlayarak vefat tarihinden itibaren doksan gün içerisinde aracı adlarına tescil ettirmeden karayoluna çıkarmaları,"
+    },
+    {
+      "madde": "21/1",
+      "fiyat": 46000,
+      "yil": 2026,
+      "aciklama": "Tescil edilen araçları tescil belgesi ve tescil plakası almadan  karayoluna çıkarmak"
+    },
+    {
+      "madde": "21/5",
+      "fiyat": 46000,
+      "yil": 2026,
+      "aciklama": "Hurdaya çıkarılmış aracı karayolunda sürmek"
+    },
+    {
+      "madde": "23/2-a",
+      "fiyat": 1057,
+      "yil": 2026,
+      "aciklama": "Araç tescil belgesini araçta bulundurmamak"
+    },
+    {
+      "madde": "23/2-b",
+      "fiyat": 1057,
+      "yil": 2026,
+      "aciklama": "Tescil plakasını monte edilmesi gereken yerin dışında farklı bir yere takmak"
+    },
+    {
+      "madde": "23/3-a",
+      "fiyat": 4000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen nitelik veya ölçülere aykırı plaka takmak"
+    },
+    {
+      "madde": "23/3-b",
+      "fiyat": 4000,
+      "yil": 2026,
+      "aciklama": "Tescilli araca Yönetmelikte öngörülen sayıda tescil plakası takmamak"
+    },
+    {
+      "madde": "23/3-c (1.kez)",
+      "fiyat": 140000,
+      "yil": 2026,
+      "aciklama": "Farklı  okunmasına  veya  okunamamasına  bilerek  neden  olacak  şekilde  tescil plakasında değişiklik yapmak,"
+    },
+    {
+      "madde": "23/3-c (2.kez)",
+      "fiyat": 280000,
+      "yil": 2026,
+      "aciklama": "Farklı  okunmasına  veya  okunamamasına  bilerek  neden  olacak  şekilde  tescil plakasında değişiklik yapmak,"
+    },
+    {
+      "madde": "23/4(1.kez)",
+      "fiyat": 46000,
+      "yil": 2026,
+      "aciklama": "Tescilli aracı plakasız kullanmak"
+    },
+    {
+      "madde": "23/4(2.kez)",
+      "fiyat": 140000,
+      "yil": 2026,
+      "aciklama": "Tescilli aracı plakasız kullanmak"
+    },
+    {
+      "madde": "23/5-a(1.kez)",
+      "fiyat": 140000,
+      "yil": 2026,
+      "aciklama": "Başka bir araca ait tescil plakasını/geçici tescil plakasını takmak veya kullanmak,"
+    },
+    {
+      "madde": "23/5-a(2.kez)",
+      "fiyat": 280000,
+      "yil": 2026,
+      "aciklama": "Başka bir araca ait tescil plakasını/geçici tescil plakasını takmak veya kullanmak,"
+    },
+    {
+      "madde": "23/5-b(1.kez)",
+      "fiyat": 140000,
+      "yil": 2026,
+      "aciklama": "Araca sahte plaka takmak veya kullanmak"
+    },
+    {
+      "madde": "23/5-b(2.kez)",
+      "fiyat": 280000,
+      "yil": 2026,
+      "aciklama": "Araca sahte plaka takmak veya kullanmak"
+    },
+    {
+      "madde": "23/5-c(1.kez)",
+      "fiyat": 140000,
+      "yil": 2026,
+      "aciklama": "Plaka basım işlemini gerçekleştiren kuruluş tarafından verilmemiş plakayı takmak veya kullanmak"
+    },
+    {
+      "madde": "23/5-c(2.kez)",
+      "fiyat": 280000,
+      "yil": 2026,
+      "aciklama": "Plaka basım işlemini gerçekleştiren kuruluş tarafından verilmemiş plakayı takmak veya kullanmak"
+    },
+    {
+      "madde": "23/5-d(1.kez)",
+      "fiyat": 140000,
+      "yil": 2026,
+      "aciklama": "Tescil kaydı bulunmayan plakayı takmak veya kullanmak"
+    },
+    {
+      "madde": "23/5-d(2.kez)",
+      "fiyat": 280000,
+      "yil": 2026,
+      "aciklama": "Tescil kaydı bulunmayan plakayı takmak veya kullanmak"
+    },
+    {
+      "madde": "25(1.kez)",
+      "fiyat": 46000,
+      "yil": 2026,
+      "aciklama": "Geçici belge ve plaka olmadan aracı trafiğe çıkarmak veya süresi bitmiş belge/plaka kullanmak"
+    },
+    {
+      "madde": "25(2.kez)",
+      "fiyat": 140000,
+      "yil": 2026,
+      "aciklama": "Geçici belge ve plaka olmadan aracı trafiğe çıkarmak veya süresi bitmiş belge/plaka kullanmak"
+    },
+    {
+      "madde": "26/1",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Zorunlu ayırım işaretlerini araçta bulundurmamak"
+    },
+    {
+      "madde": "26/2 (1.Kez)",
+      "fiyat": 173392,
+      "yil": 2026,
+      "aciklama": "Mevzuatta belirtilen ışıklı ve/veya sesli uyarı işareti veren cihazları mevzuatta izin verilmeyen araçlara takmak ve kullanmak"
+    },
+    {
+      "madde": "26/2 (2.Kez)",
+      "fiyat": 346785,
+      "yil": 2026,
+      "aciklama": "Mevzuatta belirtilen ışıklı ve/veya sesli uyarı işareti veren cihazları mevzuatta izin verilmeyen araçlara takmak ve kullanmak"
+    },
+    {
+      "madde": "26/3",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Araç dışına izinsiz reklam, yazı, sembol veya ışıklı-sesli donanım eklemek"
+    },
+    {
+      "madde": "26/6 (1.Kez)",
+      "fiyat": 173392,
+      "yil": 2026,
+      "aciklama": "Işıklı ve sesli uyarıların belirtilen yerler dışında kullanılması"
+    },
+    {
+      "madde": "26/6 (2.Kez)",
+      "fiyat": 346785,
+      "yil": 2026,
+      "aciklama": "Işıklı ve sesli uyarıların belirtilen yerler dışında kullanılması"
+    },
+    {
+      "madde": "28",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Resmi olmayan araçların tescil plakalarının, devlet malı araçlara ait plaka renginde olması"
+    },
+    {
+      "madde": "30/1-a",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Servis freni, lastikleri, dış ışık donanımından yakını ve uzağı gösteren ışıklar ile park, fren ve dönüş ışıkları noksan, bozuk veya teknik şartlara aykırı olan araçları kullanmak"
+    },
+    {
+      "madde": "30/1-b",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Görüşü engelleyen, tehlike yaratan, donanımı eksik veya bozuk araçları kullanmak"
+    },
+    {
+      "madde": "31/1-a(Sürücüye)",
+      "fiyat": 1000,
+      "yil": 2026,
+      "aciklama": "Zorunlu araç gereçlerini bulundurmamak veya çalışır durumda olmaması"
+    },
+    {
+      "madde": "31/1-a(İşletene)",
+      "fiyat": 2000,
+      "yil": 2026,
+      "aciklama": "Zorunlu araç gereçlerini bulundurmamak veya çalışır durumda olmaması"
+    },
+    {
+      "madde": "31/1-a(Sürücü=İşleten)",
+      "fiyat": 2000,
+      "yil": 2026,
+      "aciklama": "Zorunlu araç gereçlerini bulundurmamak veya çalışır durumda olmaması"
+    },
+    {
+      "madde": "31/1-b(Sürücüye)",
+      "fiyat": 75000,
+      "yil": 2026,
+      "aciklama": "Takograf veya taksimetreyi bulundurmamak, kullanmamak ya da çalışır durumda olmaması"
+    },
+    {
+      "madde": "31/1-b(İşletene)",
+      "fiyat": 150000,
+      "yil": 2026,
+      "aciklama": "Takograf veya taksimetreyi bulundurmamak, kullanmamak ya da çalışır durumda olmaması"
+    },
+       {
+      "madde": "31/1-b(Sürücü=İşleten)",
+      "fiyat": 150000,
+      "yil": 2026,
+      "aciklama": "Takograf veya taksimetreyi bulundurmamak, kullanmamak ya da çalışır durumda olmaması"
+    },
+    {
+      "madde": "31/1-c(Sürücüye)",
+      "fiyat": 46000,
+      "yil": 2026,
+      "aciklama": "Taksi hizmeti veren otomobillerde taksimetre bulundurmamak, kullanmamak veya kullanılır şekilde bulundurmamak"
+    },
+    {
+      "madde": "31/1-c(İşletene)",
+      "fiyat": 92000,
+      "yil": 2026,
+      "aciklama": "Taksi hizmeti veren otomobillerde taksimetre bulundurmamak, kullanmamak veya kullanılır şekilde bulundurmamak"
+    },
+      {
+      "madde": "31/1-c(Sürücü=İşleten)",
+      "fiyat": 92000,
+      "yil": 2026,
+      "aciklama": "Taksi hizmeti veren otomobillerde taksimetre bulundurmamak, kullanmamak veya kullanılır şekilde bulundurmamak"
+    },
+    {
+      "madde": "31/2(Sürücüye)",
+      "fiyat": 75000,
+      "yil": 2026,
+      "aciklama": "Taşıtlarda Sanayi veTeknoloji Bakanlığınca belirlenenler dışında takograf,taksimetre ve hız sınırlayıcıları kullanmak,"
+    },
+    {
+      "madde": "31/2(İşletene)",
+      "fiyat": 150000,
+      "yil": 2026,
+      "aciklama": "Taşıtlarda Sanayi veTeknoloji Bakanlığınca belirlenenler dışında takograf,taksimetre ve hız sınırlayıcıları kullanmak,"
+    },
+     {
+      "madde": "31/2(Sürücü=İşleten)",
+      "fiyat": 150000,
+      "yil": 2026,
+      "aciklama": "Taşıtlarda Sanayi veTeknoloji Bakanlığınca belirlenenler dışında takograf,taksimetre ve hız sınırlayıcıları kullanmak,"
+    },
+    {
+      "madde": "31/3(Sürücüye 1.Kez)",
+      "fiyat": 185000,
+      "yil": 2026,
+      "aciklama": "Takograf, taksimetre ve hızsınırlayıcılara müdahalede bulunarak yanlış veri üretecek duruma getirmek veya bu durumdaki cihazları kullanmak"
+    },
+    {
+      "madde": "31/3(Sürücüye 2.Kez)",
+      "fiyat": 370000,
+      "yil": 2026,
+      "aciklama": "Takograf, taksimetre ve hızsınırlayıcılara müdahalede bulunarak yanlış veri üretecek duruma getirmek veya bu durumdaki cihazları kullanmak"
+    },
+    {
+      "madde": "31/3(İşletene 1.Kez)",
+      "fiyat": 370000,
+      "yil": 2026,
+      "aciklama": "Takograf, taksimetre ve hızsınırlayıcılara müdahalede bulunarak yanlış veri üretecek duruma getirmek veya bu durumdaki cihazları kullanmak"
+    },
+    {
+      "madde": "31/3(İşletene 2.Kez)",
+      "fiyat": 740000,
+      "yil": 2026,
+      "aciklama": "Takograf, taksimetre ve hızsınırlayıcılara müdahalede bulunarak yanlış veri üretecek duruma getirmek veya bu durumdaki cihazları kullanmak"
+    }, {
+      "madde": "31/3(Sürücü=İşleten 1.Kez)",
+      "fiyat": 370000,
+      "yil": 2026,
+      "aciklama": "Takograf, taksimetre ve hızsınırlayıcılara müdahalede bulunarak yanlış veri üretecek duruma getirmek veya bu durumdaki cihazları kullanmak"
+    },
+    {
+      "madde": "31/3(Sürücü=İşleten 2.Kez)",
+      "fiyat": 740000,
+      "yil": 2026,
+      "aciklama": "Takograf, taksimetre ve hızsınırlayıcılara müdahalede bulunarak yanlış veri üretecek duruma getirmek veya bu durumdaki cihazları kullanmak"
+    },
+    {
+      "madde": "31/4-a(Sürücüye 1.Kez)",
+      "fiyat": 75000,
+      "yil": 2026,
+      "aciklama": "Sürücülerin takograf sürücükartını kullanmaması yada kendisine ait bozuk veya geçersiz bir takograf sürücü kartını kullanması"
+    },
+    {
+      "madde": "31/4-a(Sürücüye 2.Kez)",
+      "fiyat": 150000,
+      "yil": 2026,
+      "aciklama": "Sürücülerin takograf sürücükartını kullanmaması yada kendisine ait bozuk veya geçersiz bir takograf sürücü kartını kullanması"
+    },
+    {
+      "madde": "31/4-a(İşletene 1.Kez)",
+      "fiyat": 150000,
+      "yil": 2026,
+      "aciklama": "Sürücülerin takograf sürücükartını kullanmaması yada kendisine ait bozuk veya geçersiz bir takograf sürücü kartını kullanması"
+    },
+    {
+      "madde": "31/4-a(İşletene 2.Kez)",
+      "fiyat": 300000,
+      "yil": 2026,
+      "aciklama": "Sürücülerin takograf sürücükartını kullanmaması yada kendisine ait bozuk veya geçersiz bir takograf sürücü kartını kullanması"
+    },
+    {
+      "madde": "31/4-a(Sürücü=İşeten 1.Kez)",
+      "fiyat": 150000,
+      "yil": 2026,
+      "aciklama": "Sürücülerin takograf sürücükartını kullanmaması yada kendisine ait bozuk veya geçersiz bir takograf sürücü kartını kullanması"
+    },
+    {
+      "madde": "31/4-a(Sürücü=İşleten 2.Kez)",
+      "fiyat": 300000,
+      "yil": 2026,
+      "aciklama": "Sürücülerin takograf sürücükartını kullanmaması yada kendisine ait bozuk veya geçersiz bir takograf sürücü kartını kullanması"
+    },
+    {
+      "madde": "31/4-b(Sürücüye 1.Kez)",
+      "fiyat": 75000,
+      "yil": 2026,
+      "aciklama": "Sürücülerin başka bir sürücüye ait takograf sürücü kartını takograf cihazına takarak araç kullanması"
+    },
+    {
+      "madde": "31/4-b(Sürücüye 2.Kez)",
+      "fiyat": 150000,
+      "yil": 2026,
+      "aciklama": "Sürücülerin başka bir sürücüye ait takograf sürücü kartını takograf cihazına takarak araç kullanması"
+    },
+    {
+      "madde": "31/4-b(İşletene 1.Kez)",
+      "fiyat": 150000,
+      "yil": 2026,
+      "aciklama": "Sürücülerin başka bir sürücüye ait takograf sürücü kartını takograf cihazına takarak araç kullanması"
+    },
+    {
+      "madde": "31/4-b(İşletene 2.Kez)",
+      "fiyat": 300000,
+      "yil": 2026,
+      "aciklama": "Sürücülerin başka bir sürücüye ait takograf sürücü kartını takograf cihazına takarak araç kullanması"
+    },
+       {
+      "madde": "31/4-b(Sürücü=İşleten 1.Kez)",
+      "fiyat": 150000,
+      "yil": 2026,
+      "aciklama": "Sürücülerin başka bir sürücüye ait takograf sürücü kartını takograf cihazına takarak araç kullanması"
+    },
+    {
+      "madde": "31/4-b(Sürücü=İşleten 2.Kez)",
+      "fiyat": 300000,
+      "yil": 2026,
+      "aciklama": "Sürücülerin başka bir sürücüye ait takograf sürücü kartını takograf cihazına takarak araç kullanması"
+    },
+    {
+      "madde": "31/5(Kart Sahibine)",
+      "fiyat": 75000,
+      "yil": 2026,
+      "aciklama": "Takograf sürücü kartı sahiplerinin kendilerine ait takograf sürücü kartını başkalarının kullanmaması için gerekli tedbirleri almaması"
+    },
+    {
+      "madde": "32/1",
+      "fiyat": 1000,
+      "yil": 2026,
+      "aciklama": "Araçlar üzerinde mevzuata uygun şekilde yapılan her türlü değişikliği otuz gün içinde araç tescil belgesine/kayıtlarına işletmemek"
+    },
+    {
+      "madde": "32/3-a",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Araç üzerinde mevzuata aykırı şekilde değişiklik yapmak"
+    },
+    {
+      "madde": "32/3-b",
+      "fiyat": 16000,
+      "yil": 2026,
+      "aciklama": "Mevzuata aykırı şekilde yapılan teknik değişikliğin çevredekileri rahatsız edecek derecede gürültü çıkaracak özellikte olması"
+    },
+    {
+      "madde": "32/4",
+      "fiyat": 16000,
+      "yil": 2026,
+      "aciklama": "Araç koruma elemanlarının bulunmaması veya teknik şartlara uygun olmaması"
+    },
+    {
+      "madde": "34/a",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Muayenesi yapılmamış bir aracın trafiğe çıkarılması"
+    },
+    {
+      "madde": "34/b",
+      "fiyat": 5662,
+      "yil": 2026,
+      "aciklama": "İzin süresinin sonunda, aracın muayenesi yapılmadan trafiğe çıkarılması"
+    },
+    {
+      "madde": "34/c",
+      "fiyat": 5662,
+      "yil": 2026,
+      "aciklama": "Muayene sonucunda emniyetsiz raporu verilen aracın trafiğe çıkarılması"
+    },
+    {
+      "madde": "36/3-a (Sürücüye)",
+      "fiyat": 40000,
+      "yil": 2026,
+      "aciklama": "Sürücü belgesiz olarak motorlu araç kullanmak"
+    },
+    {
+      "madde": "36/3-a (İşletene)",
+      "fiyat": 40000,
+      "yil": 2026,
+      "aciklama": "Sürücü belgesi olmayan kişi tarafından sürülmesine izin vermek"
+    },
+    {
+      "madde": "36/3-b (Sürücüye)",
+      "fiyat": 200000,
+      "yil": 2026,
+      "aciklama": "Sürücü belgesi geçici veya tedbiren geri alındığı halde motorlu araç kullanmak"
+    },
+    {
+      "madde": "36/3-b (İşletene)",
+      "fiyat": 40000,
+      "yil": 2026,
+      "aciklama": "Sürücü belgesi geri alınan kişi tarafından sürülmesine izin vermek"
+    },
+    {
+      "madde": "36/3-c (Sürücüye)",
+      "fiyat": 200000,
+      "yil": 2026,
+      "aciklama": "Sürücü belgesi iptal edildiği halde motorlu araç kullanmak"
+    },
+    {
+      "madde": "36/3-c (İşletene)",
+      "fiyat": 40000,
+      "yil": 2026,
+      "aciklama": "Sürücü belgesi iptal edilen kişi tarafından sürülmesine izin vermek"
+    },
+    {
+      "madde": "37",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Yaşı veya sağlık durumu yetersiz kişilere bisiklet, motorsuz taşıt, hayvan veya elektrikli skuter kullandırmak"
+    },
+    {
+      "madde": "39/2",
+      "fiyat": 11629,
+      "yil": 2026,
+      "aciklama": "Sürücü belgesi sınıfına uygun olmayan aracı kullanmak"
+    },
+    {
+      "madde": "39/3",
+      "fiyat": 4712,
+      "yil": 2026,
+      "aciklama": "Geçerlilik süresi dolan sürücü belgesi ile araç kullanmak,"
+    },
+    {
+      "madde": "39/4",
+      "fiyat": 4712,
+      "yil": 2026,
+      "aciklama": "Yabancı sürücü belgesiyle belirtilen süre ve şartlara aykırı araç kullanmak"
+    },
+    {
+      "madde": "42/11",
+      "fiyat": 11629,
+      "yil": 2026,
+      "aciklama": "Sürücü sertifikasını sınıfına uygun sürücü belgesine dönüştürmeden karayolunda araç kullanmak,"
+    },
+    {
+      "madde": "44/1-a",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "İkamet adresi değişikliklerini tescil kuruluşuna otuz gün içinde bildirmemek"
+    },
+    {
+      "madde": "44/1-b",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Araç kullanırken sürücü belgesini yanında bulundurmamak ve yetkililerin her isteyişinde göstermemek"
+    },
+    {
+      "madde": "46/2-a",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Araçları yolun sağından veya hızına uygun şeritten sürmemek"
+    },
+    {
+      "madde": "46/2-b",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Şerit değiştirmeden önce emniyetle geçişi beklememek"
+    },
+    {
+      "madde": "46/2-c",
+      "fiyat": 10000,
+      "yil": 2026,
+      "aciklama": "Trafiği aksatacak veya tehlikeye düşürecek şekilde şerit değiştirmek"
+    },
+    {
+      "madde": "46/2-d",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Gidişe ayrılan en soldaki şeridi sürekli olarak işgal etmek"
+    },
+    {
+      "madde": "46/2-e-1",
+      "fiyat": 10000,
+      "yil": 2026,
+      "aciklama": "Aksine  bir  işaret  bulunmadıkça  sürücülerin  motosiklet,  otomobil,  kamyonet, panelvan,  minibüs  ve  otobüs  dışındaki  araçları  kullanırken  aynı  yönde  iki şeridi bulunan yollarda geçme ve dönme dışında soldaki şeridi kullanması"
+    },
+    {
+      "madde": "46/2-e-2",
+      "fiyat": 10000,
+      "yil": 2026,
+      "aciklama": "Aksine  bir  işaret  bulunmadıkça  sürücülerin  motosiklet,  otomobil,  kamyonet, panelvan, minibüs  ve otobüs  dışındaki  araçları kullanırken  aynı yönde ikiden fazla şeridi bulunan yollarda geçme dışında sağdan ikinci şeridi kullanması"
+    },
+    {
+      "madde": "46/2-e-3",
+      "fiyat": 10000,
+      "yil": 2026,
+      "aciklama": "Aksine  bir  işaret  bulunmadıkça  sürücülerin  motosiklet,  otomobil,  kamyonet, panelvan, minibüs  ve otobüs  dışındaki  araçları kullanırken  aynı yönde ikiden fazla şeridi bulunan yollarda sola dönme dışında en sağdaki iki şerit dışındaki şeritleri kullanması"
+    },
+    {
+      "madde": "46/2-f",
+      "fiyat": 20000,
+      "yil": 2026,
+      "aciklama": "Zorunlu haller dışında emniyet şeridi veya banket kullanmak"
+    },
+    {
+      "madde": "46/2-g",
+      "fiyat": 90000,
+      "yil": 2026,
+      "aciklama": "Trafiği aksatacak veya tehlikeye sokacak şekilde ardı ardına birden fazla şerit değiştirmeleri,(Makas)"
+    },
+    {
+      "madde": "46/2-h",
+      "fiyat": 10000,
+      "yil": 2026,
+      "aciklama": "Tek yönlü karayollarında araçların ters istikamette sürülmesi"
+    },
+    {
+      "madde": "46/2-i",
+      "fiyat": 20000,
+      "yil": 2026,
+      "aciklama": "Aksine bir işaret bulunmadıkça sürücülerin yerleşim yeri içerisinde bölünmüş karayollarında araçlarını ters istikamette sürmesi"
+    },
+    {
+      "madde": "46/2-j-1",
+      "fiyat": 90000,
+      "yil": 2026,
+      "aciklama": "Aksine bir işaret bulunmadıkça sürücülerin otoyollarda araçlarını ters istikamette sürmesi"
+    },
+    {
+      "madde": "46/2-j-2",
+      "fiyat": 90000,
+      "yil": 2026,
+      "aciklama": "Aksine  bir işaret  bulunmadıkça  sürücülerin  yerleşim yeri  dışındaki bölünmüş karayollarında araçlarını ters istikamette sürmesi"
+    },
+    {
+      "madde": "46/2-k",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Aksine bir işaret bulunmadıkça sürücülerin yaya yollarında araç sürmesi"
+    },
+    {
+      "madde": "46/2-l",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Aksine bir işaret bulunmadıkça  sürücülerin  bisiklet yolu ve bisiklet şeridinde bisiklet ve elektrikli skuter dışındaki taşıtlarını sürmesi"
+    },
+    {
+      "madde": "46/2-m",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Aksine  bir  işaret  bulunmadıkça  sürücülerin  taşıt  trafiğine  kapalı  veya  belirli taşıtlar için ayrılmış yollarda izin verilenler dışındaki araçlarını sürmesi"
+    },
+    {
+      "madde": "46/2-n-1",
+      "fiyat": 90000,
+      "yil": 2026,
+      "aciklama": "Sürücülerin araçlarını, kol veya grup halinde (konvoy şeklinde) veya münferiden sürerken, diğer araçların geçişini zorlaştıracak veya tehlikeye sokacak şekilde keyfi hareketlerle trafiğin akışını kısmen veya tamamen engelleyecek şekilde araçlarını karayolu üzerinde durdurması"
+    },
+    {
+      "madde": "46/2-n-2",
+      "fiyat": 180000,
+      "yil": 2026,
+      "aciklama": "Sürücülerin araçlarını, kol veya grup halinde (konvoy şeklinde) veya münferiden sürerken, diğer araçların geçişini zorlaştıracak veya tehlikeye sokacak şekilde keyfi hareketlerle trafiğin akışını kısmen veya tamamen engelleyecek şekilde araçlarını otoyol, köprü, viyadük veya tünellerde durdurması"
+    },
+    {
+      "madde": "46/3",
+      "fiyat": 3000,
+      "yil": 2026,
+      "aciklama": "Zorunlu hallerde hayvanları yolun en sağından ve en az yer kaplayarak götürmemek"
+    },
+    {
+      "madde": "46/4",
+      "fiyat": 180000,
+      "yil": 2026,
+      "aciklama": "Trafikte saldırı amacıyla başka bir aracı ısrarla takip etmek veya bu amaçla araçtan inmek"
+    },
+    {
+      "madde": "47/1-a",
+      "fiyat": 3000,
+      "yil": 2026,
+      "aciklama": "Trafiği düzenleme ve denetimle görevli trafik kolluğu veya özel kıyafetli veya işaret taşıyan diğer yetkili kişilerin uyarı ve işaretlerine uymamak"
+    },
+    {
+      "madde": "47/1-b(1.Kez)",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Kırmızı ışık kuralına uymamak"
+    },
+    {
+      "madde": "47/1-b(2.Kez)",
+      "fiyat": 10000,
+      "yil": 2026,
+      "aciklama": "Kırmızı ışık kuralına uymamak"
+    },
+    {
+      "madde": "47/1-b(3.Kez)",
+      "fiyat": 15000,
+      "yil": 2026,
+      "aciklama": "Kırmızı ışık kuralına uymamak"
+    },
+    {
+      "madde": "47/1-b(4.Kez)",
+      "fiyat": 20000,
+      "yil": 2026,
+      "aciklama": "Kırmızı ışık kuralına uymamak"
+    },
+    {
+      "madde": "47/1-b(5.Kez)",
+      "fiyat": 30000,
+      "yil": 2026,
+      "aciklama": "Kırmızı ışık kuralına uymamak"
+    },
+    {
+      "madde": "47/1-b(6.Kez)",
+      "fiyat": 80000,
+      "yil": 2026,
+      "aciklama": "Kırmızı ışık kuralına uymamak"
+    },
+    {
+      "madde": "47/1-c",
+      "fiyat": 1000,
+      "yil": 2026,
+      "aciklama": "Trafik işaret levhaları, cihazları ve yer işaretlemeleri ile belirtilen veya gösterilen hususlara uymamak"
+    },
+    {
+      "madde": "47/1-d",
+      "fiyat": 1000,
+      "yil": 2026,
+      "aciklama": "Trafik kurallarına ve e-skuter kullanım düzenlemelerine uymamak"
+    },
+    {
+      "madde": "47/4",
+      "fiyat": 200000,
+      "yil": 2026,
+      "aciklama": "Sabit veya seyir halinde yürütülen denetimlerde zabıtanın uyarı ve işaretlerine rağmen dur ikazına uymayarak kaçmak"
+    },
+    {
+      "madde": "47/5",
+      "fiyat": 0,
+      "yil": 2026,
+      "aciklama": "Işıklı trafik işaretlerinden kırmızı renkli olanına uyma kuralını ihlal ederek trafik kazasına sebebiyet vermek"
+    },
+    {
+      "madde": "48/5 (1.Kez)",
+      "fiyat": 25000,
+      "yil": 2026,
+      "aciklama": "Hususi otomobili 0,50 promil, diğer araçları 0,20 promil üzeri alkollü kullanmak"
+    },
+    {
+      "madde": "48/5 (2.Kez)",
+      "fiyat": 50000,
+      "yil": 2026,
+      "aciklama": "Hususi otomobili 0,50 promil, diğer araçları 0,20 promil üzeri alkollü kullanmak"
+    },
+    {
+      "madde": "48/5 (3.Kez...)",
+      "fiyat": 150000,
+      "yil": 2026,
+      "aciklama": "Hususi otomobili 0,50 promil, diğer araçları 0,20 promil üzeri alkollü kullanmak"
+    },
+    {
+      "madde": "48/8",
+      "fiyat": 150000,
+      "yil": 2026,
+      "aciklama": "Uyuşturucu veya uyarıcı madde alarak araç kullanmak"
+    },
+    {
+      "madde": "48/9",
+      "fiyat": 150000,
+      "yil": 2026,
+      "aciklama": "Alkol veya uyuşturucu testini kabul etmemek"
+    },
+    {
+      "madde": "48/14",
+      "fiyat": 0,
+      "yil": 2026,
+      "aciklama": "4925 sayılı Kanun, 5216 sayılı Kanun ve 5393 sayılı Kanun kapsamında yük ve yolcu taşımacılığı yapılan araçları kullanırken son ihlalin gerçekleştiği tarihten itibaren  geriye doğru beş yıl içinde  2918 sayılı Kanun'un  48 inci maddesinin beşinci veya dokuzuncu fıkrasının toplamda üç kez ihlal edilmesi"
+    },
+    {
+      "madde": "49/3-a-1 (Sürücüye)",
+      "fiyat": 1000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen günlük sürekli taşıt kullanma süresinin bir saate kadar aşılması"
+    },
+    {
+      "madde": "49/3-a-1 (İşletene)",
+      "fiyat": 2000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen günlük sürekli taşıt kullanma süresinin bir saate kadar aşılması"
+    },
+    {
+      "madde": "49/3-a-1 (Sürücü=İşleten)",
+      "fiyat": 2000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen günlük sürekli taşıt kullanma süresinin bir saate kadar aşılması"
+    },
+    {
+      "madde": "49/3-a-2 (Sürücüye)",
+      "fiyat": 3000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen günlük sürekli taşıt kullanma süresinin bir saatten fazla aşılması"
+    },
+    {
+      "madde": "49/3-a-2 (İşletene)",
+      "fiyat": 6000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen günlük sürekli taşıt kullanma süresinin bir saatten fazla aşılması"
+    },
+     {
+      "madde": "49/3-a-2 (Sürücü=İşleten)",
+      "fiyat": 6000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen günlük sürekli taşıt kullanma süresinin bir saatten fazla aşılması"
+    },
+    {
+      "madde": "49/3-b-1 (Sürücüye)",
+      "fiyat": 3000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen günlük toplam taşıt kullanma süresinin bir saate kadar aşılması"
+    },
+    {
+      "madde": "49/3-b-1 (İşletene)",
+      "fiyat": 6000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen günlük toplam taşıt kullanma süresinin bir saate kadar aşılması"
+    },
+    {
+      "madde": "49/3-b-1 (Sürücü=İşleten)",
+      "fiyat": 6000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen günlük toplam taşıt kullanma süresinin bir saate kadar aşılması"
+    },
+    {
+      "madde": "49/3-b-2 (Sürücüye)",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen günlük toplam taşıt kullanma süresinin bir saatten üç saate kadar aşılması"
+    },
+    {
+      "madde": "49/3-b-2 (İşletene)",
+      "fiyat": 10000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen günlük toplam taşıt kullanma süresinin bir saatten üç saate kadar aşılması"
+    },
+    {
+      "madde": "49/3-b-2 (Sürücü=İşleten)",
+      "fiyat": 10000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen günlük toplam taşıt kullanma süresinin bir saatten üç saate kadar aşılması"
+    },
+    {
+      "madde": "49/3-b-3 (Sürücüye)",
+      "fiyat": 10000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen günlük toplam taşıt kullanma süresinin üç saat ve daha fazla süre ile aşılması"
+    },
+    {
+      "madde": "49/3-b-3 (İşletene)",
+      "fiyat": 20000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen günlük toplam taşıt kullanma süresinin üç saat ve daha fazla süre ile aşılması"
+    },
+    {
+      "madde": "49/3-b-3 (Sürücü=İşleten)",
+      "fiyat": 20000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen günlük toplam taşıt kullanma süresinin üç saat ve daha fazla süre ile aşılması"
+    },
+    {
+      "madde": "49/3-c-1 (Sürücüye)",
+      "fiyat": 10000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen haftalık veya birleşik iki haftalık taşıt kullanma süresinin dört saate kadar aşılması"
+    },
+    {
+      "madde": "49/3-c-1 (İşletene)",
+      "fiyat": 20000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen haftalık veya birleşik iki haftalık taşıt kullanma süresinin dört saate kadar aşılması"
+    },
+    {
+      "madde": "49/3-c-1 (Sürücü=İşleten)",
+      "fiyat": 20000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen haftalık veya birleşik iki haftalık taşıt kullanma süresinin dört saate kadar aşılması"
+    },
+    {
+      "madde": "49/3-c-2 (Sürücüye)",
+      "fiyat": 15000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen haftalık veya birleşik iki haftalık taşıt kullanma süresinin dört saatten on beş saate kadar aşılması"
+    },
+    {
+      "madde": "49/3-c-2 (İşletene)",
+      "fiyat": 30000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen haftalık veya birleşik iki haftalık taşıt kullanma süresinin dört saatten on beş saate kadar aşılması"
+    },
+    {
+      "madde": "49/3-c-2 (Sürücü=İşleten)",
+      "fiyat": 30000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen haftalık veya birleşik iki haftalık taşıt kullanma süresinin dört saatten on beş saate kadar aşılması"
+    },
+    {
+      "madde": "49/3-c-3 (Sürücüye)",
+      "fiyat": 20000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen haftalık veya birleşik iki haftalık taşıt kullanma süresinin on beş saat veya daha fazla aşılması"
+    },
+        {
+      "madde": "49/3-c-3 (İşletene)",
+      "fiyat": 40000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen haftalık veya birleşik iki haftalık taşıt kullanma süresinin on beş saat veya daha fazla aşılması"
+    },
+         {
+      "madde": "49/3-c-3 (Sürücü=İşleten)",
+      "fiyat": 40000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen haftalık veya birleşik iki haftalık taşıt kullanma süresinin on beş saat veya daha fazla aşılması"
+    },
+    {
+      "madde": "49/3-d (Sürücüye)",
+      "fiyat": 3000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen günlük dinlenme sürelerinin ihlal edilmesi"
+    },
+    {
+      "madde": "49/3-d (İşletene)",
+      "fiyat": 6000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen günlük dinlenme sürelerinin ihlal edilmesi"
+    },
+    {
+      "madde": "49/3-d (Sürücü=İşleten)",
+      "fiyat": 6000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen günlük dinlenme sürelerinin ihlal edilmesi"
+    },
+    {
+      "madde": "49/3-e (Sürücüye)",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen haftalık dinlenme sürelerinin ihlal edilmesi"
+    },
+      {
+      "madde": "49/3-e (İşletene)",
+      "fiyat": 10000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen haftalık dinlenme sürelerinin ihlal edilmesi"
+    },
+    {
+      "madde": "49/3-e (Sürücü=İşleten)",
+      "fiyat": 10000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen haftalık dinlenme sürelerinin ihlal edilmesi"
+    },
+    {
+      "madde": "51/2-a-1",
+      "fiyat": 2000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri içinde belirlenen hız sınırını 6-10 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-a-2",
+      "fiyat": 4000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri içinde belirlenen hız sınırını 11-15 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-a-3",
+      "fiyat": 6000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri içinde belirlenen hız sınırını 16-20 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-a-4",
+      "fiyat": 8000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri içinde belirlenen hız sınırını 21-25 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-a-5",
+      "fiyat": 12000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri içinde belirlenen hız sınırını 26-35 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-a-6",
+      "fiyat": 15000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri içinde belirlenen hız sınırını 36-45 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-a-7",
+      "fiyat": 20000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri içinde belirlenen hız sınırını 46-55 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-a-8",
+      "fiyat": 25000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri içinde belirlenen hız sınırını 56-65 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-a-9",
+      "fiyat": 30000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri içinde belirlenen hız sınırını 66 km/s ve daha fazla aşmak"
+    },
+    {
+      "madde": "51/2-b-1",
+      "fiyat": 2000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri dışında hız sınırını 11-15 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-b-2",
+      "fiyat": 4000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri dışında hız sınırını 16-20 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-b-3",
+      "fiyat": 6000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri dışında hız sınırını 21-25 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-b-4",
+      "fiyat": 8000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri dışında hız sınırını 26-30 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-b-5",
+      "fiyat": 12000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri dışında hız sınırını 31-40 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-b-6",
+      "fiyat": 15000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri dışında hız sınırını 41-50 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-b-7",
+      "fiyat": 20000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri dışında hız sınırını 51-60 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-b-8",
+      "fiyat": 25000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri dışında hız sınırını 61-70 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-b-9",
+      "fiyat": 30000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri dışında hız sınırını 71 km/s ve daha fazla aşmak"
+    },
+    {
+      "madde": "51/2-a-1(Takoğraf)",
+      "fiyat": 2000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri içinde belirlenen hız sınırını 6-10 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-a-2(Takoğraf)",
+      "fiyat": 4000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri içinde belirlenen hız sınırını 11-15 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-a-3(Takoğraf)",
+      "fiyat": 6000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri içinde belirlenen hız sınırını 16-20 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-a-4(Takoğraf)",
+      "fiyat": 8000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri içinde belirlenen hız sınırını 21-25 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-a-5(Takoğraf)",
+      "fiyat": 12000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri içinde belirlenen hız sınırını 26-35 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-a-6(Takoğraf)",
+      "fiyat": 15000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri içinde belirlenen hız sınırını 36-45 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-a-7(Takoğraf)",
+      "fiyat": 20000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri içinde belirlenen hız sınırını 46-55 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-a-8(Takoğraf)",
+      "fiyat": 25000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri içinde belirlenen hız sınırını 56-65 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-a-9(Takoğraf)",
+      "fiyat": 30000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri içinde belirlenen hız sınırını 66 km/s ve daha fazla aşmak"
+    },
+    {
+      "madde": "51/2-b-1(Takoğraf)",
+      "fiyat": 2000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri dışında hız sınırını 11-15 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-b-2(Takoğraf)",
+      "fiyat": 4000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri dışında hız sınırını 16-20 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-b-3(Takoğraf)",
+      "fiyat": 6000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri dışında hız sınırını 21-25 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-b-4(Takoğraf)",
+      "fiyat": 8000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri dışında hız sınırını 26-30 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-b-5(Takoğraf)",
+      "fiyat": 12000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri dışında hız sınırını 31-40 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-b-6(Takoğraf)",
+      "fiyat": 15000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri dışında hız sınırını 41-50 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-b-7(Takoğraf)",
+      "fiyat": 20000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri dışında hız sınırını 51-60 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-b-8(Takoğraf)",
+      "fiyat": 25000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri dışında hız sınırını 61-70 km/s'e kadar aşmak"
+    },
+    {
+      "madde": "51/2-b-9(Takoğraf)",
+      "fiyat": 30000,
+      "yil": 2026,
+      "aciklama": "Yerleşim yeri dışında hız sınırını 71 km/s ve daha fazla aşmak"
+    },
+    {
+      "madde": "51/8-a",
+      "fiyat": 370000,
+      "yil": 2026,
+      "aciklama": "Hız sınırlarını tespite yarayan cihazların yerlerini belirleyen veya sürücüyü ikaz eden cihazları imal veya ithal etmek"
+    },
+    {
+      "madde": "51/8-b",
+      "fiyat": 185000,
+      "yil": 2026,
+      "aciklama": "Hız sınırlarını tespite yarayan cihazların yerlerini belirleyen veya sürücüyü ikaz eden cihazları araçlarda bulundurmak"
+    },
+    {
+      "madde": "52/1-a",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Aracın hızını, kavşaklara yaklaşırken, dönemeçlere girerken, tepe üstlerine yaklaşırken, dönemeçli yollarda ilerlerken, yaya geçitlerine, hemzemin geçitlere, tünellere, dar köprü ve menfezlere yaklaşırken, yapım ve onarım alanlarına girerken azaltmamak"
+    },
+    {
+      "madde": "52/1-b",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Aracının hızını, aracın yük ve teknik özelliğine, görüş, yol, hava ve trafik durumunun gerektirdiği şartlara uydurmamak"
+    },
+    {
+      "madde": "52/1-c",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Diğer bir aracı izlerken, hızını kullandığı aracın yük ve teknik özelliğine, görüş, yol, hava ve trafik durumunun gerektirdiği şartlara uydurmadan Yönetmelikte belirlenen güvenli mesafeyi bırakmamak"
+    },
+    {
+      "madde": "52/1-d",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Kol ve grup halinde araç kullanırken, araçlar arasında Yönetmelikte belirtilen esaslara uygun olarak diğer araçların güvenle girebilecekleri açıklığı bırakmamak"
+    },
+    {
+      "madde": "53/1-a",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Sağa dönüş kurallarına riayet etmemek"
+    },
+    {
+      "madde": "53/1-b",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Sola dönüş kurallarına riayet etmemek"
+    },
+    {
+      "madde": "53/1-c",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Dönel kavşaklarda dönüş kurallarına riayet etmemek"
+    },
+    {
+      "madde": "53/1-d",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Dönel kavşaklarda geriye dönüş kurallarına riayet etmemek"
+    },
+    {
+      "madde": "53/2-a",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Sağa ve sola dönüşlerde sürücülerin, kurallara uygun olarak geçiş yapan yayalara ilk geçiş hakkını vermemesi"
+    },
+    {
+      "madde": "53/2-b",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Sağa ve sola dönüşlerde sürücülerin, varsa bisiklet yolundaki ve bisiklet şeridindeki bisiklet ve elektrikli skuter kullananlara ilk geçiş hakkını vermemesi"
+    },
+    {
+      "madde": "53/2-c",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Sürücülerin, sola dönüşlerde sağdan ve karşıdan gelen trafiğe ilk geçiş hakkını vermemesi"
+    },
+    {
+      "madde": "54/1-a",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Öndeki aracı geçerken geçme kurallarına riayet etmemek"
+    },
+    {
+      "madde": "54/1-b",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Geçmenin yasak olduğu yerlerde önündeki aracı geçmek"
+    },
+    {
+      "madde": "55/1-a",
+      "fiyat": 1000,
+      "yil": 2026,
+      "aciklama": "Geçilmek istenen araç sürücüsünün; duyulur veya görülür bir geçiş işareti alınca, trafiğin iki yönlü kullanıldığı karayollarında taşıt yolunun sağ kenarından gitmemesi, dörtten fazla şeritli veya bölünmüş karayollarında bulunduğu şeridi izlememesi ve hızını artırması"
+    },
+    {
+      "madde": "55/1-b",
+      "fiyat": 1000,
+      "yil": 2026,
+      "aciklama": "Geçilmek istenen araç sürücüsünün; dar taşıt yolları ile trafiğin yoğun olduğu karayollarında yavaş gitme nedeni ile kendisini geçmek için izleyen araçların kolayca ve güvenli geçmelerini sağlamak için; aracını elverdiği oranda sağ kenara almaması, yavaşlamaması, gerektiğinde durmaması"
+    },
+    {
+      "madde": "55/1-c-1",
+      "fiyat": 46000,
+      "yil": 2026,
+      "aciklama": "Geçilmek istenen araç sürücüsünün; geçiş üstünlüğü bulunan cankurtaran araçları, yaralı veya acil hasta taşıyan araçlar, itfaiye veya orman yangınlarıyla müdahale eden araçların duyulur veya görülür işaretini alınca, bu araçların kolayca ilerlemesini sağlamak için taşıt yolu üzerinde yer açmaması, gerektiğinde durmaması"
+    },
+    {
+      "madde": "55/1-c-2",
+      "fiyat": 15000,
+      "yil": 2026,
+      "aciklama": "Geçilmek istenen araç sürücüsünün; geçiş üstünlüğü bulunan diğer araçların duyulur veya görülür işaretini alınca, bu araçların kolayca ilerlemesini sağlamak için taşıt yolu üzerinde yer açmaması, gerektiğinde durmaması"
+    },
+    {
+      "madde": "55/2-a",
+      "fiyat": 46000,
+      "yil": 2026,
+      "aciklama": "Kanunun 54/1 maddesinde yazılı durumlar dışında, cankurtaran araçları, yaralı veya acil hasta taşıyan araçlar, itfaiye veya orman yangınlarıyla müdahale eden araçların geçiş yapmak istemesi ve bunlara yol verilmemesi, geçilmekte iken bir başka aracı geçmeye veya sola dönmeye kalkışılması"
+    },
+    {
+      "madde": "55/2-b",
+      "fiyat": 15000,
+      "yil": 2026,
+      "aciklama": "Kanunun 54/1 maddesinde yazılı durumlar dışında, diğer geçiş üstünlüğü bulunan araçların geçiş yapmak istemesi ve bunlara yol verilmemesi, geçilmekte iken bir başka aracı geçmeye veya sola dönmeye kalkışılması"
+    },
+    {
+      "madde": "55/2-c",
+      "fiyat": 1000,
+      "yil": 2026,
+      "aciklama": "54 üncü maddede yazılı durumlar dışında, geçiş yapmak isteyenlere yol vermemek, geçilmekte iken bir başka aracı geçmeye veya sola dönmeye kalkışılması"
+    },
+    {
+      "madde": "56/1-a",
+      "fiyat": 1000,
+      "yil": 2026,
+      "aciklama": "Şerit izleme ve değiştirme kurallarına uymamak"
+    },
+    {
+      "madde": "56/1-b",
+      "fiyat": 1000,
+      "yil": 2026,
+      "aciklama": "İki yönlü trafiğin kullanıldığı taşıt yollarında karşı yönden gelen araçların geçişini zorlaştıran bir durum varsa; sürücülerin geçişi kolaylaştırmak için aracını sağ kenara yanaştırmaması, gerektiğinde sağa yanaşıp durmaması, dağlık ve dik yokuşlu karayollarında karşılaşma halinde; çıkan araç için geçiş güç veya mümkün değilse, güvenli geçişi sağlamak üzere, inen aracın varsa önceden sığınma cebine girmemesi, sığınma cebi yoksa sağ kenara yanaşıp durmaması, gerektiği hallerde geri gitmemesi"
+    },
+    {
+      "madde": "56/1-c",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Önlerinde giden araçları Yönetmelikte belirtilen güvenli ve yeterli bir mesafeden izlememek (Yakın takip)"
+    },
+    {
+      "madde": "56/1-d",
+      "fiyat": 1000,
+      "yil": 2026,
+      "aciklama": "Araçlarını zorunlu bir neden olmadıkça, diğer araçların ilerleyişine engel olacak şekilde veya işaretle belirtilen hız sınırının çok altında sürmek, güvenlik nedeni veya verilen herhangi bir talimata uyulması dışında, başkalarını rahatsız edecek veya tehlikeye sokacak şekilde gereksiz ani yavaşlamak"
+    },
+    {
+      "madde": "56/1-e",
+      "fiyat": 1000,
+      "yil": 2026,
+      "aciklama": "Taşıt yolunun dar olduğu yerlerde aksini gösteren bir trafik işareti yoksa motorsuz araçları kullananların motorlu araçlara, otomobil, minibüs, kamyonet, otobüs, kamyon, arazi taşıtı, lastik tekerlekli traktör, iş makinelerini kullananların, yazılış sırasına göre kendisinden öncekilere geçiş kolaylığı sağlamamaları"
+    },
+    {
+      "madde": "57/1-a",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Kavşak yaklaşımında yavaşlamamak, dikkatli olmamak ve geçiş hakkı olanlara yol vermemek"
+    },
+    {
+      "madde": "57/1-b",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Kontrolsüz kavşaklarda ilk geçiş hakkı olan araçlara yol vermemek"
+    },
+    {
+      "madde": "57/1-c",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Kontrolsüz kavşakta sağdan gelen araca yol vermemek"
+    },
+    {
+      "madde": "57/1-d",
+      "fiyat": 1000,
+      "yil": 2026,
+      "aciklama": "Kavşakta tıkanıklık oluşturacak şekilde kavşağa girmek"
+    },
+    {
+      "madde": "57/1-e",
+      "fiyat": 1000,
+      "yil": 2026,
+      "aciklama": "Kavşaklarda gereksiz durmak, yavaşlamak veya motoru durdurmak"
+    },
+    {
+      "madde": "57/1-f",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Kavşaklarda raylı taşıtlara ilk geçiş hakkı vermemek"
+    },
+    {
+      "madde": "58",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "İndirme-bindirme kurallarına uymamak"
+    },
+    {
+      "madde": "59",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Yerleşim dışı yollarda izinsiz durmak, park etmek veya gerekli önlemleri almadan durmak"
+    },
+    {
+      "madde": "60/1-a",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde duraklamanın yasaklandığının bir trafik işareti ile belirtilmiş olduğu yerlerde duraklamak"
+    },
+    {
+      "madde": "60/1-b",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde sol şeritte (raylı sistemin bulunduğu yollar hariç) duraklamak"
+    },
+    {
+      "madde": "60/1-c",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde yaya ve okul geçitleri ile diğer geçitlerde duraklamak"
+    },
+    {
+      "madde": "60/1-d",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde kavşaklar, tüneller, rampalar, köprüler ve bağlantı yollarında veya buralara yerleşim birimleri içinde beş metre veya yerleşim birimleri dışında yüz metre mesafede duraklamak"
+    },
+    {
+      "madde": "60/1-e",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde görüşün yeterli olmadığı tepelere yakın yerlerde veya dönemeçlerde duraklamak"
+    },
+    {
+      "madde": "60/1-f",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde otobüs, tramvay ve taksi duraklarında duraklamak"
+    },
+    {
+      "madde": "60/1-g",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde duraklayan veya park edilen araçların yanında duraklamak"
+    },
+    {
+      "madde": "60/1-h",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde işaret levhalarına, yaklaşım yönünde ve park izni verilen yerler dışında; yerleşim birimi içinde onbeş metre ve yerleşim birimi dışında yüz metre mesafede duraklamak"
+    },
+    {
+      "madde": "61/1-a",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde duraklamanın yasaklandığı yerlere park etmek"
+    },
+    {
+      "madde": "61/1-b",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde park etmenin trafik işaretleri ile yasaklandığı yerlerde park etmek"
+    },
+    {
+      "madde": "61/1-c",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde geçiş yolları önünde veya üzerinde park etmek"
+    },
+    {
+      "madde": "61/1-d",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde belirlenmiş yangın musluklarına her iki yönden beş metrelik mesafe içinde park etmek"
+    },
+    {
+      "madde": "61/1-e",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Kamu hizmeti yapan yolcu taşıtlarının duraklarını belirten levhalara iki yönden onbeş metrelik mesafe içinde park etmek"
+    },
+    {
+      "madde": "61/1-f",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde üç veya daha fazla ayrı taşıt yolu olan karayolunda ortadaki taşıt yolunda park etmek"
+    },
+    {
+      "madde": "61/1-g",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde kurallara uygun şekilde park etmiş araçların çıkmasına engel olacak yerlerde park etmek"
+    },
+    {
+      "madde": "61/1-h",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde geçiş üstünlüğü olan araçların giriş veya çıkışının yapıldığının belirlendiği işaret levhasından onbeş metre mesafe içinde park etmek"
+    },
+    {
+      "madde": "61/1-ı",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde işaret levhalarında park etme izni verilen süre veya zamanın dışında park etmek"
+    },
+    {
+      "madde": "61/1-j",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde kamunun faydalandığı ve Yönetmelikte belirtilen yerlerin giriş ve çıkış kapılarına her iki yönde beş metrelik mesafe içinde park etmek"
+    },
+    {
+      "madde": "61/1-k",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde park için yer ayrılmamış veya trafik işaretleri ile belirtilmemiş alt geçit, üst geçit ve köprüler üzerinde veya bunlara on metrelik mesafe içinde park etmek"
+    },
+    {
+      "madde": "61/1-l",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde park etmek için tespit edilen süre ve şeklin dışında park etmek"
+    },
+    {
+      "madde": "61/1-m",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde belirli kişi, kurum ve kuruluşlara ait araçlara, Yönetmelikteki esaslara göre ayrılmış ve bir işaret levhası ile belirlenmiş park yerlerinde park etmek"
+    },
+    {
+      "madde": "61/1-n",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen haller dışında yaya yollarında park etmek"
+    },
+    {
+      "madde": "61/1-o",
+      "fiyat": 2492,
+      "yil": 2026,
+      "aciklama": "Taşıt yolu üzerinde engellilerin araçları için ayrılmış park yerlerinde park etmek"
+    },
+    {
+      "madde": "62",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Yerleşim birimleri içindeki karayolunda, bir trafik işaretiyle izin verilmedikçe ve yükleme, boşaltma, indirme, bindirme, arızalanma gibi zorunlu nedenler dışında kamyon, otobüs ve bunların katarlarını, lastik tekerlekli traktörler ile her türlü iş makinelerini park etmek"
+    },
+    {
+      "madde": "63",
+      "fiyat": 5662,
+      "yil": 2026,
+      "aciklama": "Araçlarda nicelik ve nitelikleri yönetmelikte belirtilen şartlara uygun ışık donanımı bulundurmamak"
+    },
+    {
+      "madde": "64/1-a-1",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Yerleşim birimleri dışındaki karayollarında geceleri seyrederken, yeterince aydınlatılmamış tünellere girerken, benzeri yer ve hallerde (karşılaşmalar ve öndeki aracı izleme halleri dışında) uzağı gösteren ışıkları yakmamak"
+    },
+    {
+      "madde": "64/1-a-2",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Geceleri, yerleşim birimleri dışında ve içinde karayollarındaki karşılaşmalarda, bir aracı takip ederken, bir aracı geçerken yan yana gelinceye kadar, gündüzleri ise görüşü azaltan sisli, yağışlı ve benzeri havalarda yakını gösteren ışıkların yakılmaması"
+    },
+    {
+      "madde": "64/1-a-3",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Kuyruk (arka kenar-arka park lambası) ışıklarını uzağı veya yakını gösteren ışıklarla birlikte kullanmamak"
+    },
+    {
+      "madde": "64/1-b-1",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Gece sis ışıklarını; sisli, karlı ve sağanak yağmurlu havalar dışında diğer farlarla birlikte yakmak"
+    },
+    {
+      "madde": "64/1-b-2",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Dönüş ışıklarını geç anlamında kullanmak"
+    },
+    {
+      "madde": "64/1-b-3",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Gece karşılaşmalarda ışıkları söndürmek"
+    },
+    {
+      "madde": "64/1-b-4",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Öndeki aracı geçerken, uyarı için çok kısa süre dışında uzağı gösteren ışıkları yakmak"
+    },
+    {
+      "madde": "64/1-b-5",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirlenen esaslara aykırı ışık takmak ve kullanmak"
+    },
+    {
+      "madde": "64/1-b-6",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Sadece park lambaları ile seyretmek"
+    },
+    {
+      "madde": "65/1-a",
+      "fiyat": 1000,
+      "yil": 2026,
+      "aciklama": "Taşıma sınırı üstünde yolcu almak"
+    },
+    {
+      "madde": "65/1-b(a)",
+      "fiyat": 10000,
+      "yil": 2026,
+      "aciklama": "Azami yüklü ağırlığı veya izin verilen azami yüklü ağırlığı %3,75 + 500 Kg'dan %10 fazlasına kadar aşmak"
+    },
+    {
+      "madde": "65/1-b(b)",
+      "fiyat": 20000,
+      "yil": 2026,
+      "aciklama": "Azami yüklü ağırlığı veya izin verilen azami yüklü ağırlığı %3,75 + 500 Kg'dan %15 fazlasına kadar aşmak"
+    },
+    {
+      "madde": "65/1-b(c)",
+      "fiyat": 30000,
+      "yil": 2026,
+      "aciklama": "Azami yüklü ağırlığı veya izin verilen azami yüklü ağırlığı %3,75 + 500 Kg'dan %20 fazlasına kadar aşmak"
+    },
+    {
+      "madde": "65/1-b(d)",
+      "fiyat": 40000,
+      "yil": 2026,
+      "aciklama": "Azami yüklü ağırlığı veya izin verilen azami yüklü ağırlığı %3,75 + 500 Kg'dan %25 fazlasına kadar aşmak"
+    },
+    {
+      "madde": "65/1-b(e)",
+      "fiyat": 60000,
+      "yil": 2026,
+      "aciklama": "Azami yüklü ağırlığı veya izin verilen azami yüklü ağırlığı %3,75 + 500 Kg'dan %25'in üzerinde fazla aşmak"
+    },
+    {
+      "madde": "65/1-c",
+      "fiyat": 10000,
+      "yil": 2026,
+      "aciklama": "Azami yüklü ağırlık veya izin verilen azami yüklü ağırlık aşılmamış olsa bile azami dingil ağırlıklarını aşmak"
+    },
+    {
+      "madde": "65/1-d",
+      "fiyat": 3000,
+      "yil": 2026,
+      "aciklama": "Karayolu yapısı ve kapasitesi ile trafik güvenliği bakımından tehlikeli olabilecek tarzda yükleme yapmak"
+    },
+    {
+      "madde": "65/1-e",
+      "fiyat": 20000,
+      "yil": 2026,
+      "aciklama": "Tehlikeli ve zararlı maddelerin, gerekli izin ve tedbirler alınmadan taşınması"
+    },
+    {
+      "madde": "65/1-f",
+      "fiyat": 60000,
+      "yil": 2026,
+      "aciklama": "Ağırlık ve boyutları bakımından taşınması özel izne bağlı olan eşyayı izin almadan veya izin belgesinde belirtilen şartlar sağlanmadan yüklemek, taşımak ve taşıttırmak"
+    },
+    {
+      "madde": "65/1-g(İşletene)",
+      "fiyat": "10000",
+      "yil": 2026,
+      "aciklama": "Gabari dışı yük yüklemek, taşınan yük üzerine veya araç dışına yolcu bindirmek"
+    },
+    {
+      "madde": "65/1-g(Gönderene)",
+      "fiyat": "20000",
+      "yil": 2026,
+      "aciklama": "Gabari dışı yük yüklemek, taşınan yük üzerine veya araç dışına yolcu bindirmek"
+    },
+    {
+      "madde": "65/1-h-1",
+      "fiyat": 3000,
+      "yil": 2026,
+      "aciklama": "Tehlikeli madde taşımacılığında kullanılan araçlar ile konteyner taşıyan araçlar dışında yükün uygun bağlama ve sabitleme yapılmayarak karayoluna değecek, düşecek, dökülecek, saçılacak, sızacak, akacak, kayacak, gürültü çıkaracak, devrilecek veya aracın dengesini bozacak şekilde yüklemek"
+    },
+    {
+      "madde": "65/1-h-2",
+      "fiyat": 20000,
+      "yil": 2026,
+      "aciklama": "Tehlikeli madde taşımacılığında kullanılan araçlar ile konteyner taşıyan araçlarda yükün uygun bağlama ve sabitleme yapılmayarak karayoluna değecek, düşecek, dökülecek, saçılacak, sızacak, akacak, kayacak, gürültü çıkaracak, devrilecek veya aracın dengesini bozacak şekilde yüklemek"
+    },
+    {
+      "madde": "65/1-i",
+      "fiyat": 3000,
+      "yil": 2026,
+      "aciklama": "Yükü, her çeşit yolda ve yolun her eğiminde dengeyi bozacak, yoldaki bir şeye takılacak ve sivri çıkıntılar hasıl edecek şekilde yüklemek"
+    },
+    {
+      "madde": "65/1-j",
+      "fiyat": 3000,
+      "yil": 2026,
+      "aciklama": "Sürücünün görüşüne engel olacak, aracın sürme güvenliğini bozacak ve tescil plakaları, ayırım işaretleri, dur ve dönüş ışıkları ile yansıtıcıları örtecek şekilde yükleme yapmak"
+    },
+    {
+      "madde": "65/1-k",
+      "fiyat": 3000,
+      "yil": 2026,
+      "aciklama": "Çeken ve çekilen araçlarla ilgili şartlar ve tedbirler yerine getirilmeden araçları çekmek"
+    },
+    {
+      "madde": "65/1-l",
+      "fiyat": 30000,
+      "yil": 2026,
+      "aciklama": "Ağırlık ve boyutları bakımından karayolunda sürülmesi özel izne bağlı olan araçların izin alınmadan ya da izin belgesinde belirtilen şartlar sağlanmadan karayoluna çıkarılması"
+    },
+    {
+      "madde": "65/4-a",
+      "fiyat": 60000,
+      "yil": 2026,
+      "aciklama": "Ağırlık ve boyut denetimlerinin yapıldığı kontrol mahallerinde işaretlere uymadan veya işaret, ışık, ses veya görevlilerin dur ikazına rağmen tartı, ölçü veya belge kontrolüne girmeden seyrine devam etmek"
+    },
+    {
+      "madde": "65/4-b",
+      "fiyat": 60000,
+      "yil": 2026,
+      "aciklama": "Yetkililerce yapılacak ağırlık ve boyut denetimlerini engellemek"
+    },
+    {
+      "madde": "65/A",
+      "fiyat": 6000,
+      "yil": 2026,
+      "aciklama": "Araçlarda, zorunlu tutulan dönemlerde kış lastiği kullanmamak"
+    },
+    {
+      "madde": "65/A/2",
+      "fiyat": 6000,
+      "yil": 2026,
+      "aciklama": "Karlı ve buzlu hava şartlarında, kamyon, çekici ve otobüs cinsi araçların güvenle seyredemediği karayollarında kar zinciri bulundurmamak, kullanmamak veya kullanılabilir durumda tutmamak"
+    },
+    {
+      "madde": "65/A/3",
+      "fiyat": 24000,
+      "yil": 2026,
+      "aciklama": "Kar ve buzla mücadele çalışmaları sırasında, kamyon, çekici ve otobüs cinsi araçların kar zinciri kullanmaması nedeniyle trafiğin akışına engel olmak"
+    },
+    {
+      "madde": "66/1-a-1",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Ayrı bisiklet yolu veya bisiklet şeridi varsa, bisiklet ve elektrikli skuterlerin taşıt yolunda sürülmesi"
+    },
+    {
+      "madde": "66/1-a-2",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Bisiklet, elektrikli skuter, motorlu bisiklet ve motosikletlerin yayaların kullanmasına ayrılmış yerlerde sürülmesi"
+    },
+    {
+      "madde": "66/1-a-3",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Bisiklet, elektrikli skuter, motorlu bisiklet ve motosikletlerin ikiden fazlasının taşıt yolunun bir şeridinde yan yana sürülmesi"
+    },
+    {
+      "madde": "66/1-b",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Bisiklet sürenlerin en az bir elleri, elektrikli skuter ve motorlu bisiklet sürenlerin manevra için işaret verme hali dışında iki elleri ve motosiklet sürenlerin devamlı iki elleri ile taşıtlarını sürmemeleri ve yönetmelikte belirtilen güvenlik şartlarına uymamaları"
+    },
+    {
+      "madde": "66/1-c",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Bisiklet, motorlu bisiklet ve sepetsiz motosiklet sürücülerinin, sürücü arkasında yeterli bir oturma yeri olmadıkça başka kişileri bindirmeleri ve yönetmelikte belirtilen sınırdan fazla yük taşımaları"
+    },
+    {
+      "madde": "66/1-d",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Elektrikli skuter ile sırtta taşınabilen kişisel eşya harici yük ve yolcu taşınması"
+    },
+    {
+      "madde": "66/1-e",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Elektrikli skuter otoyol, şehirler arası karayolları ve azami hız sınırı 50 km/s üzerinde olan karayollarında kullanılması"
+    },
+    {
+      "madde": "66/1-f",
+      "fiyat": 46000,
+      "yil": 2026,
+      "aciklama": "Motorlu bisiklet ve motosiklet cinsi araçların, izin alınarak yapılan gösteriler dışında tek tekerlek üzerinde, sele üzerine yatarak, sele üzerinde ayağa kalkarak, kendi etrafında döndürülerek, tekerleği kaydırılarak, sürüş güvenliğini olumsuz yönde etkileyecek benzeri akrobatik hareketler yapılarak sürülmesi"
+    },
+    {
+      "madde": "66/5",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Sürücü arkasında ayrı oturma yeri olan bisiklet, motorlu bisiklet ve sepetsiz motosikletlerle tescil kayıtlarında belirtilen kişiden fazlasını taşımak"
+    },
+    {
+      "madde": "66/6",
+      "fiyat": 86900,
+      "yil": 2026,
+      "aciklama": "Paylaşımlı elektrikli skuter işletmeciliği yapmak isteyen gerçek veya tüzel kişilerin Ulaştırma ve Altyapı Bakanlığından yetki belgesi almadan faaliyette bulunmak"
+    },
+    {
+      "madde": "67/1-a",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Park yapmış taşıtlar arasından çıkarken, duraklarken veya park yaparken taşıt yolunun sağına veya soluna yanaşırken, sağa veya sola dönerken, karayolunu kullananlar için tehlike doğurabilecek ve bunların hareketlerini zorlaştıracak şekilde davranmak"
+    },
+    {
+      "madde": "67/1-b",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen şartlar dışında geriye dönmek veya geriye gitmek, izin verilen hallerde bu manevraları yaparken karayolunu kullananlar için tehlike veya engel yaratmak"
+    },
+    {
+      "madde": "67/1-c",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Dönüşlerde veya şerit değiştirmelerde niyetini dönüş işaret ışıkları veya kol işareti ile açıkça ve yeterli şekilde belirtmemek, işaretlere manevra süresince devam etmemek ve biter bitmez sona erdirmemek"
+    },
+    {
+      "madde": "67/1-d",
+      "fiyat": 140000,
+      "yil": 2026,
+      "aciklama": "Herhangi bir zorunluluk olmaksızın, karayollarında dönüş kuralları dışında bilerek ve isteyerek aracın el freninin çekilmesi suretiyle veya başka yöntemlerle aracın ani olarak yönünün değiştirilmesi veya kendi etrafında döndürülmesi"
+    },
+    {
+      "madde": "68/1-a",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "68/1-a-1, 68/1-a-2 ve 68/1-a-3’te sayılan haller dışında; taşıt yolu bitişiğinde ve yakınında yaya yolu, banket veya alan bulunduğu halde yayaların bisiklet yolunda veya şeridinde ya da taşıt yolunda yürümesi"
+    },
+    {
+      "madde": "68/1-a-1",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "1- Diğer yayalar için ciddi rahatsızlık verecek boyutta eşyaları iten veya taşıyan kişilerin taşıt yolunu kullanırken Yönetmelikte belirtilen tedbirleri almamaları ve taşıt yolunun en sağ şeridinden fazla kısmını işgal etmeleri; 2- Bir yetkili veya görevli yönetiminde düzenli şekilde taşıt yolunda yürüyen yaya kafilelerinin, gece ve gündüz görüşün az olduğu hallerde çarpmayı önleyici uyarıcı tedbirleri almadan ve imkan oranında tek sıra halinde yürümemeleri ve taşıt yolunun en sağ şeridinden fazla kısmını işgal etmeleri"
+    },
+    {
+      "madde": "68/1-a-2",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Yayaların yürümesine ayrılmış kısımların kullanılmasının mümkün olmadığı veya bulunmadığı hallerde, yayaların taşıt yolunun kenara yakın olan kısmı dışında yürümeleri"
+    },
+    {
+      "madde": "68/1-a-3",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Her iki tarafta da yaya yolu ve banket bulunmayan veya kullanılır durumda olmayan iki yönlü trafiğin kullanıldığı karayollarında, yayaların taşıt yolunun sol kenarını izlememeleri"
+    },
+    {
+      "madde": "68/1-b",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Yüz metreye kadar mesafede yaya geçidi veya kavşak bulunduğu halde yayaların, karşı tarafa geçmek için taşıt yolunun yaya ve okul geçidi veya kavşak giriş ve çıkışları dışında herhangi bir yerini kullanmaları"
+    },
+    {
+      "madde": "68/1-b-1",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Yaya ve okul geçitlerinin bulunduğu yerlerdeki geçitlerde yayalar için ışıklı işaret olduğu halde yayaların bu işaretlere uymaması"
+    },
+    {
+      "madde": "68/1-b-2",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Geçitte yayalar için ışıklı işaret yoksa ve geçit sadece taşıt trafiği ışıklı işareti veya yetkili kişi tarafından yönetiliyorsa, geçecekleri doğrultu açılmadan yayaların taşıt yoluna girmesi"
+    },
+    {
+      "madde": "68/1-c",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Yaya yollarında, geçitlerde veya zorunlu hallerde; taşıt yolu üzerinde bulunan yayaların trafiği engelleyecek veya tehlikeye düşürecek şekilde davranışlarda bulunmaları veya buraları saygısızca kullanmaları"
+    },
+    {
+      "madde": "69/1",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Yerleşim yerleri dışındaki karayollarında, taşıt yolu üzerinde; zorunlu haller dışında hayvan bulundurmak, binek hayvanları ve sürüler ile elle sürülen araçları trafik kurallarına uymadan sevk ve idare etmek veya ettirmek, başıboş bırakmak"
+    },
+    {
+      "madde": "69/2",
+      "fiyat": 0,
+      "yil": 2026,
+      "aciklama": "Başıboş hayvan bırakma yasağına riayet etmeyerek, trafik kazasına sebebiyet vermek"
+    },
+    {
+      "madde": "70/4",
+      "fiyat": 16000,
+      "yil": 2026,
+      "aciklama": "Gerekli makamdan izin almadan karayolu üzerinde yarış ve koşu düzenlemek"
+    },
+    {
+      "madde": "70/5",
+      "fiyat": 46000,
+      "yil": 2026,
+      "aciklama": "Karayolu üzerinde yarış yapmak"
+    },
+    {
+      "madde": "71",
+      "fiyat": 46000,
+      "yil": 2026,
+      "aciklama": "Zorunluluk olmadığı halde geçiş üstünlüğü hakkını kullanmak"
+    },
+    {
+      "madde": "72/1",
+      "fiyat": 3000,
+      "yil": 2026,
+      "aciklama": "Ses, müzik, görüntü ve haberleşme cihazlarının yönetmelikte gösterilen şartlara uygun olarak kamunun rahat ve huzurunu bozacak şekilde kullanmak"
+    },
+    {
+      "madde": "72/2",
+      "fiyat": 21000,
+      "yil": 2026,
+      "aciklama": "Araçlarda kanun ve yönetmelikte belirtilen şartlara uymayan ses, müzik, görüntü ve haberleşme cihazları ile sürücünün izleme ve kullanma sahası içinde kalan görüntü cihazlarını bulundurmak veya kullanmak"
+    },
+    {
+      "madde": "73/a",
+      "fiyat": 1000,
+      "yil": 2026,
+      "aciklama": "Karayolunda kamunun rahat ve huzurunu bozacak veya kişilere zarar verecek şekilde; su, çamur ve benzerlerini sıçratmak, kişileri korkutmak/şaşırtmak, özel amaçlarla keyfi ya da kasıtlı davranışlarda bulunarak yaya veya araç trafiğinin seyir emniyetini ihlal etmek suretiyle tedbirsiz ve saygısız davranışlarda bulunarak araç sürmek"
+    },
+    {
+      "madde": "73/b",
+      "fiyat": 1000,
+      "yil": 2026,
+      "aciklama": "Araçlardan bir şey atmak veya dökmek"
+    },
+    {
+      "madde": "73/c(1.kez)",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Seyir halinde cep veya araç telefonu ya da benzer haberleşme cihazlarını ele alarak kullanmak"
+    },
+    {
+      "madde": "73/c(2.kez)",
+      "fiyat": 10000,
+      "yil": 2026,
+      "aciklama": "Seyir halinde cep veya araç telefonu ya da benzer haberleşme cihazlarını ele alarak kullanmak"
+    },
+    {
+      "madde": "73/c(3.kez)",
+      "fiyat": 20000,
+      "yil": 2026,
+      "aciklama": "Seyir halinde cep veya araç telefonu ya da benzer haberleşme cihazlarını ele alarak kullanmak"
+    },
+    {
+      "madde": "74/a",
+      "fiyat": 5662,
+      "yil": 2026,
+      "aciklama": "İşaretli kavşaklarda yayalara durarak ilk geçiş hakkını vermemek"
+    },
+    {
+      "madde": "74/b",
+      "fiyat": 5662,
+      "yil": 2026,
+      "aciklama": "İşaretli yaya veya okul geçitlerine yaklaşırken yavaşlamamak ve yayalara geçiş hakkı vermemek"
+    },
+    {
+      "madde": "75",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Okul servis araçlarıyla ilgili yönetmeliğe uymamak"
+    },
+    {
+      "madde": "76/1-a",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Demiryolu geçitlerinde hız, ışık, ses ve bariyer kurallarına uymamak"
+    },
+    {
+      "madde": "76/1-b",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Işıksız ve bariyersiz demiryolu geçitlerinde durmadan ve kontrol etmeden geçmek"
+    },
+    {
+      "madde": "77/1-b",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Görme engelli yayalara yolda yavaşlamamak, durmamak ve yardımcı olmamak"
+    },
+    {
+      "madde": "77/1-c",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Bir yetkili veya görevli yönetimindeki yürüyüş kolları arasından geçmek"
+    },
+    {
+      "madde": "78/1-a",
+      "fiyat": 2500,
+      "yil": 2026,
+      "aciklama": "Emniyet kemerini usulune uygun olarak kullanmamak"
+    },
+    {
+      "madde": "78/1-b(1.kez)",
+      "fiyat": 2500,
+      "yil": 2026,
+      "aciklama": "Zorunlu araçlarda sürücü ve yolcuların koruma başlığı ve gözlük kurallarına uymaması"
+    },
+    {
+      "madde": "78/1-b(2.kez)",
+      "fiyat": 5000,
+      "yil": 2026,
+      "aciklama": "Zorunlu araçlarda sürücü ve yolcuların koruma başlığı ve gözlük kurallarına uymaması"
+    },
+    {
+      "madde": "78/1-b(3.kez...)",
+      "fiyat": 10000,
+      "yil": 2026,
+      "aciklama": "Zorunlu araçlarda sürücü ve yolcuların koruma başlığı ve gözlük kurallarına uymaması"
+    },
+    {
+      "madde": "78/1-d",
+      "fiyat": 1000,
+      "yil": 2026,
+      "aciklama": "Yönetmelikte belirtilen diğer koruma sistemlerini bulundurmamak ve kullanmamak"
+    },
+    {
+      "madde": "81/1-a",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Trafik kazalarına karışanların, kaza mahallinde durmaması ve kaza mahallinde  trafik güvenliği için gerekli tedbirleri almaması"
+    },
+    {
+      "madde": "81/1-b",
+      "fiyat": 46000,
+      "yil": 2026,
+      "aciklama": "Can ve mal güvenliği tehlikede değilken kazanın iz ve delillerini değiştirmek"
+    },
+    {
+      "madde": "81/1-c",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Kazaya karışanların, istenildiğinde kimlik ve belge bilgilerini paylaşmaması"
+    },
+    {
+      "madde": "81/1-d-1",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Kazaya karışanların kazayı yetkilelere bildirmemesi"
+    },
+    {
+      "madde": "81/1-d-2",
+      "fiyat": 46000,
+      "yil": 2026,
+      "aciklama": "Maddi hasarlı kazaya karışanların izinsiz kaza yerinden ayrılması"
+    },
+    {
+      "madde": "81/1-d-3",
+      "fiyat": 46000,
+      "yil": 2026,
+      "aciklama": "Ölümlü veya yaralanmalı kazaya karışanların izinsiz kaza yerinden ayrılması"
+    },
+    {
+      "madde": "81/1-e",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Kazayla zarar verilen malın sahibini bulmamak, bilgi bırakmamak ve zabıtaya bildirmemek"
+    },
+    {
+      "madde": "82/1-a",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Kazaya karışan veya tanık olan sürücülerin ilk yardım, ihbar ve yaralı taşıma yükümlülüklerini yerine getirmemesi"
+    },
+    {
+      "madde": "82/1-b",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Şehirlerarası akaryakıt istasyonlarında sağlık malzemesini her an kullanılabilir durumda bulundurmamak"
+    },
+    {
+      "madde": "82/1-c",
+      "fiyat": 2719,
+      "yil": 2026,
+      "aciklama": "Ölümlü, yaralanmalı veya suç şüphesi taşıyan aracı kabul ettiğinde zabıtaya bildirmemek ve kayda geçirmemek"
+    },
+    {
+      "madde": "91",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Zorunlu mali sorumluluk sigortası yaptırmamak"
+    },
+    {
+      "madde": "94",
+      "fiyat": 1246,
+      "yil": 2026,
+      "aciklama": "Sigorta müddetinin sona ermesi veya işletenin değişmesi halinde belirlenen müddetler içerisinde durumu ilgili sigorta şirketine bildirmemek"
+    },
+    {
+      "madde": "118",
+      "fiyat": 0,
+      "yil": 2026,
+      "aciklama": "Trafik ihlalinin yapıldığı tarihten geriye doğru 1 yıl içerisinde 100 ceza puanını doldurmak"
+    },
+    {
+      "madde": "Ek-2/1",
+      "fiyat": 11629,
+      "yil": 2026,
+      "aciklama": "Amaç dışı kullanım"
+    },
+    {
+      "madde": "Ek-2/3-a (1.Kez)",
+      "fiyat": 100000,
+      "yil": 2026,
+      "aciklama": "Belediye sınırlarında çalışma izni veya ruhsatı olmadan yolcu taşımak"
+    },
+    {
+      "madde": "Ek-2/3-a (2.Kez)",
+      "fiyat": 200000,
+      "yil": 2026,
+      "aciklama": "Belediye sınırlarında çalışma izni veya ruhsatı olmadan yolcu taşımak"
+    },
+    {
+      "madde": "Ek-2/3-b",
+      "fiyat": 46000,
+      "yil": 2026,
+      "aciklama": "İzin belgesindeki faaliyet konusu dışında belediye sınırlarında yolcu taşımak"
+    },
+    {
+      "madde": "Ek-2/3-b (2.Kez)",
+      "fiyat": 92000,
+      "yil": 2026,
+      "aciklama": "İzin belgesindeki faaliyet konusu dışında belediye sınırlarında yolcu taşımak (2.Kez)"
+    },
+    {
+      "madde": "Ek-2/3-c",
+      "fiyat": 20000,
+      "yil": 2026,
+      "aciklama": "İzin belgesindeki güzergah veya bölge dışında yolcu taşımak"
+    },
+    {
+      "madde": "Ek-2/3-c (2.Kez)",
+      "fiyat": 40000,
+      "yil": 2026,
+      "aciklama": "İzin belgesindeki güzergah veya bölge dışında yolcu taşımak"
+    },
+    {
+      "madde": "Ek 2/5",
+      "fiyat": 11629,
+      "yil": 2026,
+      "aciklama": "Süresi dolmuş çalışma izniyle belediye sınırları içinde yolcu taşımak"
+    },
+    {
+      "madde": "Ek-2/6",
+      "fiyat": 3870,
+      "yil": 2026,
+      "aciklama": "Gerekli izin ve ayırıcı işareti olmayan araçlardan usulsüz taşımacılık hizmeti almak"
+    },
+    {
+      "madde": "Ek-20",
+      "fiyat": 25000,
+      "yil": 2026,
+      "aciklama": "Karayolları Trafik Kanununun idari yaptırıma bağlayarak yasakladığı bir eylemi basın, yayın, internet, sosyal ve dijital medya veya diğer elektronik cihazlar yoluyla paylaşarak trafik kural ihlali yapmaya özendiren  görüntüleri alenen yaymak ve övmek"
+    },
+    {
+      "madde": "26/1-A-2",
+      "fiyat": 21333,
+      "yil": 2026,
+      "aciklama": "Yetki belgesi alınmadan veya yetki belgesi aldığı halde yetki belgesi kapsamına uygun olmayan faaliyette bulunanlara"
+    },
+    {
+      "madde": "26/1-A-3",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Yetki belgesi olduğu halde taşıtını yetki yetki belgesine kaydettirmeden kullananlara"
+    },
+    {
+      "madde": "26/1-B",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Tehlikeli yük taşıyan taşıtlar ve bunların bağlı olduğu taşımacıların, taşıyacakları yüklerin özelliğine uygun olduğunu gösteren bilgi ve belgelere dayanarak yetki belgesinden ayrı olarak ilgili mercilerden ayrıca izin almayanlara"
+    },
+    {
+      "madde": "26/1-C",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Taşıma hizmetini yapmaktan kaçınan taşımacılara"
+    },
+    {
+      "madde": "26/1-Ç",
+      "fiyat": 31372,
+      "yil": 2026,
+      "aciklama": "Diğer bir taşımacının faaliyetini engelleyen taşımacılara"
+    },
+    {
+      "madde": "26/1-D-I-1",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Yolcu ile yapılan sözleşmeye uymayan düzenli yolcu taşımacılarına"
+    },
+    {
+      "madde": "26/1-D-I-2",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Biletsiz yolcu taşıyan düzenli yolcu taşımacılarına"
+    },
+    {
+      "madde": "26/1-D-I-3",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Taşıma senedi olmaksızın eşya taşıyanlara"
+    },
+    {
+      "madde": "26/1-D-I-4",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Taşıma sözleşmesiz yolcu taşıyan arızi ve mekik yolcu taşımacılığı yapanlara"
+    },
+    {
+      "madde": "26/1-D-I-5",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Arızi ve mekik taşımalarda taşıma sözleşmesine uymayanlara"
+    },
+    {
+      "madde": "26/1-D-I-6",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Gönderen ile yapılan sözleşmeye uymayan eşya taşımacılarına"
+    },
+    {
+      "madde": "26/1-D-I-7",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Kanunlara uygun taşıma yapmayanlara"
+    },
+    {
+      "madde": "26/1-D-II",
+      "fiyat": 6274,
+      "yil": 2026,
+      "aciklama": "Yolcu ve eşyayı güvenlik içinde taşımayanlara"
+    },
+    {
+      "madde": "26/1-D-III",
+      "fiyat": 6274,
+      "yil": 2026,
+      "aciklama": "Çevreyi ve insan sağlığını koruma amacıyla yürürlüğe konulan mevzuata uymayanlara"
+    },
+    {
+      "madde": "26/1-E-I-1",
+      "fiyat": 21333,
+      "yil": 2026,
+      "aciklama": "Yolcuların sağlıklı, rahat ve güvenli bir yolculuk yapmasını sağlayacak tedbirleri almayan taşımacılara"
+    },
+    {
+      "madde": "26/1-E-I-2",
+      "fiyat": 21333,
+      "yil": 2026,
+      "aciklama": "Yolcuyu taahhüt ettiği yere kadar götürmeyen yolcu taşımacılara"
+    },
+    {
+      "madde": "26/1-E-II-1",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "İlgili mevzuat hükümlerine uygun olmayan bir taşıtı sefere gönderen taşımacılara"
+    },
+    {
+      "madde": "26/1-E-II-2",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Nitelikli olmayan şoför ve hizmetli personeli sefere gönderenlere (PSİKOTEKNİK)"
+    },
+    {
+      "madde": "26/1-E-II-3",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Şoförlerin sürücü belgelerinin bulunup bulunmadığını araştırmayan taşımacılara"
+    },
+    {
+      "madde": "26/1-E-II-4",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Teknik şartlara uymayan taşıtları trafiğe çıkaran taşımacılara"
+    },
+    {
+      "madde": "26/1-E-II-5",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Güzergah mesafesini dikkate alarak yeteri kadar şoför bulundurmayan taşımacılara"
+    },
+    {
+      "madde": "26/1-E-II-6",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Taşıt kartları olmayan taşıtları trafiğe çıkaran taşımacılara"
+    },
+    {
+      "madde": "26/1-E-III",
+      "fiyat": 6274,
+      "yil": 2026,
+      "aciklama": "Altışar aylık süre ile yılda en az iki kez şoförlerin ceza puanı durumunu Emniyet Genel Müdürlüğünden öğrenmeyen ve ceza puanı yüksek olan şoförlerle ilgili, eğitim ve iç denetim yönünden gerekli tedbirleri almayan taşımacılara"
+    },
+    {
+      "madde": "26/1-F",
+      "fiyat": 31372,
+      "yil": 2026,
+      "aciklama": "Taşıma yetki belgesi almadan, kendi nam ve hesaplarına taşıma yapan ve yaptıran acentelik ve taşıma işleri komisyonculuğu yetki belgesi sahiplerine"
+    },
+    {
+      "madde": "26/1-G-1",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Ücret tarifesi düzenlemeyenlere"
+    },
+    {
+      "madde": "26/1-G-2",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Zaman tarifesi düzenlemeyenlere"
+    },
+    {
+      "madde": "26/1-G-3",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Ücret tarifesine uymayanlara"
+    },
+    {
+      "madde": "26/1-G-4",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Zaman tarifesine uymayanlara"
+    },
+    {
+      "madde": "26/1-Ğ-1",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Değişik ücret tarifeleri uygulayanlara"
+    },
+    {
+      "madde": "26/1-Ğ-2",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Değişik zaman tarifeleri uygulayanlara"
+    },
+    {
+      "madde": "26/1-H-1",
+      "fiyat": 4392,
+      "yil": 2026,
+      "aciklama": "Zorunlu hallerde; sınır mülki idare amirince verilecek izin dışında, ilgili kanunlara ve taşımacı ile yolcu ve gönderen arasındaki sözleşmelere aykırı olarak yolcu ve eşyayı sınır kapılarına taşıyanlara"
+    },
+    {
+      "madde": "26/1-H-2",
+      "fiyat": 4380,
+      "yil": 2026,
+      "aciklama": "Zorunlu hallerde; sınır mülki idare amirince verilecek izin dışında, ilgili kanunlara ve taşımacı ile yolcu ve gönderen arasındaki sözleşmelere aykırı olarak sınır kapılarına aktarma yapanlara"
+    },
+    {
+      "madde": "26/1-J",
+      "fiyat": 6274,
+      "yil": 2026,
+      "aciklama": "Terminal veya ara durak dışında, yolcu indirip bindiren taşımacılara"
+    },
+    {
+      "madde": "26/1-L-1",
+      "fiyat": 4392,
+      "yil": 2026,
+      "aciklama": "Mesleki yeterlik belgesine sahip olmadan taşıt kullanan şoföre (SRC)"
+    },
+    {
+      "madde": "26/1-L-2",
+      "fiyat": 10666,
+      "yil": 2026,
+      "aciklama": "Mesleki yeterlik belgesine sahip olmadan taşıt kullanan şoförün işleticisine (SRC)"
+    },
+    {
+      "madde": "26/1-M",
+      "fiyat": 3764,
+      "yil": 2026,
+      "aciklama": "27. maddesinde belirlenen yetkililere denetim için gerekli bilgi veya belgeleri ibraz etmemek"
+    }
+  ]
+}

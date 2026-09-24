@@ -1,0 +1,10 @@
+{
+  "name": "icraat-mobil",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check app.js && node --check db.js && node --check domain.js && node --check sw.js"
+  }
+}
