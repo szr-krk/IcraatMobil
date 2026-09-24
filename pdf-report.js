@@ -3,6 +3,8 @@ import { buildDailyReportData } from './report.js';
 const PAGE_WIDTH = 595;
 const PAGE_HEIGHT = 842;
 const textEncoder = new TextEncoder();
+const REPORT_BORDER_COLOR = '#000000';
+const REPORT_BORDER_WIDTH = 1;
 
 function loadImage(url) {
   return new Promise((resolve, reject) => {
@@ -201,8 +203,8 @@ function drawAchievementBar(context, cell, ratio) {
   context.fillRect(x, y, width, height);
   context.fillStyle = color;
   context.fillRect(x, y, width * Math.min(1, safeRatio), height);
-  context.strokeStyle = '#27313D';
-  context.lineWidth = 2;
+  context.strokeStyle = REPORT_BORDER_COLOR;
+  context.lineWidth = REPORT_BORDER_WIDTH;
   context.strokeRect(x, y, width, height);
   context.restore();
 }
@@ -271,8 +273,8 @@ function drawBorders(context, cell) {
     const border = cell.borders?.[edge];
     if (!border) continue;
     context.beginPath();
-    context.strokeStyle = border.color || '#000000';
-    context.lineWidth = Number(border.width) || 1;
+    context.strokeStyle = REPORT_BORDER_COLOR;
+    context.lineWidth = REPORT_BORDER_WIDTH;
     if (edge === 'left') { context.moveTo(cell.x, cell.y); context.lineTo(cell.x, cell.y + cell.height); }
     if (edge === 'right') { context.moveTo(cell.x + cell.width, cell.y); context.lineTo(cell.x + cell.width, cell.y + cell.height); }
     if (edge === 'top') { context.moveTo(cell.x, cell.y); context.lineTo(cell.x + cell.width, cell.y); }
