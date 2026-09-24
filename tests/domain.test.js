@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  buildEnvelope, calculateKeyboardInset, compareIncoming, ensurePayload, exportRecord, normalizeEvk,
+  buildEnvelope, buildPerformanceReport, calculateKeyboardInset, compareIncoming, ensurePayload, exportRecord, normalizeEvk,
   mergeDirectoryItems, penaltySummary, sameLogicalShift, toIstanbulIso, validateEnvelope
 } from '../domain.js';
 
@@ -94,4 +94,22 @@ test('ceza kartı düz cümle özetini toplam tutar ve ek işlemlerle oluşturur
     vehicleBan: true, licenseCancel: true, parking: true
   });
   assert.equal(summary, 'Sürücüye: 78/1-a, 34/a → 3.000 ₺. Araç Men. Belge İptal. Otoparka (3 Adet)');
+});
+
+test('icraat özeti kurum başlığı ile hız, kemer, alkol ve not satırlarını üretir', () => {
+  const report = buildPerformanceReport(normalizeEvk(record({
+    payload: {
+      controls: { K1_A: 5 },
+      penalties: [
+        { type: 'DRIVER', count: 2, articles: [{ code: '51/2-b-1', amount: 2000 }], vehicleBan: false },
+        { type: 'PLATE', count: 1, articles: [{ code: '78/1-a', amount: 1000 }], vehicleBan: false },
+        { type: 'DRIVER', count: 3, articles: [{ code: '48/5', amount: 500 }], vehicleBan: false }
+      ],
+      personnel: [], roads: [], accidents: {}, note: 'Deneme notu'
+    }
+  })));
+  assert.match(report.text, /Malkara Bölge Trafik Denetleme İstasyon Amirliği/);
+  assert.match(report.text, /Kontrol edilen araç sayısı: 7/);
+  assert.match(report.text, /Hız: 2 adet\nKemer: 1 adet\nAlkol: 3 adet/);
+  assert.match(report.text, /Not: Deneme notu/);
 });

@@ -134,6 +134,147 @@ export function penaltySummary(record) {
   return `${type}: ${codes} → ${totalAmount} ₺.${flags.length ? ` ${flags.join('. ')} ` : ' '}(${count} Adet)`;
 }
 
+const reportDateFormatter = new Intl.DateTimeFormat('tr-TR', {
+  timeZone: 'Europe/Istanbul', day: '2-digit', month: '2-digit', year: 'numeric'
+});
+const reportTimeFormatter = new Intl.DateTimeFormat('tr-TR', {
+  timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit', hour12: false
+});
+
+export function performanceUnitName(sourceUnit) {
+  return sourceUnit === 'MERKEZ'
+    ? 'Tekirdağ Bölge Trafik Denetleme Şube Müdürlüğü'
+    : 'Malkara Bölge Trafik Denetleme İstasyon Amirliği';
+}
+
+function reportCount(section, key) {
+  const legacy = { K1_A: 'k1', K2_A: 'k2A', K2_B: 'k2B', K4_A: 'k4', K5: 'k5', K6: 'k6' }[key];
+  const value = Object.hasOwn(section || {}, key) ? section[key] : (legacy ? section?.[legacy] : 0);
+  const numeric = Number.parseInt(value, 10);
+  return Number.isInteger(numeric) && numeric > 0 ? numeric : 0;
+}
+
+function joinedNames(values) {
+  const clean = values.filter(Boolean);
+  if (clean.length < 2) return clean[0] || '';
+  if (clean.length === 2) return `${clean[0]} ve ${clean[1]}`;
+  return `${clean.slice(0, -1).join(', ')} ve ${clean.at(-1)}`;
+}
+
+export function buildPerformanceReport(evk, noteOverride) {
+  const payload = ensurePayload(evk);
+  const records = payload.penalties.filter(record => record.origin !== 'RADAR_OPERATOR');
+  const articleCounts = new Map();
+  const articleTypes = new Map();
+  const operationCounts = Object.fromEntries(Object.keys(PENALTY_TYPES).map(type => [type, 0]));
+  const articleTypeCounts = Object.fromEntries(Object.keys(PENALTY_TYPES).map(type => [type, 0]));
+  let totalAmount = 0;
+  let vehicleBans = 0;
+  let parkingCount = 0;
+  let licenseCancelCount = 0;
+  let speedCount = 0;
+  let beltCount = 0;
+  let alcoholCount = 0;
+  let k3 = 0;
+
+  records.forEach(record => {
+    const parsedCount = Number.parseInt(record.count, 10);
+    const count = Number.isInteger(parsedCount) && parsedCount > 0 ? parsedCount : 1;
+    if (Object.hasOwn(operationCounts, record.type)) operationCounts[record.type] += count;
+    if (record.vehicleBan) vehicleBans += count;
+    if (record.parking) parkingCount += count;
+    if (record.licenseCancel) licenseCancelCount += count;
+    let speedOperation = false;
+    (record.articles || []).forEach(article => {
+      const code = String(article.code || '').trim();
+      if (!code) return;
+      const normalized = code.toLocaleLowerCase('tr-TR');
+      articleCounts.set(code, (articleCounts.get(code) || 0) + count);
+      if (!articleTypes.has(code)) articleTypes.set(code, {});
+      const distribution = articleTypes.get(code);
+      if (Object.hasOwn(operationCounts, record.type)) {
+        distribution[record.type] = (distribution[record.type] || 0) + count;
+        articleTypeCounts[record.type] += count;
+      }
+      totalAmount += (Number(article.amount) || 0) * count;
+      if (normalized.startsWith('51')) { speedCount += count; speedOperation = true; }
+      if (normalized === '78/1-a') beltCount += count;
+      if (normalized.startsWith('48')) alcoholCount += count;
+    });
+    if (speedOperation) k3 += count;
+  });
+
+  const controlRows = [];
+  let inspectedVehicles = k3;
+  CONTROLS.forEach(([key, code]) => {
+    const count = reportCount(payload.controls, key);
+    inspectedVehicles += count;
+    if (count > 0) controlRows.push(`${code}:${count}`);
+    if (key === 'K2_D' && k3 > 0) controlRows.push(`K3:${k3}`);
+  });
+
+  const start = new Date(evk.startEpochMillis ?? evk.startDateTime);
+  const end = new Date(evk.endEpochMillis ?? evk.endDateTime);
+  const startDate = reportDateFormatter.format(start);
+  const endDate = reportDateFormatter.format(end);
+  const dateText = startDate === endDate ? `${startDate} tarihinde` : `${startDate} - ${endDate} tarihinde`;
+  const timeText = `${reportTimeFormatter.format(start)} - ${reportTimeFormatter.format(end)}`;
+  const roads = (payload.roads || []).map(road => String(road.yolad || '').trim()).filter(Boolean);
+  const roadNames = joinedNames(roads);
+  const personnel = (payload.personnel || []).map(person => {
+    const name = `${person.ad || ''} ${person.soyad || ''}`.trim();
+    const registry = String(person.sicil || '').trim();
+    return `${name}${registry ? ` (${registry})` : ''}`.trim();
+  }).filter(Boolean);
+  const note = String(noteOverride ?? payload.note ?? '').trim();
+  const lines = [performanceUnitName(evk.sourceUnit), ''];
+  let intro = `${dateText} ${timeText} saatleri arasında ${evk.teamCode} kod nolu ekip olarak`;
+  if (roadNames) intro += ` ${roadNames}${roads.length === 1 ? ' yolunda' : ' yollarında'}`;
+  lines.push(`${intro} yapmış olduğumuz uygulama icraatı ve görevler aşağıda çıkarılmıştır.`, '');
+  lines.push(`${evk.teamCode}${roadNames ? ` (${roadNames}${roads.length === 1 ? ' yolunda' : ' yollarında'} görevli personeller)` : ''}`);
+  lines.push(...personnel, '', `Kontrol edilen araç sayısı: ${inspectedVehicles}`);
+  lines.push(...(controlRows.length ? controlRows : ['—']), '', 'Yazılan Ceza Maddeleri:');
+
+  const sortedArticles = [...articleCounts.keys()].sort((left, right) => left.localeCompare(right, 'tr-TR', { numeric: true }));
+  if (!sortedArticles.length) lines.push('—');
+  sortedArticles.forEach((code, index) => {
+    const distribution = articleTypes.get(code) || {};
+    const parts = Object.entries(PENALTY_TYPES)
+      .map(([type, label]) => distribution[type] > 0 ? `${label} ${distribution[type]}` : '')
+      .filter(Boolean);
+    lines.push(`${index + 1}) ${code} (${parts.join(' - ') || `${articleCounts.get(code)} adet`})`);
+  });
+
+  const totalPenaltyCount = [...articleCounts.values()].reduce((total, value) => total + value, 0);
+  lines.push('', `Toplam Ceza: ${totalPenaltyCount} adet`);
+  Object.entries(PENALTY_TYPES).forEach(([type, label]) => {
+    if (articleTypeCounts[type] > 0) lines.push(`${label}: ${articleTypeCounts[type]} adet`);
+  });
+  lines.push('', 'İşlem Yapılan');
+  Object.entries(PENALTY_TYPES).forEach(([type, label]) => {
+    if (operationCounts[type] > 0) lines.push(`${label}: ${operationCounts[type]} adet`);
+  });
+  lines.push('', `Toplam Ceza Miktarı: ${new Intl.NumberFormat('tr-TR').format(totalAmount)}₺`);
+  if (vehicleBans > 0) lines.push(`Trafikten Men Edilen Araç Sayısı: ${vehicleBans} adet`);
+  if (parkingCount > 0) lines.push(`Otoparka Çekilen Araç Sayısı: ${parkingCount} adet`);
+  if (licenseCancelCount > 0) lines.push(`İptal Edilen Sürücü Belgesi Sayısı: ${licenseCancelCount} adet`);
+  ACCIDENT_FIELDS.forEach(([key, label]) => {
+    const count = reportCount(payload.accidents, key);
+    if (count > 0) lines.push(`${label}: ${count} adet`);
+  });
+  lines.push('', `Hız: ${speedCount} adet`, `Kemer: ${beltCount} adet`, `Alkol: ${alcoholCount} adet`);
+  if (note) lines.push('', `Not: ${note}`);
+  lines.push('', 'Arz ederim.');
+
+  return {
+    text: lines.join('\n').replace(/\n{3,}/g, '\n\n').trim(),
+    note,
+    speedCount,
+    beltCount,
+    alcoholCount
+  };
+}
+
 export function ensurePayload(evk) {
   let payload = evk.payload;
   if (!payload && typeof evk.payloadJson === 'string') {

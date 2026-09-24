@@ -157,6 +157,14 @@ button { touch-action: manipulation; }
 .watermark-panel { background-image: linear-gradient(rgb(244 247 250 / 92%), rgb(244 247 250 / 92%)), url("assets/trafik-armasi.png"); background-position: center; background-repeat: no-repeat; background-size: cover; }
 .blank-panel { display: grid; place-items: center; }
 .empty-state.compact { min-height: 50dvh; }
+.performance-panel { display: grid; align-content: start; gap: 12px; }
+.performance-card { padding: 16px; border: 1px solid var(--line); border-radius: 13px; background: rgb(255 255 255 / 96%); box-shadow: 0 2px 8px rgb(8 24 44 / 7%); }
+.performance-card pre { margin: 0; overflow: visible; color: var(--text); white-space: pre-wrap; overflow-wrap: anywhere; font: 500 .84rem/1.5 system-ui, sans-serif; }
+.performance-note { display: grid; gap: 6px; color: var(--navy-800); font-size: .8rem; font-weight: 800; }
+.performance-note textarea { width: 100%; min-height: 100px; resize: vertical; border: 1px solid #aebcca; border-radius: 11px; padding: 11px 12px; color: var(--text); background: rgb(255 255 255 / 97%); font: inherit; line-height: 1.4; }
+.performance-note textarea:focus { border-color: var(--blue-600); outline: 3px solid rgb(23 105 170 / 13%); }
+.performance-share { min-height: 50px; border: 0; border-radius: 11px; color: white; background: var(--navy-800); font-size: .8rem; font-weight: 900; letter-spacing: .04em; }
+.keyboard-open #performancePanel { padding-bottom: calc(var(--keyboard-height, 0px) + 80px); }
 
 .penalty-list { display: grid; gap: 8px; }
 .penalty-empty { padding: 22px 14px; border: 1px dashed #aab8c7; border-radius: 13px; color: var(--muted); background: rgb(255 255 255 / 75%); text-align: center; font-size: .88rem; }

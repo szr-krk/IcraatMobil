@@ -93,12 +93,12 @@
         <div id="accidentFields" class="accident-fields"></div>
       </section>
 
-      <section id="performancePanel" class="tab-panel blank-panel" role="tabpanel" hidden>
-        <div class="empty-state compact">
-          <div class="empty-mark" aria-hidden="true">İ</div>
-          <h2>İcraat bölümü hazır</h2>
-          <p>Bu sekmenin içeriği şimdilik bilerek boş bırakıldı.</p>
-        </div>
+      <section id="performancePanel" class="tab-panel watermark-panel performance-panel" role="tabpanel" hidden>
+        <article class="performance-card">
+          <pre id="performancePreview" aria-label="Görüntülenen icraat özeti"></pre>
+        </article>
+        <label class="performance-note"><span>Not</span><textarea id="performanceNote" rows="4" placeholder="Not yazın…"></textarea></label>
+        <button type="button" class="performance-share" id="sharePerformance">METİN OLARAK PAYLAŞ</button>
       </section>
     </main>
 

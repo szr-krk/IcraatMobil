@@ -3,7 +3,7 @@ import {
   putEvk, putManyEvks, setSetting, updateEvk
 } from './db.js';
 import {
-  ACCIDENT_FIELDS, CONTROLS, UNITS, buildEnvelope, calculateKeyboardInset, compareIncoming,
+  ACCIDENT_FIELDS, CONTROLS, UNITS, buildEnvelope, buildPerformanceReport, calculateKeyboardInset, compareIncoming,
   directoryItemKey, displayDateTime, dutyLabel, ensurePayload, makeChildId, makeRandomId,
   mergeDirectoryItems, penaltySummary, sameLogicalShift,
   toIstanbulIso, unitLabel, validateEnvelope
@@ -477,6 +477,7 @@ function renderDetail(evk) {
   renderRadarCounts(payload.penalties, 'RADAR_OPERATOR', '#radarOperatorGrid');
   renderControls(payload.controls);
   renderAccidents(payload.accidents);
+  renderPerformance(evk);
 }
 
 function configureDetailTabs(radar) {
@@ -492,6 +493,13 @@ function selectTab(name) {
   const names = ['penalties', 'radarTeam', 'radarOperator', 'controls', 'accidents', 'performance'];
   names.forEach(value => { $(`#${value}Panel`).hidden = value !== name; });
   if (name === 'penalties') requestAnimationFrame(updatePenaltyComposerMetrics);
+  if (name === 'radarTeam' || name === 'radarOperator') clearUnexpectedRadarFocus();
+}
+
+function clearUnexpectedRadarFocus() {
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (document.activeElement?.matches('[data-radar-code]')) document.activeElement.blur();
+  }));
 }
 
 function radarGuideArticles() {
@@ -522,7 +530,7 @@ function renderRadarCounts(records, origin, selector) {
     const value = counts[article.code] || '';
     return `<label class="radar-count-field">
       <strong>${escapeHtml(article.code)}</strong>
-      <input type="number" min="0" inputmode="numeric" pattern="[0-9]*" data-radar-origin="${escapeHtml(origin)}" data-radar-code="${escapeHtml(article.code)}" value="${escapeHtml(value)}" aria-label="${escapeHtml(article.code)} ceza adedi">
+      <input type="number" min="0" inputmode="numeric" pattern="[0-9]*" autocomplete="off" data-radar-origin="${escapeHtml(origin)}" data-radar-code="${escapeHtml(article.code)}" value="${escapeHtml(value)}" aria-label="${escapeHtml(article.code)} ceza adedi">
     </label>`;
   }).join('');
 }
@@ -825,6 +833,51 @@ function renderControls(controls) {
 
 function renderAccidents(accidents) {
   $('#accidentFields').innerHTML = ACCIDENT_FIELDS.map(([key, label]) => `<label class="field"><span>${escapeHtml(label)}</span><input type="number" min="0" inputmode="numeric" data-count-section="accidents" data-count-key="${escapeHtml(key)}" value="${Object.hasOwn(accidents, key) ? escapeHtml(accidents[key]) : ''}"></label>`).join('');
+}
+
+function renderPerformance(evk, noteOverride) {
+  const report = buildPerformanceReport(evk, noteOverride);
+  $('#performancePreview').textContent = report.text;
+  if (document.activeElement !== $('#performanceNote')) $('#performanceNote').value = report.note;
+}
+
+function schedulePerformanceNoteSave(input) {
+  const evkId = state.selectedEvkId;
+  const timerKey = `${evkId}:performance-note`;
+  clearTimeout(state.saveTimers.get(timerKey));
+  const evk = state.evks.find(item => item.evkId === evkId);
+  if (evk) renderPerformance(evk, input.value);
+  state.saveTimers.set(timerKey, setTimeout(() => savePerformanceNote(evkId, input.value), 280));
+}
+
+async function savePerformanceNote(evkId, value) {
+  if (!evkId) return;
+  const note = value.trim();
+  await updateEvk(evkId, current => {
+    const payload = ensurePayload(current);
+    if (String(payload.note || '') === note) return current;
+    if (note) payload.note = note; else delete payload.note;
+    return { ...current, payload, updatedAt: Date.now() };
+  });
+  const updated = await getEvk(evkId);
+  const index = state.evks.findIndex(item => item.evkId === evkId);
+  if (index >= 0 && updated) state.evks[index] = updated;
+}
+
+async function sharePerformanceText() {
+  const evk = state.evks.find(item => item.evkId === state.selectedEvkId);
+  if (!evk) return;
+  const text = buildPerformanceReport(evk, $('#performanceNote').value).text;
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: `Ekip ${evk.teamCode} İcraatı`, text });
+      return;
+    }
+    await navigator.clipboard.writeText(text);
+    showToast('İcraat metni panoya kopyalandı.');
+  } catch (error) {
+    if (error?.name !== 'AbortError') showToast('Metin paylaşılamadı.');
+  }
 }
 
 function scheduleCountSave(input) {
@@ -1228,7 +1281,9 @@ function bindEvents() {
     if (input) scheduleCountSave(input);
     const radarInput = event.target.closest('[data-radar-code]');
     if (radarInput) scheduleRadarCountSave(radarInput);
+    if (event.target === $('#performanceNote')) schedulePerformanceNoteSave(event.target);
   });
+  $('#sharePerformance').addEventListener('click', sharePerformanceText);
   detailScreen.addEventListener('focusin', event => {
     if (event.target.matches('[data-count-section], [data-radar-code]')) scheduleFocusedCountVisibility();
   });
