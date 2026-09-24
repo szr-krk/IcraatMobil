@@ -13,7 +13,7 @@
 - `IcraatPdfYeni`: Birim seçimi, EVK kimlik/revizyon kuralları, birim odaklı kart listesi, ceza/kontrol/kaza payload yapısı ve JSON sözleşmesi.
 - Kart sağa kaydırılırsa güncelleme, sola kaydırılırsa onaylı silme açılır. Uzun basma aynı işlemleri menüyle sunar.
 - Normal görevlerde kart ayrıntısında sabit sekmeler Ceza Ekle, Kontroller, Kazalar ve İcraat'tır. İcraat sekmesi birinci projenin ekip faaliyet metnini, ayrıca Hız/Kemer/Alkol adetlerini gösterir; EVK'ya bağlı not girişi ve sistem metin paylaşımı sunar.
-- Radar görevlerinde yalnızca `Ekip · Yüzüne` ve `Operatör · Plakaya` sekmeleri gösterilir; Kontroller, Kazalar, İcraat ve standart ceza arama arayüzü gösterilmez.
+- Radar görevlerinde `Ekip · Yüzüne`, `Operatör · Plakaya` ve `İcraat` sekmeleri gösterilir; Kontroller, Kazalar ve standart ceza arama arayüzü gösterilmez.
 
 ## Veri kuralları
 
@@ -35,6 +35,7 @@
 - Kontroller sekmesindeki kartlarda yalnızca kontrol kodu ve adet alanı gösterilir; açıklama metni gösterilmez.
 - Radar görevindeki iki ceza sekmesi de `51/2-b-1` ile `51/2-b-9` arasındaki dokuz maddeyi yalnızca madde kodu ve adet alanıyla gösterir. Ekip sekmesindeki adetler `RADAR_TEAM`/`DRIVER`, operatör sekmesindekiler `RADAR_OPERATOR`/`PLATE` olarak mevcut `payload.penalties` listesine otomatik kaydedilir. Boş veya sıfır adet ilgili kaydın kaldırılmasıdır.
 - Radar adet ekranı açıldığında hiçbir giriş alanı otomatik odaklanmaz; klavye yalnızca kullanıcının seçtiği alana dokunmasıyla açılır.
+- Radar İcraat sekmesi birinci projenin radar faaliyet metnini kullanır: K3 ve kontrol edilen araç sayısı radar ceza işlemlerinden hesaplanır; ceza maddeleri ekip/operatör ayrımı olmadan toplam adetle listelenir, ardından sürücüye/plakasına toplamları, toplam tutar, not ve `Arz ederim.` satırı gösterilir. Radar için Kontroller, Kazalar ve Hız/Kemer/Alkol ek özeti gösterilmez.
 - İcraat başlığı Merkez EVK'larında `Tekirdağ Bölge Trafik Denetleme Şube Müdürlüğü`, Çorlu ve Malkara EVK'larında `Malkara Bölge Trafik Denetleme İstasyon Amirliği` olarak gösterilir. Not `payload.note` alanında saklanır ve EVK JSON aktarımında korunur. Metin paylaşımı Web Share ile WhatsApp dahil cihaz paylaşım ekranını açar; desteklenmiyorsa metni panoya kopyalar.
 
 ## Web uzantısı

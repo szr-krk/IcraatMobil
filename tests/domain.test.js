@@ -113,3 +113,21 @@ test('icraat özeti kurum başlığı ile hız, kemer, alkol ve not satırların
   assert.match(report.text, /Hız: 2 adet\nKemer: 1 adet\nAlkol: 3 adet/);
   assert.match(report.text, /Not: Deneme notu/);
 });
+
+test('radar icraat özeti ekip ve operatör cezalarını tek madde toplamında gösterir', () => {
+  const report = buildPerformanceReport(normalizeEvk(record({
+    dutyType: 'RADAR',
+    payload: {
+      penalties: [
+        { origin: 'RADAR_TEAM', type: 'DRIVER', count: 2, articles: [{ code: '51/2-b-2', amount: 4000 }] },
+        { origin: 'RADAR_OPERATOR', type: 'PLATE', count: 3, articles: [{ code: '51/2-b-2', amount: 4000 }] }
+      ],
+      personnel: [], roads: [], controls: {}, accidents: {}, note: 'Radar notu'
+    }
+  })));
+  assert.match(report.text, /Kontrol edilen araç sayısı: 5\nK3:5/);
+  assert.match(report.text, /1\) 51\/2-b-2 \(5 adet\)/);
+  assert.match(report.text, /Sürücüye: 2 adet\nPlakasına: 3 adet/);
+  assert.doesNotMatch(report.text, /Hız:/);
+  assert.match(report.text, /Not: Radar notu/);
+});

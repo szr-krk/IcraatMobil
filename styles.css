@@ -149,7 +149,7 @@ button { touch-action: manipulation; }
 .detail-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--line); color: var(--muted); background: white; font-size: .78rem; }
 .detail-summary strong { color: var(--navy-800); }
 .tabs { position: sticky; top: calc(76px + env(safe-area-inset-top)); z-index: 16; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--line); background: white; box-shadow: 0 3px 10px rgb(8 24 44 / 7%); }
-.tabs.radar-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.tabs.radar-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .tabs button { min-width: 0; min-height: 52px; padding: 8px 2px; border: 0; border-bottom: 3px solid transparent; color: var(--muted); background: transparent; font-size: .76rem; font-weight: 800; }
 .tabs button[aria-selected="true"] { border-bottom-color: var(--red-600); color: var(--navy-800); }
 .tab-panel { min-height: calc(100dvh - 190px); padding: 13px 12px calc(24px + env(safe-area-inset-bottom)); }

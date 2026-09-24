@@ -481,10 +481,11 @@ function renderDetail(evk) {
 }
 
 function configureDetailTabs(radar) {
-  const normalTabs = ['penalties', 'controls', 'accidents', 'performance'];
+  const normalTabs = ['penalties', 'controls', 'accidents'];
   const radarTabs = ['radarTeam', 'radarOperator'];
   normalTabs.forEach(name => { $(`[data-tab="${name}"]`).hidden = radar; });
   radarTabs.forEach(name => { $(`[data-tab="${name}"]`).hidden = !radar; });
+  $('[data-tab="performance"]').hidden = false;
   $('.tabs').classList.toggle('radar-tabs', radar);
 }
 

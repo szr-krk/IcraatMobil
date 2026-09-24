@@ -161,7 +161,76 @@ function joinedNames(values) {
   return `${clean.slice(0, -1).join(', ')} ve ${clean.at(-1)}`;
 }
 
+function buildRadarPerformanceReport(evk, noteOverride) {
+  const payload = ensurePayload(evk);
+  const articleCounts = new Map();
+  const typeCounts = Object.fromEntries(Object.keys(PENALTY_TYPES).map(type => [type, 0]));
+  let totalAmount = 0;
+  let k3 = 0;
+  let vehicleBans = 0;
+  let parkingCount = 0;
+  let licenseCancelCount = 0;
+
+  payload.penalties.forEach(record => {
+    const parsedCount = Number.parseInt(record.count, 10);
+    const count = Number.isInteger(parsedCount) && parsedCount > 0 ? parsedCount : 1;
+    if (Object.hasOwn(typeCounts, record.type)) typeCounts[record.type] += count;
+    if (record.vehicleBan) vehicleBans += count;
+    if (record.parking) parkingCount += count;
+    if (record.licenseCancel) licenseCancelCount += count;
+    let speedOperation = false;
+    (record.articles || []).forEach(article => {
+      const code = String(article.code || '').trim();
+      if (!code) return;
+      articleCounts.set(code, (articleCounts.get(code) || 0) + count);
+      totalAmount += (Number(article.amount) || 0) * count;
+      if (/^51\/2-[ab]-[1-9]$/i.test(code)) speedOperation = true;
+    });
+    if (speedOperation) k3 += count;
+  });
+
+  const start = new Date(evk.startEpochMillis ?? evk.startDateTime);
+  const end = new Date(evk.endEpochMillis ?? evk.endDateTime);
+  const startDate = reportDateFormatter.format(start);
+  const endDate = reportDateFormatter.format(end);
+  const dateText = startDate === endDate ? `${startDate} tarihinde` : `${startDate} - ${endDate} tarihinde`;
+  const timeText = `${reportTimeFormatter.format(start)} - ${reportTimeFormatter.format(end)}`;
+  const roads = (payload.roads || []).map(road => String(road.yolad || '').trim()).filter(Boolean);
+  const roadNames = joinedNames(roads);
+  const personnel = (payload.personnel || []).map(person => {
+    const name = `${person.ad || ''} ${person.soyad || ''}`.trim();
+    const registry = String(person.sicil || '').trim();
+    return `${name}${registry ? ` (${registry})` : ''}`.trim();
+  }).filter(Boolean);
+  const note = String(noteOverride ?? payload.note ?? '').trim();
+  const lines = [performanceUnitName(evk.sourceUnit), ''];
+  let intro = `${dateText} ${timeText} saatleri arasında ${evk.teamCode} kod nolu ekip olarak`;
+  if (roadNames) intro += ` ${roadNames}${roads.length === 1 ? ' yolunda' : ' yollarında'}`;
+  lines.push(`${intro} yapmış olduğumuz uygulama icraatı ve görevler aşağıda çıkarılmıştır.`, '');
+  lines.push(`${evk.teamCode}${roadNames ? ` (${roadNames}${roads.length === 1 ? ' yolunda' : ' yollarında'} görevli personeller)` : ''}`);
+  lines.push(...personnel, '', `Kontrol edilen araç sayısı: ${k3}`);
+  lines.push(...(k3 > 0 ? [`K3:${k3}`] : ['—']), '', 'Yazılan Ceza Maddeleri:');
+
+  const sortedArticles = [...articleCounts.keys()].sort((left, right) => left.localeCompare(right, 'tr-TR', { numeric: true }));
+  if (!sortedArticles.length) lines.push('—');
+  sortedArticles.forEach((code, index) => lines.push(`${index + 1}) ${code} (${articleCounts.get(code)} adet)`));
+  const totalPenaltyCount = [...articleCounts.values()].reduce((total, value) => total + value, 0);
+  lines.push('', `Toplam Ceza: ${totalPenaltyCount} adet`);
+  Object.entries(PENALTY_TYPES).forEach(([type, label]) => {
+    if (typeCounts[type] > 0) lines.push(`${label}: ${typeCounts[type]} adet`);
+  });
+  lines.push('', `Toplam Ceza Miktarı: ${new Intl.NumberFormat('tr-TR').format(totalAmount)}₺`);
+  if (vehicleBans > 0) lines.push(`Trafikten Men Edilen Araç Sayısı: ${vehicleBans} adet`);
+  if (parkingCount > 0) lines.push(`Otoparka Çekilen Araç Sayısı: ${parkingCount} adet`);
+  if (licenseCancelCount > 0) lines.push(`İptal Edilen Sürücü Belgesi Sayısı: ${licenseCancelCount} adet`);
+  if (note) lines.push('', `Not: ${note}`);
+  lines.push('', 'Arz ederim.');
+
+  return { text: lines.join('\n').replace(/\n{3,}/g, '\n\n').trim(), note };
+}
+
 export function buildPerformanceReport(evk, noteOverride) {
+  if (evk.dutyType === 'RADAR') return buildRadarPerformanceReport(evk, noteOverride);
   const payload = ensurePayload(evk);
   const records = payload.penalties.filter(record => record.origin !== 'RADAR_OPERATOR');
   const articleCounts = new Map();
