@@ -94,6 +94,27 @@ export function directoryItemKey(item, type) {
   return `yol:${normalize(item.yolad)}`;
 }
 
+export function sortPersonnelByRegistry(items) {
+  const registryParts = person => {
+    const text = String(person?.sicil || '').trim();
+    return { text, numeric: /^\d+$/.test(text) ? BigInt(text) : null };
+  };
+  return [...(items || [])].sort((left, right) => {
+    const leftRegistry = registryParts(left);
+    const rightRegistry = registryParts(right);
+    if (leftRegistry.numeric !== null && rightRegistry.numeric !== null && leftRegistry.numeric !== rightRegistry.numeric) {
+      return leftRegistry.numeric < rightRegistry.numeric ? -1 : 1;
+    }
+    if (leftRegistry.numeric !== null && rightRegistry.numeric === null) return -1;
+    if (leftRegistry.numeric === null && rightRegistry.numeric !== null) return 1;
+    const registryOrder = leftRegistry.text.localeCompare(rightRegistry.text, 'tr-TR', { numeric: true });
+    if (registryOrder) return registryOrder;
+    const surnameOrder = String(left?.soyad || '').localeCompare(String(right?.soyad || ''), 'tr-TR');
+    if (surnameOrder) return surnameOrder;
+    return String(left?.ad || '').localeCompare(String(right?.ad || ''), 'tr-TR');
+  });
+}
+
 export function mergeDirectoryItems(current, incoming, type) {
   const merged = [];
   const keys = new Set();
@@ -197,7 +218,7 @@ function buildRadarPerformanceReport(evk, noteOverride) {
   const timeText = `${reportTimeFormatter.format(start)} - ${reportTimeFormatter.format(end)}`;
   const roads = (payload.roads || []).map(road => String(road.yolad || '').trim()).filter(Boolean);
   const roadNames = joinedNames(roads);
-  const personnel = (payload.personnel || []).map(person => {
+  const personnel = sortPersonnelByRegistry(payload.personnel).map(person => {
     const name = `${person.ad || ''} ${person.soyad || ''}`.trim();
     const registry = String(person.sicil || '').trim();
     return `${name}${registry ? ` (${registry})` : ''}`.trim();
@@ -290,7 +311,7 @@ export function buildPerformanceReport(evk, noteOverride) {
   const timeText = `${reportTimeFormatter.format(start)} - ${reportTimeFormatter.format(end)}`;
   const roads = (payload.roads || []).map(road => String(road.yolad || '').trim()).filter(Boolean);
   const roadNames = joinedNames(roads);
-  const personnel = (payload.personnel || []).map(person => {
+  const personnel = sortPersonnelByRegistry(payload.personnel).map(person => {
     const name = `${person.ad || ''} ${person.soyad || ''}`.trim();
     const registry = String(person.sicil || '').trim();
     return `${name}${registry ? ` (${registry})` : ''}`.trim();

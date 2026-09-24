@@ -5,7 +5,7 @@ import {
 import {
   ACCIDENT_FIELDS, CONTROLS, UNITS, buildEnvelope, buildPerformanceReport, calculateKeyboardInset, compareIncoming,
   directoryItemKey, displayDateTime, dutyLabel, ensurePayload, makeChildId, makeRandomId,
-  mergeDirectoryItems, penaltySummary, sameLogicalShift,
+  mergeDirectoryItems, penaltySummary, sameLogicalShift, sortPersonnelByRegistry,
   toIstanbulIso, unitLabel, validateEnvelope
 } from './domain.js';
 import { createDailyReportPdf } from './pdf-report.js';
@@ -29,7 +29,8 @@ const state = {
   selectedArticles: [],
   guide: [],
   reportFile: null,
-  saveTimers: new Map()
+  saveTimers: new Map(),
+  pendingDetailInputs: new Set()
 };
 
 const listScreen = $('#listScreen');
@@ -131,12 +132,12 @@ async function loadDirectories() {
   const existingRoads = await getSetting('road_directory', null);
   const evkPersonnel = state.evks.flatMap(evk => ensurePayload(evk).personnel);
   const evkRoads = state.evks.flatMap(evk => ensurePayload(evk).roads);
-  state.personnelDirectory = withDirectoryIds(
+  state.personnelDirectory = sortPersonnelByRegistry(withDirectoryIds(
     existingPersonnel === null
       ? mergeDirectoryItems([], evkPersonnel, 'personnel')
       : (Array.isArray(existingPersonnel) ? existingPersonnel : []),
     'person'
-  );
+  ));
   state.roadDirectory = withDirectoryIds(
     existingRoads === null
       ? mergeDirectoryItems([], evkRoads, 'roads')
@@ -149,11 +150,11 @@ async function loadDirectories() {
 }
 
 async function absorbDirectoriesFromEvks(evks) {
-  state.personnelDirectory = withDirectoryIds(mergeDirectoryItems(
+  state.personnelDirectory = sortPersonnelByRegistry(withDirectoryIds(mergeDirectoryItems(
     state.personnelDirectory,
     evks.flatMap(evk => ensurePayload(evk).personnel),
     'personnel'
-  ), 'person');
+  ), 'person'));
   state.roadDirectory = withDirectoryIds(mergeDirectoryItems(
     state.roadDirectory,
     evks.flatMap(evk => ensurePayload(evk).roads),
@@ -177,7 +178,7 @@ function renderOfficerDirectory() {
     list.innerHTML = '<div class="directory-empty">Henüz kayıtlı görevli yok. “Yeni” düğmesiyle ilk kaydı oluşturun.</div>';
     return;
   }
-  list.innerHTML = state.personnelDirectory.map(person => {
+  list.innerHTML = sortPersonnelByRegistry(state.personnelDirectory).map(person => {
     const selected = directorySelectionContains(person, 'personnel');
     const name = `${person.ad || ''} ${person.soyad || ''}`.trim();
     return `<div class="directory-row ${selected ? 'selected' : ''}">
@@ -215,9 +216,9 @@ function showOfficerEditor(id = null) {
   $('#officerEditorTitle').textContent = person ? 'Görevliyi Güncelle' : 'Yeni Görevli';
   $('#officerRegistry').value = person?.sicil || '';
   $('#officerName').value = person?.ad || '';
-  $('#officerSurname').value = person?.soyad || '';
+  $('#officerSurname').value = String(person?.soyad || '').toLocaleUpperCase('tr-TR');
   $('#officerForm').hidden = false;
-  $('#officerName').focus();
+  $('#officerDialog .directory-card').classList.add('editing');
 }
 
 function showRoadEditor(id = null) {
@@ -227,7 +228,7 @@ function showRoadEditor(id = null) {
   $('#roadEditorTitle').textContent = road ? 'Yolu Güncelle' : 'Yeni Yol';
   $('#roadName').value = road?.yolad || '';
   $('#roadForm').hidden = false;
-  $('#roadName').focus();
+  $('#roadDialog .directory-card').classList.add('editing');
 }
 
 function toggleDirectorySelection(item, type) {
@@ -329,6 +330,7 @@ function openCardMenu(id) {
 }
 
 function renderTeamDraftLists() {
+  state.draftPersonnel = sortPersonnelByRegistry(state.draftPersonnel);
   $('#officerList').innerHTML = state.draftPersonnel.map(person => `<span class="data-chip">
     ${escapeHtml(`${person.ad} ${person.soyad}`.trim())}${person.sicil ? ` · ${escapeHtml(person.sicil)}` : ''}
     <button type="button" data-remove-officer="${escapeHtml(person.id)}" aria-label="Görevliyi kaldır">×</button>
@@ -414,7 +416,7 @@ async function saveTeam(event) {
     do { evkId = makeRandomId(); } while (await evkIdExists(evkId));
   }
   const payload = existing ? ensurePayload(existing) : ensurePayload({});
-  payload.personnel = structuredClone(state.draftPersonnel);
+  payload.personnel = structuredClone(sortPersonnelByRegistry(state.draftPersonnel));
   payload.roads = structuredClone(state.draftRoads);
   const value = {
     ...(existing || {}),
@@ -491,12 +493,21 @@ function configureDetailTabs(radar) {
   $('.tabs').classList.toggle('radar-tabs', radar);
 }
 
-function selectTab(name) {
+async function selectTab(name) {
   $$('.tabs [role="tab"]').forEach(button => button.setAttribute('aria-selected', String(button.dataset.tab === name)));
   const names = ['penalties', 'radarTeam', 'radarOperator', 'controls', 'accidents', 'performance'];
   names.forEach(value => { $(`#${value}Panel`).hidden = value !== name; });
   if (name === 'penalties') requestAnimationFrame(updatePenaltyComposerMetrics);
   if (name === 'radarTeam' || name === 'radarOperator') clearUnexpectedRadarFocus();
+  if (name === 'performance') {
+    const evkId = state.selectedEvkId;
+    await flushPendingDetailInputs(evkId);
+    const updated = evkId ? await getEvk(evkId) : null;
+    if (!updated || state.selectedEvkId !== evkId || $('#performancePanel').hidden) return;
+    const index = state.evks.findIndex(item => item.evkId === evkId);
+    if (index >= 0) state.evks[index] = updated;
+    renderPerformance(updated);
+  }
 }
 
 function clearUnexpectedRadarFocus() {
@@ -718,9 +729,20 @@ function scheduleFocusedCountVisibility() {
 
 function scheduleRadarCountSave(input) {
   const evkId = state.selectedEvkId;
-  const timerKey = `${evkId}:${input.dataset.radarOrigin}:${input.dataset.radarCode}`;
+  const timerKey = detailInputTimerKey(input, evkId);
   clearTimeout(state.saveTimers.get(timerKey));
-  state.saveTimers.set(timerKey, setTimeout(() => saveRadarCount(input, evkId), 280));
+  input.dataset.pendingEvkId = evkId || '';
+  state.pendingDetailInputs.add(input);
+  const timer = setTimeout(async () => {
+    try {
+      await saveRadarCount(input, evkId);
+    } finally {
+      if (state.saveTimers.get(timerKey) === timer) state.saveTimers.delete(timerKey);
+      state.pendingDetailInputs.delete(input);
+      delete input.dataset.pendingEvkId;
+    }
+  }, 280);
+  state.saveTimers.set(timerKey, timer);
 }
 
 async function saveRadarCount(input, evkId) {
@@ -884,13 +906,42 @@ async function sharePerformanceText() {
 }
 
 function scheduleCountSave(input) {
-  const timerKey = `${state.selectedEvkId}:${input.dataset.countSection}:${input.dataset.countKey}`;
+  const evkId = state.selectedEvkId;
+  const timerKey = detailInputTimerKey(input, evkId);
   clearTimeout(state.saveTimers.get(timerKey));
-  state.saveTimers.set(timerKey, setTimeout(() => saveCountValue(input), 280));
+  input.dataset.pendingEvkId = evkId || '';
+  state.pendingDetailInputs.add(input);
+  const timer = setTimeout(async () => {
+    try {
+      await saveCountValue(input, evkId);
+    } finally {
+      if (state.saveTimers.get(timerKey) === timer) state.saveTimers.delete(timerKey);
+      state.pendingDetailInputs.delete(input);
+      delete input.dataset.pendingEvkId;
+    }
+  }, 280);
+  state.saveTimers.set(timerKey, timer);
 }
 
-async function saveCountValue(input) {
-  const evkId = state.selectedEvkId;
+function detailInputTimerKey(input, evkId) {
+  if (input.matches('[data-radar-code]')) return `${evkId}:${input.dataset.radarOrigin}:${input.dataset.radarCode}`;
+  return `${evkId}:${input.dataset.countSection}:${input.dataset.countKey}`;
+}
+
+async function flushPendingDetailInputs(evkId) {
+  const inputs = [...state.pendingDetailInputs].filter(input => input.dataset.pendingEvkId === evkId);
+  for (const input of inputs) {
+    const timerKey = detailInputTimerKey(input, evkId);
+    clearTimeout(state.saveTimers.get(timerKey));
+    state.saveTimers.delete(timerKey);
+    if (input.matches('[data-radar-code]')) await saveRadarCount(input, evkId);
+    else await saveCountValue(input, evkId);
+    state.pendingDetailInputs.delete(input);
+    delete input.dataset.pendingEvkId;
+  }
+}
+
+async function saveCountValue(input, evkId = state.selectedEvkId) {
   if (!evkId) return;
   const sectionName = input.dataset.countSection;
   const key = input.dataset.countKey;
@@ -1248,19 +1299,35 @@ function bindEvents() {
   $('#addOfficerButton').addEventListener('click', () => {
     state.editingOfficerId = null;
     $('#officerForm').hidden = true;
+    $('#officerDialog .directory-card').classList.remove('editing');
     renderOfficerDirectory();
     $('#officerDialog').showModal();
   });
-  $('[data-close-officer]').addEventListener('click', () => $('#officerDialog').close());
+  $('[data-close-officer]').addEventListener('click', () => {
+    $('#officerDialog .directory-card').classList.remove('editing');
+    $('#officerDialog').close();
+  });
   $('#newOfficerButton').addEventListener('click', () => showOfficerEditor());
-  $('#cancelOfficerEdit').addEventListener('click', () => { $('#officerForm').hidden = true; });
+  $('#cancelOfficerEdit').addEventListener('click', () => {
+    $('#officerForm').hidden = true;
+    $('#officerDialog .directory-card').classList.remove('editing');
+  });
+  $('#officerSurname').addEventListener('input', event => {
+    const input = event.currentTarget;
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    const upper = input.value.toLocaleUpperCase('tr-TR');
+    if (upper === input.value) return;
+    input.value = upper;
+    if (start !== null && end !== null) input.setSelectionRange(start, end);
+  });
   $('#officerForm').addEventListener('submit', async event => {
     event.preventDefault();
     if (!event.currentTarget.reportValidity()) return;
     const current = state.personnelDirectory.find(item => item.id === state.editingOfficerId);
     const person = {
       id: current?.id || makeChildId('person'), sicil: $('#officerRegistry').value.trim(),
-      ad: $('#officerName').value.trim(), soyad: $('#officerSurname').value.trim()
+      ad: $('#officerName').value.trim(), soyad: $('#officerSurname').value.trim().toLocaleUpperCase('tr-TR')
     };
     const duplicate = state.personnelDirectory.find(item => item.id !== current?.id
       && directoryItemKey(item, 'personnel') === directoryItemKey(person, 'personnel'));
@@ -1276,8 +1343,11 @@ function bindEvents() {
       state.personnelDirectory.push(person);
       state.draftPersonnel.push(structuredClone(person));
     }
+    state.personnelDirectory = sortPersonnelByRegistry(state.personnelDirectory);
+    state.draftPersonnel = sortPersonnelByRegistry(state.draftPersonnel);
     await setSetting('personnel_directory', state.personnelDirectory);
     $('#officerForm').hidden = true;
+    $('#officerDialog .directory-card').classList.remove('editing');
     renderTeamDraftLists();
     renderOfficerDirectory();
   });
@@ -1313,12 +1383,19 @@ function bindEvents() {
   $('#addRoadButton').addEventListener('click', () => {
     state.editingRoadId = null;
     $('#roadForm').hidden = true;
+    $('#roadDialog .directory-card').classList.remove('editing');
     renderRoadDirectory();
     $('#roadDialog').showModal();
   });
-  $('[data-close-road]').addEventListener('click', () => $('#roadDialog').close());
+  $('[data-close-road]').addEventListener('click', () => {
+    $('#roadDialog .directory-card').classList.remove('editing');
+    $('#roadDialog').close();
+  });
   $('#newRoadButton').addEventListener('click', () => showRoadEditor());
-  $('#cancelRoadEdit').addEventListener('click', () => { $('#roadForm').hidden = true; });
+  $('#cancelRoadEdit').addEventListener('click', () => {
+    $('#roadForm').hidden = true;
+    $('#roadDialog .directory-card').classList.remove('editing');
+  });
   $('#roadForm').addEventListener('submit', async event => {
     event.preventDefault();
     if (!event.currentTarget.reportValidity()) return;
@@ -1340,6 +1417,7 @@ function bindEvents() {
     }
     await setSetting('road_directory', state.roadDirectory);
     $('#roadForm').hidden = true;
+    $('#roadDialog .directory-card').classList.remove('editing');
     renderTeamDraftLists();
     renderRoadDirectory();
   });

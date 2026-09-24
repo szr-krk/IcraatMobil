@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   buildEnvelope, buildPerformanceReport, calculateKeyboardInset, compareIncoming, ensurePayload, exportRecord, normalizeEvk,
-  mergeDirectoryItems, penaltySummary, sameLogicalShift, toIstanbulIso, validateEnvelope
+  mergeDirectoryItems, penaltySummary, sameLogicalShift, sortPersonnelByRegistry, toIstanbulIso, validateEnvelope
 } from '../domain.js';
 
 function record(overrides = {}) {
@@ -70,6 +70,16 @@ test('görevli rehberi sicile göre mükerrer kayıt oluşturmaz', () => {
   );
   assert.equal(merged.length, 2);
   assert.equal(merged[0].id, '1');
+});
+
+test('görevliler küçük sicil numarası en üstte olacak şekilde sıralanır', () => {
+  const sorted = sortPersonnelByRegistry([
+    { sicil: '300', ad: 'Üç' },
+    { sicil: '', ad: 'Sicilsiz' },
+    { sicil: '20', ad: 'Bir' },
+    { sicil: '100', ad: 'İki' }
+  ]);
+  assert.deepEqual(sorted.map(item => item.sicil), ['20', '100', '300', '']);
 });
 
 test('yol rehberi büyük küçük harf ve boşluk farkını yok sayar', () => {
