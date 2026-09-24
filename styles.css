@@ -164,31 +164,35 @@ button { touch-action: manipulation; }
 .penalty-card p { margin: 4px 0 0; color: var(--muted); font-size: .8rem; line-height: 1.4; }
 .penalty-card-actions { display: flex; gap: 4px; }
 .penalty-card-actions button { width: 39px; height: 39px; border: 0; border-radius: 10px; color: var(--navy-800); background: var(--surface-soft); }
-.penalty-composer { position: fixed; left: 50%; right: auto; bottom: calc(var(--keyboard-inset, 0px) + env(safe-area-inset-bottom)); z-index: 30; width: min(544px, calc(100vw - 16px)); display: grid; gap: 9px; transform: translateX(-50%); padding: 10px; border: 1px solid #b8c5d2; border-radius: 14px; background: rgb(255 255 255 / 98%); box-shadow: 0 -8px 28px rgb(8 24 44 / 18%); }
-.radar-origin { display: grid; gap: 7px; color: var(--muted); font-size: .78rem; font-weight: 700; }
-.choice-pills { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.penalty-composer { position: fixed; left: 50%; right: auto; bottom: calc(var(--keyboard-inset, 0px) + env(safe-area-inset-bottom)); z-index: 30; width: min(544px, calc(100vw - 10px)); display: grid; gap: 4px; transform: translateX(-50%); padding: 6px; border: 1px solid #b8c5d2; border-radius: 12px; background: rgb(255 255 255 / 98%); box-shadow: 0 -8px 28px rgb(8 24 44 / 18%); }
+.radar-origin { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 6px; color: var(--muted); font-size: .68rem; font-weight: 700; }
+.choice-pills { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
 .choice-pills input, .type-scroll input { position: absolute; opacity: 0; }
-.choice-pills span, .type-scroll span { display: block; padding: 9px 10px; border: 1px solid var(--line); border-radius: 9px; text-align: center; background: white; }
+.choice-pills span, .type-scroll span { display: block; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; text-align: center; background: white; }
 .choice-pills input:checked + span, .type-scroll input:checked + span { border-color: var(--navy-800); color: white; background: var(--navy-800); }
-.penalty-row { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 8px; }
-.count-field { display: grid; gap: 4px; color: var(--muted); text-align: center; font-size: .72rem; font-weight: 700; }
-.count-field input { width: 100%; min-height: 46px; border: 1px solid var(--line); border-radius: 9px; text-align: center; font-size: 1.15rem; font-weight: 800; }
-.type-scroll { display: flex; gap: 6px; overflow-x: auto; padding-top: 18px; scrollbar-width: none; }
+.penalty-row { display: grid; grid-template-columns: 50px minmax(0, 1fr); align-items: end; gap: 5px; }
+.count-field { position: relative; display: block; color: var(--muted); text-align: center; font-size: .62rem; font-weight: 700; }
+.count-field > span { position: absolute; inset: 2px 0 auto; z-index: 1; pointer-events: none; }
+.count-field input { width: 100%; min-height: 38px; padding: 12px 3px 2px; border: 1px solid var(--line); border-radius: 8px; text-align: center; font-size: 1rem; font-weight: 800; }
+.type-scroll { display: flex; gap: 4px; overflow-x: auto; padding: 0; scrollbar-width: none; }
 .type-scroll label { flex: 0 0 auto; }
-.type-scroll span { padding: 8px 10px; font-size: .76rem; }
-.check-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 6px 0; border-block: 1px solid var(--line); }
-.check-row label { display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 36px; color: var(--text); font-size: .73rem; text-align: center; }
-.selected-articles { min-height: 32px; display: flex; flex-wrap: wrap; gap: 6px; }
-.selected-articles:empty::before { content: "Seçilen madde yok"; align-self: center; color: var(--muted); font-size: .78rem; }
-.article-search-row { display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; gap: 6px; }
+.type-scroll span { min-height: 38px; display: grid; place-items: center; padding: 5px 8px; font-size: .7rem; }
+.check-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 2px 0; border-block: 1px solid var(--line); }
+.check-row label { display: flex; align-items: center; justify-content: center; gap: 3px; min-height: 28px; color: var(--text); font-size: .67rem; text-align: center; }
+.check-row input { width: 14px; height: 14px; margin: 0; }
+.selected-articles { min-height: 25px; display: flex; flex-wrap: nowrap; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+.selected-articles .article-chip { flex: 0 0 auto; padding: 3px 4px 3px 8px; font-size: .7rem; }
+.selected-articles .article-chip button { width: 21px; height: 21px; font-size: .85rem; }
+.selected-articles:empty::before { content: "Seçilen madde yok"; align-self: center; color: var(--muted); font-size: .68rem; }
+.article-search-row { display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; gap: 4px; }
 .clear-button { border: 0; border-radius: 10px; color: var(--red-600); background: #f7e9eb; font-size: 1.6rem; }
-.article-search input { width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; text-align: center; }
-.primary-small { min-height: 44px; border: 0; border-radius: 10px; padding: 8px 11px; color: white; background: var(--navy-800); font-size: .76rem; font-weight: 900; }
-.article-results { position: absolute; left: 0; right: 0; bottom: calc(100% + 7px); z-index: 4; max-height: min(46dvh, 340px, calc(100dvh - var(--keyboard-inset, 0px) - var(--composer-height, 260px) - 96px)); overflow-y: auto; overscroll-behavior: contain; border: 1px solid #8ea1b4; border-radius: 12px; background: white; box-shadow: 0 -8px 28px rgb(8 24 44 / 22%); }
-.article-result { width: 100%; display: grid; gap: 2px; padding: 11px 12px; border: 0; border-bottom: 1px solid var(--line); text-align: left; color: var(--text); background: white; }
+.article-search input { width: 100%; min-height: 38px; border: 1px solid var(--line); border-radius: 9px; padding: 6px 8px; text-align: center; }
+.primary-small { min-height: 38px; border: 0; border-radius: 9px; padding: 6px 9px; color: white; background: var(--navy-800); font-size: .7rem; font-weight: 900; }
+.article-results { position: absolute; left: 0; right: 0; bottom: calc(100% + 4px); z-index: 4; max-height: min(340px, calc(var(--visual-height, 100dvh) - var(--composer-height, 180px) - 12px)); overflow-y: auto; overscroll-behavior: contain; border: 1px solid #8ea1b4; border-radius: 10px; background: white; box-shadow: 0 -8px 28px rgb(8 24 44 / 22%); }
+.article-result { width: 100%; min-height: 48px; display: grid; gap: 1px; padding: 7px 9px; border: 0; border-bottom: 1px solid var(--line); text-align: left; color: var(--text); background: white; }
 .article-result:last-child { border-bottom: 0; }
 .article-result strong { color: var(--navy-800); }
-.article-result span { color: var(--muted); font-size: .75rem; }
+.article-result span { overflow: hidden; color: var(--muted); font-size: .7rem; text-overflow: ellipsis; white-space: nowrap; }
 
 .autosave-note { margin: 0 0 12px; color: var(--muted); font-size: .79rem; }
 .controls-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
@@ -196,6 +200,7 @@ button { touch-action: manipulation; }
 .control-field strong { overflow: hidden; color: var(--navy-800); text-align: center; text-overflow: ellipsis; white-space: nowrap; font-size: .78rem; }
 .control-field span { min-height: 30px; color: var(--muted); text-align: center; font-size: .75rem; line-height: 1.25; }
 .control-field input { width: 100%; min-height: 42px; border: 1px solid #bac6d2; border-radius: 8px; text-align: center; font-size: 1rem; }
+.keyboard-open #controlsPanel, .keyboard-open #accidentsPanel { padding-bottom: calc(var(--keyboard-height, 0px) + 80px); }
 .accident-fields { display: grid; gap: 12px; }
 .accident-fields .field { padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: rgb(255 255 255 / 94%); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }

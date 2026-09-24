@@ -41,6 +41,8 @@ const articleSearch = $('#articleSearch');
 const articleResults = $('#articleResults');
 
 let toastTimer;
+let largestVisualViewportHeight = window.visualViewport?.height || window.innerHeight;
+let focusedCountScrollTimer;
 
 function showToast(message, duration = 2400) {
   const toast = $('#toast');
@@ -594,10 +596,35 @@ function updatePenaltyComposerMetrics() {
   const height = composer && !composer.closest('[hidden]') ? Math.ceil(composer.getBoundingClientRect().height) : 0;
   if (height) document.documentElement.style.setProperty('--composer-height', `${height}px`);
   const viewport = window.visualViewport;
-  const keyboardInset = viewport
+  if (!viewport) return;
+  const visualHeight = Math.round(viewport.height);
+  largestVisualViewportHeight = Math.max(largestVisualViewportHeight, visualHeight);
+  const overlayInset = viewport
     ? calculateKeyboardInset(window.innerHeight, viewport.height, viewport.offsetTop)
     : 0;
-  document.documentElement.style.setProperty('--keyboard-inset', `${keyboardInset}px`);
+  const resizedInset = Math.max(0, Math.round(largestVisualViewportHeight - viewport.height));
+  const keyboardHeight = Math.max(overlayInset, resizedInset);
+  document.documentElement.style.setProperty('--keyboard-inset', `${overlayInset}px`);
+  document.documentElement.style.setProperty('--keyboard-height', `${keyboardHeight}px`);
+  document.documentElement.style.setProperty('--visual-height', `${visualHeight}px`);
+  document.documentElement.classList.toggle('keyboard-open', keyboardHeight > 120);
+}
+
+function keepArticleSearchFocused(event) {
+  if (document.activeElement !== articleSearch) return;
+  const control = event.target.closest(
+    '.type-scroll label, .check-row label, .choice-pills label, .clear-button, .article-chip button, .article-result'
+  );
+  if (control) event.preventDefault();
+}
+
+function scheduleFocusedCountVisibility() {
+  clearTimeout(focusedCountScrollTimer);
+  focusedCountScrollTimer = setTimeout(() => {
+    const input = document.activeElement;
+    if (!input?.matches('[data-count-section]')) return;
+    input.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' });
+  }, 180);
 }
 
 async function editPenaltyCount(penaltyId) {
@@ -1039,6 +1066,7 @@ function bindEvents() {
 
   $$('.tabs [role="tab"]').forEach(button => button.addEventListener('click', () => selectTab(button.dataset.tab)));
   $('#penaltyForm').addEventListener('submit', savePenalty);
+  $('#penaltyForm').addEventListener('pointerdown', keepArticleSearchFocused);
   $('#penaltyCount').addEventListener('focus', selectPenaltyCount);
   $('#penaltyCount').addEventListener('click', selectPenaltyCount);
   articleSearch.addEventListener('input', () => renderArticleResults(articleSearch.value));
@@ -1077,6 +1105,9 @@ function bindEvents() {
     const input = event.target.closest('[data-count-section]');
     if (input) scheduleCountSave(input);
   });
+  detailScreen.addEventListener('focusin', event => {
+    if (event.target.matches('[data-count-section]')) scheduleFocusedCountVisibility();
+  });
 
   overflowMenu.addEventListener('click', event => {
     const button = event.target.closest('[data-action]');
@@ -1098,10 +1129,17 @@ function bindEvents() {
     else showListView();
   });
   if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', updatePenaltyComposerMetrics);
+    window.visualViewport.addEventListener('resize', () => {
+      updatePenaltyComposerMetrics();
+      scheduleFocusedCountVisibility();
+    });
     window.visualViewport.addEventListener('scroll', updatePenaltyComposerMetrics);
   }
   window.addEventListener('resize', updatePenaltyComposerMetrics);
+  window.addEventListener('orientationchange', () => {
+    largestVisualViewportHeight = 0;
+    requestAnimationFrame(updatePenaltyComposerMetrics);
+  });
 }
 
 async function init() {
