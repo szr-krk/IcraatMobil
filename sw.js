@@ -1,4 +1,4 @@
-const CACHE_NAME = 'icraat-mobil-v12';
+const CACHE_NAME = 'icraat-mobil-v13';
 const APP_SHELL = [
   './',
   './index.html',
@@ -6,12 +6,18 @@ const APP_SHELL = [
   './app.js',
   './db.js',
   './domain.js',
+  './report.js',
+  './pdf-report.js',
   './manifest.webmanifest',
   './icons/favicon.svg',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './assets/trafik-armasi.png',
-  './assets/ceza_rehberi.json'
+  './assets/ceza_rehberi.json',
+  './assets/reference_data.json',
+  './assets/daily_report/template.json',
+  './assets/daily_report/logo_1.png',
+  './assets/daily_report/logo_2.png'
 ];
 
 self.addEventListener('install', event => {
@@ -32,7 +38,7 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
   const networkFirst = event.request.mode === 'navigate'
-    || /\/(index\.html|app\.js|db\.js|domain\.js|styles\.css|manifest\.webmanifest)$/.test(url.pathname);
+    || /\/(index\.html|app\.js|db\.js|domain\.js|report\.js|pdf-report\.js|styles\.css|manifest\.webmanifest|ceza_rehberi\.json|reference_data\.json)$/.test(url.pathname);
   if (networkFirst) {
     event.respondWith(
       fetch(event.request)

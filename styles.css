@@ -88,6 +88,28 @@ button { touch-action: manipulation; }
 .sheet-header .icon-button { align-self: center; }
 .text-button { min-height: 44px; border: 0; color: white; background: transparent; font-size: .82rem; font-weight: 900; letter-spacing: .05em; }
 .sheet-body { display: grid; gap: 14px; padding: 16px 14px calc(28px + env(safe-area-inset-bottom)); overflow: auto; }
+.report-sheet { height: 100%; }
+.report-sheet-body { align-content: start; min-height: 0; }
+.report-intro { padding: 14px; border: 1px solid #b9c8d8; border-radius: 13px; background: #f3f7fb; }
+.report-intro strong { display: block; color: var(--navy-800); font-size: .93rem; line-height: 1.4; }
+.report-intro p { margin: 7px 0 0; color: var(--muted); font-size: .79rem; line-height: 1.45; }
+#reportForm { display: grid; gap: 14px; }
+.report-accident-sections { display: grid; gap: 16px; }
+.report-unit-card { padding: 13px; border: 1px solid var(--line); border-radius: 13px; background: white; box-shadow: 0 2px 8px rgb(8 24 44 / 5%); }
+.report-unit-card h3 { margin: 0 0 10px; color: var(--navy-800); font-size: .94rem; }
+.report-count-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.report-count-grid .field { min-width: 0; }
+.report-count-grid .field span { min-height: 2.1em; display: flex; align-items: end; line-height: 1.05; }
+.report-count-grid .field input { min-height: 46px; text-align: center; font-weight: 800; appearance: textfield; }
+.report-count-grid .field input::-webkit-inner-spin-button,
+.report-count-grid .field input::-webkit-outer-spin-button { margin: 0; appearance: none; }
+.report-count-grid .field.invalid input { border-color: var(--red-600); outline: 2px solid rgb(201 52 60 / 12%); }
+.report-status { min-height: 22px; margin: 0; color: var(--muted); font-size: .82rem; line-height: 1.4; }
+.report-status.error { color: var(--red-600); font-weight: 700; }
+.report-generate { width: 100%; min-height: 50px; }
+.report-actions { position: sticky; bottom: calc(-28px - env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; padding: 12px 0 calc(12px + env(safe-area-inset-bottom)); background: linear-gradient(rgb(255 255 255 / 0%), white 18%); }
+.report-actions button { min-width: 0; padding-inline: 8px; }
+.report-actions button:disabled, .report-generate:disabled { opacity: .46; }
 .field { display: grid; gap: 6px; color: var(--muted); font-size: .78rem; font-weight: 700; }
 .field input, .field select { width: 100%; min-height: 52px; border: 1px solid #bcc8d4; border-radius: 10px; padding: 10px 12px; color: var(--text); background: white; font-size: 1rem; font-weight: 500; }
 .field input:focus, .field select:focus { border-color: var(--blue-600); outline: 3px solid rgb(23 105 170 / 13%); }
@@ -234,4 +256,5 @@ button { touch-action: manipulation; }
   .team-card { grid-template-columns: 38px 70px minmax(0, 1fr) 40px; }
   .controls-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .radar-count-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .report-count-grid { grid-template-columns: 1fr; }
 }

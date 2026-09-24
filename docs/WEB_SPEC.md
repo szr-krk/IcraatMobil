@@ -5,7 +5,7 @@
 - Hedef platformlar: güncel iPhone/Safari ve Android/Chrome.
 - Uygulama PWA olarak GitHub Pages üzerinden sunulacak; ilk yükleme ve güncellemeler dışında çevrimdışı çalışacak.
 - EVK verileri cihazdaki IndexedDB içinde saklanır.
-- PDF üretimi bu fazın kapsamında değildir.
+- Günlük İcraat PDF, cihazda kayıtlı tüm EVK’lerden tarayıcı içinde ve çevrimdışı üretilebilir.
 
 ## Birleştirilen özellikler
 
@@ -28,6 +28,7 @@
 - Açılış özet satırı Merkez, Çorlu ve Malkara birimlerinin kayıtlı EVK sayılarını (kayıt yoksa `0`) sabit sırayla gösterir.
 - Görevli ve yol bilgileri ayrıca IndexedDB `settings` deposunda cihaz genelinde seçilebilir rehberler olarak tutulur. İlk kullanımda mevcut EVK payload kayıtları rehberlere alınır. Rehber kaydı güncellenebilir veya silinebilir; silme geçmiş EVK payload verilerini değiştirmez.
 - Ceza ekleme çerçevesi Ceza Ekle sekmesinde ekranın altında sabittir ve sanal klavye açıldığında görünür alanın altına taşınır. Ceza listesi düşey kaydırılabilir; madde arama sonuçları sabit çerçevenin üstünde açılır.
+- `assets/ceza_rehberi.json` ağ varken GitHub Pages kaynağından yeniden doğrulanır, ağ yokken Service Worker’daki son geçerli kopya kullanılır; yalnızca rehber içeriği değiştiğinde uygulama kodu güncellemesi gerekmez.
 - Ceza çerçevesi dar telefonlarda sonuçlara alan bırakacak sıkı düzendedir. Madde arama alanı odaktayken madde sonucu, ceza türü, radar kaynağı, araç men, otopark ve belge iptal seçimleri arama odağını bozmaz; seri madde seçimi sırasında klavye açık kalır.
 - Kontrol ve kaza sayısı alanları klavye açıldığında görünür alanın ortasına kaydırılır; son satırlar için klavye yüksekliği kadar ek kaydırma alanı ayrılır.
 - Madde filtresi açıkken ceza türü, radar kaynağı, ek işlem kutuları ve seçili madde satırı geçici olarak gizlenir; sonuç penceresinin alt kenarı Madde Ara satırının hemen üstünde kalır.
@@ -38,6 +39,16 @@
 - Radar İcraat sekmesi birinci projenin radar faaliyet metnini kullanır: K3 ve kontrol edilen araç sayısı radar ceza işlemlerinden hesaplanır; ceza maddeleri ekip/operatör ayrımı olmadan toplam adetle listelenir, ardından sürücüye/plakasına toplamları, toplam tutar, not ve `Arz ederim.` satırı gösterilir. Radar için Kontroller, Kazalar ve Hız/Kemer/Alkol ek özeti gösterilmez.
 - İcraat başlığı Merkez EVK'larında `Tekirdağ Bölge Trafik Denetleme Şube Müdürlüğü`, Çorlu ve Malkara EVK'larında `Malkara Bölge Trafik Denetleme İstasyon Amirliği` olarak gösterilir. Not `payload.note` alanında saklanır ve EVK JSON aktarımında korunur. Metin paylaşımı Web Share ile WhatsApp dahil cihaz paylaşım ekranını açar; desteklenmiyorsa metni panoya kopyalar.
 
+## Günlük İcraat PDF
+
+- Ana menüdeki **Günlük İcraat PDF** işlemi cihazda kayıtlı bütün EVK’leri rapora alır; PDF oluşturmak EVK kimlik, revision veya updatedAt değerlerini değiştirmez.
+- Rapor aralığı EVK’lerin en erken başlangıcı ile en geç bitişidir. `12/36`, Gündüz ve Gece ekiplerinin toplamıdır; Ara Ekip ve Radar ayrı satırlardır.
+- PDF öncesinde Merkez, Çorlu ve Malkara için Ölümlü Kaza, Ölü, Yaralanmalı Kaza ve Yaralı toplamları elle ve zorunlu olarak girilir. Bunlar yılbaşından raporun bitiş tarihine kadar birikmiş değerlerdir; yoksa `0` girilir ve EVK payload’ına kaydedilmez.
+- Birim bazlı K1/A, K2/A, K2/B, K4/A, K5 ve K6 gerçekleşenleri EVK kontrollerinden; hedefleri `assets/reference_data.json` içindeki rapor bitiş ayından gelir.
+- Ceza adetleri madde çarpanlarıyla hesaplanır. Radar EVK’de mükerrer ekip/yüzüne değerleri dışlanır; yalnızca `RADAR_OPERATOR` + `PLATE` kayıtları toplu rapora eklenir.
+- Şablon `assets/daily_report/template.json` ve iki resmi logodan tarayıcı Canvas’ına çizilir; tek sayfalık A4 PDF cihaz içinde oluşturulur. Kullanıcı önizleyebilir, indirebilir veya desteklenen cihazlarda sistem paylaşım ekranıyla gönderebilir.
+- `reference_data.json` Service Worker tarafından ağ öncelikli okunur; ağ yoksa son geçerli çevrimdışı kopya kullanılır. Yeni ay hedefleri eklenirken uygulama kodu değişmez.
+
 ## Web uzantısı
 
 Tüm birimlerdeki EVK kayıtlarının tek dosyada taşınabilmesi için web sürümü `exportType = ALL_EVK` ve karışık paketlerde `sourceUnit = MIXED` kullanır. Kayıtların içindeki `sourceUnit` değerleri değişmez. Import motoru mevcut `SINGLE_EVK` ve `UNIT_PACKAGE` zarflarını da kayıt bazında kabul eder.
@@ -45,6 +56,6 @@ Tüm birimlerdeki EVK kayıtlarının tek dosyada taşınabilmesi için web sür
 ## Açık TODO
 
 - BIRIM_BILGI alanları tanımlanınca IndexedDB store ve form eklenecek.
-- PDF alan eşlemesi tanımlanınca ayrı fazda ele alınacak.
+- Uzak aylık hedef kaynağının nihai adresi belirlendiğinde yerel `reference_data.json` için sürümlü güncelleme mekanizması eklenecek.
 - Public kaynak deposu: `https://github.com/szr-krk/IcraatMobil`
 - GitHub Pages yayını: `https://szr-krk.github.io/IcraatMobil/`

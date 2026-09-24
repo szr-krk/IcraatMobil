@@ -107,6 +107,7 @@
 
   <div class="backdrop" id="menuBackdrop" hidden></div>
   <nav class="overflow-menu" id="overflowMenu" aria-label="Uygulama menüsü" hidden>
+    <button type="button" data-action="pdf">Günlük İcraat PDF</button>
     <button type="button" data-action="import">JSON İçe Aktar</button>
     <button type="button" data-action="export">Tüm EVK’leri Dışa Aktar</button>
     <button type="button" data-action="share">Tüm EVK’leri Paylaş</button>
@@ -153,6 +154,32 @@
         </section>
       </div>
     </form>
+  </dialog>
+
+  <dialog id="reportDialog" class="sheet-dialog">
+    <section class="sheet report-sheet">
+      <header class="sheet-header">
+        <button class="icon-button" type="button" data-close-report aria-label="Kapat">‹</button>
+        <h2>Günlük İcraat PDF</h2>
+        <span></span>
+      </header>
+      <div class="sheet-body report-sheet-body">
+        <section class="report-intro">
+          <strong id="reportPeriod">Kayıtlar hazırlanıyor…</strong>
+          <p>Her birimin yılbaşından raporun bitiş tarihine kadar birikmiş kaza ve kişi sayılarını girin. EVK içindeki vardiya kazaları buraya aktarılmaz. Yoksa 0 yazın.</p>
+        </section>
+        <form id="reportForm" novalidate>
+          <div id="reportAccidentSections" class="report-accident-sections"></div>
+          <p id="reportStatus" class="report-status" role="status" aria-live="polite"></p>
+          <button type="submit" class="primary-button report-generate" id="generateReport">PDF OLUŞTUR</button>
+        </form>
+        <div class="report-actions" aria-label="PDF işlemleri">
+          <button type="button" class="secondary-button" id="previewReport" disabled>Önizle</button>
+          <button type="button" class="secondary-button" id="downloadReport" disabled>İndir</button>
+          <button type="button" class="primary-button" id="shareReport" disabled>Paylaş</button>
+        </div>
+      </div>
+    </section>
   </dialog>
 
   <dialog id="officerDialog" class="mini-dialog">
@@ -213,7 +240,7 @@
     <div class="dialog-card">
       <h2>İcraat Mobil</h2>
       <p>EVK verileri bu cihazın tarayıcı hafızasında saklanır. Uygulama ana ekrana eklendikten sonra çevrimdışı kullanılabilir.</p>
-      <p class="small-copy">PDF üretimi bu sürümün kapsamında değildir.</p>
+      <p class="small-copy">Günlük İcraat PDF; kayıtlı EVK’leri, aylık hedefleri ve PDF öncesinde elle girilen birim kaza toplamlarını kullanır.</p>
       <div class="dialog-actions"><button type="button" class="primary-button" data-close-info>Tamam</button></div>
     </div>
   </dialog>

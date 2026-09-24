@@ -2,6 +2,8 @@
 
 HTML, CSS ve JavaScript ile yazılmış; Android ve iPhone için mobil odaklı, çevrimdışı çalışabilen EVK uygulaması.
 
+Uygulama kayıtlı EVK’lerden Excel düzenine denk tek sayfalık A4 Günlük İcraat PDF üretir. PDF öncesinde üç birimin yılbaşından rapor gününe kadar birikmiş kaza toplamları elle girilir; çıktı önizlenebilir, indirilebilir veya cihazın paylaşım ekranıyla gönderilebilir.
+
 Canlı uygulama: https://szr-krk.github.io/IcraatMobil/
 
 ## Yerelde çalıştırma
@@ -25,6 +27,8 @@ node --test
 node --check app.js
 node --check db.js
 node --check domain.js
+node --check report.js
+node --check pdf-report.js
 node --check sw.js
 ```
 

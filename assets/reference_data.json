@@ -1,0 +1,15 @@
+{
+  "app": "ICRAAT_REFERENCE",
+  "schemaVersion": 1,
+  "dataVersion": 1,
+  "updatedAt": "2026-09-18T00:00:00+03:00",
+  "minimumAppVersion": 1,
+  "historicalFixedData": {},
+  "monthlyTargets": {
+    "2026-09": {
+      "MERKEZ": { "K1_A": 261, "K2_A": 58, "K2_B": 35, "K4_A": 333, "K5": 58, "K6": 315 },
+      "CORLU": { "K1_A": 205, "K2_A": 46, "K2_B": 27, "K4_A": 262, "K5": 46, "K6": 247 },
+      "MALKARA": { "K1_A": 156, "K2_A": 35, "K2_B": 21, "K4_A": 198, "K5": 35, "K6": 187 }
+    }
+  }
+}

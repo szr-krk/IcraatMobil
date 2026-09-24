@@ -8,6 +8,7 @@ import {
   mergeDirectoryItems, penaltySummary, sameLogicalShift,
   toIstanbulIso, unitLabel, validateEnvelope
 } from './domain.js';
+import { createDailyReportPdf } from './pdf-report.js';
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -26,6 +27,7 @@ const state = {
   editingRoadId: null,
   selectedArticles: [],
   guide: [],
+  reportFile: null,
   saveTimers: new Map()
 };
 
@@ -975,18 +977,127 @@ function downloadFile(file) {
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
-async function shareFile(file, title) {
+async function shareFile(file, title, text = 'İcraat EVK kaydı', fallbackMessage = 'Paylaşım desteklenmediği için dosya indirildi.') {
   if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
     try {
-      await navigator.share({ files: [file], title, text: 'İcraat EVK kaydı' });
+      await navigator.share({ files: [file], title, text });
       return true;
     } catch (error) {
       if (error.name === 'AbortError') return false;
     }
   }
   downloadFile(file);
-  showToast('Paylaşım desteklenmediği için JSON dosyası indirildi.', 3600);
+  showToast(fallbackMessage, 3600);
   return false;
+}
+
+function clearReportOutput(message = '') {
+  state.reportFile = null;
+  $('#previewReport').disabled = true;
+  $('#downloadReport').disabled = true;
+  $('#shareReport').disabled = true;
+  const status = $('#reportStatus');
+  status.textContent = message;
+  status.classList.remove('error');
+}
+
+function renderReportAccidentInputs() {
+  $('#reportAccidentSections').innerHTML = UNITS.map(unit => `<section class="report-unit-card">
+    <h3>${escapeHtml(unit.label)}</h3>
+    <div class="report-count-grid">${ACCIDENT_FIELDS.map(([key, label]) => `<label class="field" data-report-field>
+      <span>${escapeHtml(label)}</span>
+      <input type="number" min="0" step="1" inputmode="numeric" data-report-unit="${unit.code}" data-report-key="${key}" required>
+    </label>`).join('')}</div>
+  </section>`).join('');
+}
+
+function openReportDialog() {
+  if (!state.evks.length) {
+    showToast('PDF oluşturmak için en az bir EVK kaydı ekleyin.');
+    return;
+  }
+  renderReportAccidentInputs();
+  clearReportOutput('Kaza toplamlarını girip PDF Oluştur’a dokunun.');
+  const earliest = Math.min(...state.evks.map(evk => Number(evk.startEpochMillis)));
+  const latest = Math.max(...state.evks.map(evk => Number(evk.endEpochMillis)));
+  $('#reportPeriod').textContent = `${state.evks.length} ekip kaydı · ${displayDateTime(earliest)} – ${displayDateTime(latest)}`;
+  $('#reportDialog').showModal();
+}
+
+function readReportAccidents() {
+  const values = Object.fromEntries(UNITS.map(unit => [unit.code, []]));
+  let firstInvalid = null;
+  $$('[data-report-unit]').forEach(input => {
+    const wrapper = input.closest('[data-report-field]');
+    wrapper.classList.remove('invalid');
+    const text = input.value.trim();
+    const valid = /^\d+$/.test(text) && Number.isSafeInteger(Number(text));
+    if (!valid) {
+      wrapper.classList.add('invalid');
+      if (!firstInvalid) firstInvalid = input;
+      return;
+    }
+    values[input.dataset.reportUnit].push(Number(text));
+  });
+  if (firstInvalid) {
+    firstInvalid.focus();
+    firstInvalid.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    throw new Error('Tüm kaza alanlarına sıfır veya daha büyük bir tam sayı girin.');
+  }
+  return values;
+}
+
+async function generateDailyReport(event) {
+  event.preventDefault();
+  const status = $('#reportStatus');
+  let accidents;
+  try {
+    accidents = readReportAccidents();
+  } catch (error) {
+    status.textContent = error.message;
+    status.classList.add('error');
+    return;
+  }
+  const button = $('#generateReport');
+  button.disabled = true;
+  status.classList.remove('error');
+  status.textContent = 'Güncel EVK kayıtlarıyla PDF hazırlanıyor…';
+  try {
+    const result = await createDailyReportPdf(state.evks.map(evk => structuredClone(evk)), accidents);
+    state.reportFile = result.file;
+    $('#previewReport').disabled = false;
+    $('#downloadReport').disabled = false;
+    $('#shareReport').disabled = false;
+    status.textContent = `PDF hazır: ${result.report.periodLabel}`;
+  } catch (error) {
+    clearReportOutput();
+    status.textContent = error.message || 'PDF oluşturulamadı.';
+    status.classList.add('error');
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function previewDailyReport() {
+  if (!state.reportFile) return;
+  const url = URL.createObjectURL(state.reportFile);
+  const opened = window.open(url, '_blank', 'noopener');
+  if (!opened) {
+    URL.revokeObjectURL(url);
+    showToast('PDF önizleme açılamadı. İndir veya Paylaş seçeneğini kullanın.');
+    return;
+  }
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+
+async function shareDailyReport() {
+  if (!state.reportFile) return;
+  await shareFile(
+    state.reportFile,
+    'Günlük İcraat PDF',
+    'Günlük İcraat PDF raporu',
+    'PDF paylaşımı desteklenmediği için dosya indirildi.'
+  );
 }
 
 async function shareSingleEvk(id) {
@@ -1293,11 +1404,26 @@ function bindEvents() {
     const button = event.target.closest('[data-action]');
     if (!button) return;
     toggleMenu(false);
+    if (button.dataset.action === 'pdf') openReportDialog();
     if (button.dataset.action === 'import') $('#importInput').click();
     if (button.dataset.action === 'export') exportAll(false);
     if (button.dataset.action === 'share') exportAll(true);
     if (button.dataset.action === 'about') $('#infoDialog').showModal();
   });
+  $('[data-close-report]').addEventListener('click', () => $('#reportDialog').close());
+  $('#reportForm').addEventListener('submit', generateDailyReport);
+  $('#reportForm').addEventListener('input', event => {
+    if (!event.target.matches('[data-report-unit]')) return;
+    event.target.closest('[data-report-field]').classList.remove('invalid');
+    if (state.reportFile) clearReportOutput('Kaza verileri değişti. Güncel PDF için yeniden PDF Oluştur’a dokunun.');
+  });
+  $('#previewReport').addEventListener('click', previewDailyReport);
+  $('#downloadReport').addEventListener('click', () => {
+    if (!state.reportFile) return;
+    downloadFile(state.reportFile);
+    showToast('PDF indirildi.');
+  });
+  $('#shareReport').addEventListener('click', shareDailyReport);
   $('[data-close-info]').addEventListener('click', () => $('#infoDialog').close());
   $('#importInput').addEventListener('change', event => {
     const [file] = event.target.files;
