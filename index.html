@@ -186,28 +186,44 @@
     <div class="dialog-card directory-card">
       <div class="directory-heading"><div><h2>Görevli Seç</h2><p>Kayıtlı görevlilere dokunarak ekibe ekleyin.</p></div><button type="button" class="small-action" id="newOfficerButton">+ Yeni</button></div>
       <div id="savedOfficerList" class="directory-list"></div>
-      <form id="officerForm" class="directory-editor" hidden>
-        <h3 id="officerEditorTitle">Yeni Görevli</h3>
+      <div class="dialog-actions"><button type="button" class="primary-button" data-close-officer>Tamam</button></div>
+    </div>
+  </dialog>
+
+  <dialog id="officerEditorDialog" class="sheet-dialog record-editor-dialog">
+    <form id="officerForm" class="sheet record-editor-sheet">
+      <header class="sheet-header">
+        <button class="icon-button" type="button" id="cancelOfficerEdit" aria-label="Görevli seçimine dön">‹</button>
+        <h2 id="officerEditorTitle">Yeni Görevli</h2>
+        <button class="text-button" type="submit">KAYDET</button>
+      </header>
+      <div class="record-editor-body">
         <label class="field"><span>Sicil</span><input id="officerRegistry" inputmode="numeric"></label>
         <label class="field"><span>Ad</span><input id="officerName" autocomplete="given-name" required></label>
         <label class="field"><span>Soyad</span><input id="officerSurname" autocomplete="family-name" autocapitalize="characters" spellcheck="false" required></label>
-        <div class="dialog-actions"><button type="button" class="secondary-button" id="cancelOfficerEdit">Vazgeç</button><button class="primary-button" type="submit">Kaydet</button></div>
-      </form>
-      <div class="dialog-actions"><button type="button" class="primary-button" data-close-officer>Tamam</button></div>
-    </div>
+      </div>
+    </form>
   </dialog>
 
   <dialog id="roadDialog" class="mini-dialog">
     <div class="dialog-card directory-card">
       <div class="directory-heading"><div><h2>Yol Seç</h2><p>Kayıtlı yollara dokunarak ekibe ekleyin.</p></div><button type="button" class="small-action" id="newRoadButton">+ Yeni</button></div>
       <div id="savedRoadList" class="directory-list"></div>
-      <form id="roadForm" class="directory-editor" hidden>
-        <h3 id="roadEditorTitle">Yeni Yol</h3>
-        <label class="field"><span>Yol Adı</span><input id="roadName" required></label>
-        <div class="dialog-actions"><button type="button" class="secondary-button" id="cancelRoadEdit">Vazgeç</button><button class="primary-button" type="submit">Kaydet</button></div>
-      </form>
       <div class="dialog-actions"><button type="button" class="primary-button" data-close-road>Tamam</button></div>
     </div>
+  </dialog>
+
+  <dialog id="roadEditorDialog" class="sheet-dialog record-editor-dialog">
+    <form id="roadForm" class="sheet record-editor-sheet">
+      <header class="sheet-header">
+        <button class="icon-button" type="button" id="cancelRoadEdit" aria-label="Yol seçimine dön">‹</button>
+        <h2 id="roadEditorTitle">Yeni Yol</h2>
+        <button class="text-button" type="submit">KAYDET</button>
+      </header>
+      <div class="record-editor-body">
+        <label class="field"><span>Yol Adı</span><input id="roadName" required></label>
+      </div>
+    </form>
   </dialog>
 
   <dialog id="cardMenuDialog" class="action-dialog">

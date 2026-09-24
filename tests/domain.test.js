@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  buildEnvelope, buildPerformanceReport, calculateKeyboardInset, compareIncoming, ensurePayload, exportRecord, normalizeEvk,
+  buildEnvelope, buildJsonFileName, buildPerformanceReport, buildSharePerformanceText, calculateKeyboardInset, compareIncoming, ensurePayload, exportRecord, normalizeEvk,
   mergeDirectoryItems, penaltySummary, sameLogicalShift, sortPersonnelByRegistry, toIstanbulIso, validateEnvelope
 } from '../domain.js';
 
@@ -82,6 +82,14 @@ test('görevliler küçük sicil numarası en üstte olacak şekilde sıralanır
   assert.deepEqual(sorted.map(item => item.sicil), ['20', '100', '300', '']);
 });
 
+test('tek ve toplu JSON dosya adları ekip, birim ve tarih bilgisini öne taşır', () => {
+  const first = normalizeEvk(record({ teamCode: '59635', dutyType: 'GUNDUZ', sourceUnit: 'MALKARA', startDateTime: '2026-09-24T08:00:00+03:00' }));
+  const second = normalizeEvk(record({ evkId: '1789758432123-482732', teamCode: '59636', sourceUnit: 'MALKARA', startDateTime: '2026-09-25T08:00:00+03:00' }));
+  assert.equal(buildJsonFileName([first]), '59635_Gündüz_24_Eylül.json');
+  assert.equal(buildJsonFileName([first, second]), 'Malkara_24_25_Eylül.json');
+  assert.equal(buildJsonFileName([first, { ...second, sourceUnit: 'CORLU' }]), 'Toplu_icraat_24_25_Eylül.json');
+});
+
 test('yol rehberi büyük küçük harf ve boşluk farkını yok sayar', () => {
   const merged = mergeDirectoryItems(
     [{ id: '1', yolad: 'D-100' }],
@@ -124,8 +132,26 @@ test('icraat özeti kurum başlığı ile hız, kemer, alkol ve not satırların
   assert.match(report.text, /Not: Deneme notu/);
 });
 
+test('WhatsApp paylaşım metni birinci projenin kısa ve kalın işaretli biçimini kullanır', () => {
+  const evk = normalizeEvk(record({
+    teamCode: '59635',
+    payload: {
+      controls: { K1_A: 5 },
+      penalties: [{ type: 'DRIVER', count: 2, articles: [{ code: '51/2-b-1', amount: 2000 }] }],
+      personnel: [], roads: [], accidents: {}, note: 'Deneme notu'
+    }
+  }));
+  const shared = buildSharePerformanceText(evk);
+  assert.match(shared, /^\*Malkara Bölge Trafik Denetleme İstasyon Amirliği\*/);
+  assert.match(shared, /\*59635\* kod nolu ekip/);
+  assert.match(shared, /1\) 51\/2-b-1 \(2 adet\)/);
+  assert.match(shared, /\*Toplam Ceza: 2 adet\*/);
+  assert.match(shared, /\*Not:\* Deneme notu/);
+  assert.doesNotMatch(shared, /İşlem Yapılan|Hız:|Kemer:|Alkol:/);
+});
+
 test('radar icraat özeti ekip ve operatör cezalarını tek madde toplamında gösterir', () => {
-  const report = buildPerformanceReport(normalizeEvk(record({
+  const evk = normalizeEvk(record({
     dutyType: 'RADAR',
     payload: {
       penalties: [
@@ -134,10 +160,15 @@ test('radar icraat özeti ekip ve operatör cezalarını tek madde toplamında g
       ],
       personnel: [], roads: [], controls: {}, accidents: {}, note: 'Radar notu'
     }
-  })));
+  }));
+  const report = buildPerformanceReport(evk);
   assert.match(report.text, /Kontrol edilen araç sayısı: 5\nK3:5/);
   assert.match(report.text, /1\) 51\/2-b-2 \(5 adet\)/);
   assert.match(report.text, /Sürücüye: 2 adet\nPlakasına: 3 adet/);
   assert.doesNotMatch(report.text, /Hız:/);
   assert.match(report.text, /Not: Radar notu/);
+  const shared = buildSharePerformanceText(evk);
+  assert.match(shared, /^\*Malkara Bölge Trafik Denetleme İstasyon Amirliği\*/);
+  assert.match(shared, /\*Kontrol edilen araç sayısı: 5\*/);
+  assert.match(shared, /\*Arz ederim\.\*$/);
 });

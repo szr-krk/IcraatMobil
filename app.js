@@ -3,7 +3,7 @@ import {
   putEvk, putManyEvks, setSetting, updateEvk
 } from './db.js';
 import {
-  ACCIDENT_FIELDS, CONTROLS, UNITS, buildEnvelope, buildPerformanceReport, calculateKeyboardInset, compareIncoming,
+  ACCIDENT_FIELDS, CONTROLS, UNITS, buildEnvelope, buildJsonFileName, buildPerformanceReport, buildSharePerformanceText, calculateKeyboardInset, compareIncoming,
   directoryItemKey, displayDateTime, dutyLabel, ensurePayload, makeChildId, makeRandomId,
   mergeDirectoryItems, penaltySummary, sameLogicalShift, sortPersonnelByRegistry,
   toIstanbulIso, unitLabel, validateEnvelope
@@ -217,8 +217,8 @@ function showOfficerEditor(id = null) {
   $('#officerRegistry').value = person?.sicil || '';
   $('#officerName').value = person?.ad || '';
   $('#officerSurname').value = String(person?.soyad || '').toLocaleUpperCase('tr-TR');
-  $('#officerForm').hidden = false;
-  $('#officerDialog .directory-card').classList.add('editing');
+  if ($('#officerDialog').open) $('#officerDialog').close();
+  $('#officerEditorDialog').showModal();
 }
 
 function showRoadEditor(id = null) {
@@ -227,8 +227,20 @@ function showRoadEditor(id = null) {
   $('#roadForm').reset();
   $('#roadEditorTitle').textContent = road ? 'Yolu Güncelle' : 'Yeni Yol';
   $('#roadName').value = road?.yolad || '';
-  $('#roadForm').hidden = false;
-  $('#roadDialog .directory-card').classList.add('editing');
+  if ($('#roadDialog').open) $('#roadDialog').close();
+  $('#roadEditorDialog').showModal();
+}
+
+function returnToOfficerDirectory() {
+  if ($('#officerEditorDialog').open) $('#officerEditorDialog').close();
+  renderOfficerDirectory();
+  if (!$('#officerDialog').open) $('#officerDialog').showModal();
+}
+
+function returnToRoadDirectory() {
+  if ($('#roadEditorDialog').open) $('#roadEditorDialog').close();
+  renderRoadDirectory();
+  if (!$('#roadDialog').open) $('#roadDialog').showModal();
 }
 
 function toggleDirectorySelection(item, type) {
@@ -892,7 +904,7 @@ async function savePerformanceNote(evkId, value) {
 async function sharePerformanceText() {
   const evk = state.evks.find(item => item.evkId === state.selectedEvkId);
   if (!evk) return;
-  const text = buildPerformanceReport(evk, $('#performanceNote').value).text;
+  const text = buildSharePerformanceText(evk, $('#performanceNote').value);
   try {
     if (navigator.share) {
       await navigator.share({ title: `Ekip ${evk.teamCode} İcraatı`, text });
@@ -1183,7 +1195,7 @@ async function shareSingleEvk(id) {
   try {
     const [evk] = await prepareEvksForExport([id]);
     const envelope = buildEnvelope([evk], 'SINGLE_EVK');
-    const file = makeJsonFile(envelope, `ICRAAT_${evk.sourceUnit}_${evk.teamCode}_${evk.reportPeriod}.json`);
+    const file = makeJsonFile(envelope, buildJsonFileName([evk]));
     await shareFile(file, `Ekip ${evk.teamCode} İcraatı`);
   } catch (error) {
     showToast(error.message || 'İcraat paylaşılamadı.');
@@ -1198,8 +1210,7 @@ async function exportAll(share) {
   try {
     const prepared = await prepareEvksForExport(state.evks.map(item => item.evkId));
     const envelope = buildEnvelope(prepared, 'ALL_EVK');
-    const today = new Date().toISOString().slice(0, 10);
-    const file = makeJsonFile(envelope, `ICRAAT_TUM_KAYITLAR_${today}.json`);
+    const file = makeJsonFile(envelope, buildJsonFileName(prepared));
     if (share) await shareFile(file, 'Tüm İcraat Kayıtları');
     else {
       downloadFile(file);
@@ -1298,20 +1309,13 @@ function bindEvents() {
 
   $('#addOfficerButton').addEventListener('click', () => {
     state.editingOfficerId = null;
-    $('#officerForm').hidden = true;
-    $('#officerDialog .directory-card').classList.remove('editing');
     renderOfficerDirectory();
     $('#officerDialog').showModal();
   });
-  $('[data-close-officer]').addEventListener('click', () => {
-    $('#officerDialog .directory-card').classList.remove('editing');
-    $('#officerDialog').close();
-  });
+  $('[data-close-officer]').addEventListener('click', () => $('#officerDialog').close());
   $('#newOfficerButton').addEventListener('click', () => showOfficerEditor());
-  $('#cancelOfficerEdit').addEventListener('click', () => {
-    $('#officerForm').hidden = true;
-    $('#officerDialog .directory-card').classList.remove('editing');
-  });
+  $('#cancelOfficerEdit').addEventListener('click', returnToOfficerDirectory);
+  $('#officerEditorDialog').addEventListener('cancel', event => { event.preventDefault(); returnToOfficerDirectory(); });
   $('#officerSurname').addEventListener('input', event => {
     const input = event.currentTarget;
     const start = input.selectionStart;
@@ -1346,10 +1350,8 @@ function bindEvents() {
     state.personnelDirectory = sortPersonnelByRegistry(state.personnelDirectory);
     state.draftPersonnel = sortPersonnelByRegistry(state.draftPersonnel);
     await setSetting('personnel_directory', state.personnelDirectory);
-    $('#officerForm').hidden = true;
-    $('#officerDialog .directory-card').classList.remove('editing');
     renderTeamDraftLists();
-    renderOfficerDirectory();
+    returnToOfficerDirectory();
   });
   $('#savedOfficerList').addEventListener('click', async event => {
     const toggle = event.target.closest('[data-toggle-officer]');
@@ -1382,20 +1384,13 @@ function bindEvents() {
 
   $('#addRoadButton').addEventListener('click', () => {
     state.editingRoadId = null;
-    $('#roadForm').hidden = true;
-    $('#roadDialog .directory-card').classList.remove('editing');
     renderRoadDirectory();
     $('#roadDialog').showModal();
   });
-  $('[data-close-road]').addEventListener('click', () => {
-    $('#roadDialog .directory-card').classList.remove('editing');
-    $('#roadDialog').close();
-  });
+  $('[data-close-road]').addEventListener('click', () => $('#roadDialog').close());
   $('#newRoadButton').addEventListener('click', () => showRoadEditor());
-  $('#cancelRoadEdit').addEventListener('click', () => {
-    $('#roadForm').hidden = true;
-    $('#roadDialog .directory-card').classList.remove('editing');
-  });
+  $('#cancelRoadEdit').addEventListener('click', returnToRoadDirectory);
+  $('#roadEditorDialog').addEventListener('cancel', event => { event.preventDefault(); returnToRoadDirectory(); });
   $('#roadForm').addEventListener('submit', async event => {
     event.preventDefault();
     if (!event.currentTarget.reportValidity()) return;
@@ -1416,10 +1411,8 @@ function bindEvents() {
       state.draftRoads.push(structuredClone(road));
     }
     await setSetting('road_directory', state.roadDirectory);
-    $('#roadForm').hidden = true;
-    $('#roadDialog .directory-card').classList.remove('editing');
     renderTeamDraftLists();
-    renderRoadDirectory();
+    returnToRoadDirectory();
   });
   $('#savedRoadList').addEventListener('click', async event => {
     const toggle = event.target.closest('[data-toggle-road]');

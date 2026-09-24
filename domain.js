@@ -67,6 +67,54 @@ export function dutyLabel(code) {
   return DUTIES[code] || code;
 }
 
+const fileMonthFormatter = new Intl.DateTimeFormat('tr-TR', {
+  timeZone: 'Europe/Istanbul', month: 'long'
+});
+const fileDayFormatter = new Intl.DateTimeFormat('tr-TR', {
+  timeZone: 'Europe/Istanbul', day: '2-digit'
+});
+const fileYearFormatter = new Intl.DateTimeFormat('tr-TR', {
+  timeZone: 'Europe/Istanbul', year: 'numeric'
+});
+
+function filenameDateParts(record) {
+  const date = new Date(record?.startEpochMillis ?? record?.startDateTime ?? record?.createdAt);
+  return {
+    time: date.getTime(),
+    day: String(Number(fileDayFormatter.format(date))),
+    month: fileMonthFormatter.format(date),
+    year: fileYearFormatter.format(date)
+  };
+}
+
+function safeFilenamePart(value) {
+  return String(value || '').trim().replace(/[<>:"/\\|?*\u0000-\u001f]/g, '').replace(/\s+/g, '_');
+}
+
+function filenameDateRange(records) {
+  const dates = records.map(filenameDateParts).filter(item => Number.isFinite(item.time)).sort((a, b) => a.time - b.time);
+  if (!dates.length) return 'Tarihsiz';
+  const first = dates[0];
+  const last = dates.at(-1);
+  if (first.day === last.day && first.month === last.month && first.year === last.year) return `${first.day}_${first.month}`;
+  if (first.month === last.month && first.year === last.year) return `${first.day}_${last.day}_${first.month}`;
+  if (first.year === last.year) return `${first.day}_${first.month}_${last.day}_${last.month}`;
+  return `${first.day}_${first.month}_${first.year}_${last.day}_${last.month}_${last.year}`;
+}
+
+export function buildJsonFileName(records) {
+  const items = Array.isArray(records) ? records.filter(Boolean) : [];
+  if (items.length === 1) {
+    const record = items[0];
+    return `${safeFilenamePart(record.teamCode)}_${safeFilenamePart(dutyLabel(record.dutyType))}_${filenameDateRange(items)}.json`;
+  }
+  const unitNames = [...new Set(items.map(record => ({
+    MERKEZ: 'Merkez', CORLU: 'Çorlu', MALKARA: 'Malkara'
+  })[record.sourceUnit] || unitLabel(record.sourceUnit)))];
+  const prefix = unitNames.length === 1 ? safeFilenamePart(unitNames[0]) : 'Toplu_icraat';
+  return `${prefix}_${filenameDateRange(items)}.json`;
+}
+
 export function displayDateTime(epochMillis) {
   return dateTimeFormatter.format(new Date(epochMillis)).replace(',', '');
 }
@@ -363,6 +411,89 @@ export function buildPerformanceReport(evk, noteOverride) {
     beltCount,
     alcoholCount
   };
+}
+
+function whatsAppFormattedRadarText(evk, noteOverride) {
+  const preview = buildRadarPerformanceReport(evk, noteOverride).text;
+  return preview.split('\n').map((line, index) => {
+    if (index === 0) return `*${line}*`;
+    if (line.includes(`${evk.teamCode} kod nolu ekip olarak`)) {
+      return line.replace(`${evk.teamCode} kod nolu ekip olarak`, `*${evk.teamCode}* kod nolu ekip olarak`);
+    }
+    if (/^(Kontrol edilen araç sayısı:|Yazılan Ceza Maddeleri:|Toplam Ceza:|Toplam Ceza Miktarı:)/.test(line)) return `*${line}*`;
+    if (line.startsWith('Not:')) return line.replace(/^Not:/, '*Not:*');
+    if (line === 'Arz ederim.') return '*Arz ederim.*';
+    return line;
+  }).join('\n');
+}
+
+export function buildSharePerformanceText(evk, noteOverride) {
+  if (evk.dutyType === 'RADAR') return whatsAppFormattedRadarText(evk, noteOverride);
+  const payload = ensurePayload(evk);
+  const records = payload.penalties.filter(record => record.origin !== 'RADAR_OPERATOR');
+  const articleCounts = new Map();
+  const articleTypeCounts = Object.fromEntries(Object.keys(PENALTY_TYPES).map(type => [type, 0]));
+  let totalAmount = 0;
+  let k3 = 0;
+
+  records.forEach(record => {
+    const parsedCount = Number.parseInt(record.count, 10);
+    const count = Number.isInteger(parsedCount) && parsedCount > 0 ? parsedCount : 1;
+    let speedOperation = false;
+    (record.articles || []).forEach(article => {
+      const code = String(article.code || '').trim();
+      if (!code) return;
+      articleCounts.set(code, (articleCounts.get(code) || 0) + count);
+      if (Object.hasOwn(articleTypeCounts, record.type)) articleTypeCounts[record.type] += count;
+      totalAmount += (Number(article.amount) || 0) * count;
+      if (code.toLocaleLowerCase('tr-TR').startsWith('51')) speedOperation = true;
+    });
+    if (speedOperation) k3 += count;
+  });
+
+  const controlRows = [];
+  let inspectedVehicles = k3;
+  CONTROLS.forEach(([key, code]) => {
+    const count = reportCount(payload.controls, key);
+    inspectedVehicles += count;
+    if (count > 0) controlRows.push(`${code}:${count}`);
+    if (key === 'K2_D' && k3 > 0) controlRows.push(`K3:${k3}`);
+  });
+
+  const start = new Date(evk.startEpochMillis ?? evk.startDateTime);
+  const end = new Date(evk.endEpochMillis ?? evk.endDateTime);
+  const startDate = reportDateFormatter.format(start);
+  const endDate = reportDateFormatter.format(end);
+  const dateText = startDate === endDate ? `${startDate} tarihinde` : `${startDate} - ${endDate} tarihinde`;
+  const timeText = `${reportTimeFormatter.format(start)} - ${reportTimeFormatter.format(end)}`;
+  const roads = (payload.roads || []).map(road => String(road.yolad || '').trim()).filter(Boolean);
+  const roadNames = joinedNames(roads);
+  const personnel = sortPersonnelByRegistry(payload.personnel).map(person => {
+    const name = `${person.ad || ''} ${person.soyad || ''}`.trim();
+    const registry = String(person.sicil || '').trim();
+    return `${name}${registry ? ` (${registry})` : ''}`.trim();
+  }).filter(Boolean);
+  const note = String(noteOverride ?? payload.note ?? '').trim();
+  const lines = [`*${performanceUnitName(evk.sourceUnit)}*`, ''];
+  let intro = `${dateText} ${timeText} saatleri arasında *${evk.teamCode}* kod nolu ekip olarak`;
+  if (roadNames) intro += ` ${roadNames}${roads.length === 1 ? ' yolunda' : ' yollarında'}`;
+  lines.push(`${intro} yapmış olduğumuz uygulama icraatı ve görevler aşağıda çıkarılmıştır.`, '');
+  lines.push(`${evk.teamCode}${roadNames ? ` (${roadNames}${roads.length === 1 ? ' yolunda' : ' yollarında'} görevli personeller)` : ''}`);
+  lines.push(...personnel, '', `*Kontrol edilen araç sayısı: ${inspectedVehicles}*`);
+  lines.push(...(controlRows.length ? controlRows : ['—']), '', '*Yazılan Ceza Maddeleri:*');
+
+  const sortedArticles = [...articleCounts.keys()].sort((left, right) => left.localeCompare(right, 'tr-TR', { numeric: true }));
+  if (!sortedArticles.length) lines.push('—');
+  sortedArticles.forEach((code, index) => lines.push(`${index + 1}) ${code} (${articleCounts.get(code)} adet)`));
+  const totalPenaltyCount = [...articleCounts.values()].reduce((total, value) => total + value, 0);
+  lines.push('', `*Toplam Ceza: ${totalPenaltyCount} adet*`);
+  Object.entries(PENALTY_TYPES).forEach(([type, label]) => {
+    if (articleTypeCounts[type] > 0) lines.push(`${label}: ${articleTypeCounts[type]} adet`);
+  });
+  lines.push('', `*Toplam Ceza Miktarı: ${new Intl.NumberFormat('tr-TR').format(totalAmount)}₺*`);
+  if (note) lines.push('', `*Not:* ${note}`);
+  lines.push('', '*Arz ederim.*');
+  return lines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
 }
 
 export function ensurePayload(evk) {
