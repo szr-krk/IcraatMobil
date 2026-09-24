@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildDailyReportData, reportPeriodLabel } from '../report.js';
+import { buildDailyReportData, reportPeriodLabel, summarizeDailyReport } from '../report.js';
 
 function evk(unit = 'MERKEZ', duty = 'GUNDUZ', start = '2026-09-21T08:00:00+03:00', end = '2026-09-21T20:00:00+03:00') {
   return {
@@ -99,6 +99,37 @@ test('elle girilen üç birim kaza toplamları ve günlük ortalamaları kullan�
   assert.deepEqual([65, 67, 69, 71].map(row => report.cells[`R${row}`]), [15, 18, 21, 24]);
   assert.equal(report.cells.F64, '2026\n(Bugüne Kadar)');
   assert.equal(report.cells.F66, 1 / 264);
+});
+
+test('ekiplerden gelen kaza verileri PDF öncesi birim özetinde toplanır', () => {
+  const first = evk('MERKEZ');
+  first.payload.accidents = { fatalAccidentCount: 1, deathCount: 2, injuryAccidentCount: 3, injuredCount: 4 };
+  const second = evk('MERKEZ', 'GECE');
+  second.payload.accidents = { injuryAccidentCount: 2, injuredCount: 5 };
+  const summary = summarizeDailyReport([first, second]);
+  assert.deepEqual(summary.units.MERKEZ.accidentCounts, {
+    fatalAccidentCount: 1,
+    deathCount: 2,
+    injuryAccidentCount: 5,
+    injuredCount: 9
+  });
+});
+
+test('PDF öncesinde girilen PTS ve KGYS adetleri ceza toplamı ve yüzdelerine katılır', () => {
+  const merkez = evk('MERKEZ');
+  merkez.payload.penalties = [
+    penalty('DRIVER', 57, 'NORMAL', '51/2-b-1'),
+    penalty('PLATE', 68, 'NORMAL', '78/1-a')
+  ];
+  const manual = {
+    MERKEZ: { fatalAccidentCount: 0, deathCount: 0, injuryAccidentCount: 0, injuredCount: 0, kgysPenaltyCount: 4, ptsPenaltyCount: 18 },
+    CORLU: { fatalAccidentCount: 0, deathCount: 0, injuryAccidentCount: 0, injuredCount: 0 },
+    MALKARA: { fatalAccidentCount: 0, deathCount: 0, injuryAccidentCount: 0, injuredCount: 0 }
+  };
+  const report = buildDailyReportData([merkez], manual, reference());
+  assert.deepEqual([report.cells.E84, report.cells.E86, report.cells.E88, report.cells.E90, report.cells.E92], [57, 68, 18, 4, 147]);
+  assert.equal(report.cells.F88, 18 / 147);
+  assert.equal(report.cells.F90, 4 / 147);
 });
 
 test('eksik hedef ayı, eksik kaza alanı ve geçersiz EVK raporu engeller', () => {

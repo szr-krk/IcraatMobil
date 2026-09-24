@@ -36,7 +36,7 @@
 
     <main id="detailScreen" class="detail-screen" hidden>
       <section id="detailSummary" class="detail-summary"></section>
-      <nav class="tabs" role="tablist" aria-label="EVK bölümleri">
+      <nav class="tabs" role="tablist" aria-label="İcraat bölümleri">
         <button role="tab" aria-selected="true" data-tab="penalties">Ceza Ekle</button>
         <button role="tab" aria-selected="false" data-tab="radarTeam" hidden>Ekip · Yüzüne</button>
         <button role="tab" aria-selected="false" data-tab="radarOperator" hidden>Operatör · Plakaya</button>
@@ -84,12 +84,12 @@
       </section>
 
       <section id="controlsPanel" class="tab-panel watermark-panel" role="tabpanel" hidden>
-        <p class="autosave-note">Değerler yazıldıkça bu EVK’ya kaydedilir.</p>
+        <p class="autosave-note">Değerler yazıldıkça bu icraata kaydedilir.</p>
         <div id="controlsGrid" class="controls-grid"></div>
       </section>
 
       <section id="accidentsPanel" class="tab-panel watermark-panel" role="tabpanel" hidden>
-        <p class="autosave-note">Değerler yazıldıkça bu EVK’ya kaydedilir.</p>
+        <p class="autosave-note">Değerler yazıldıkça bu icraata kaydedilir.</p>
         <div id="accidentFields" class="accident-fields"></div>
       </section>
 
@@ -109,9 +109,9 @@
   <nav class="overflow-menu" id="overflowMenu" aria-label="Uygulama menüsü" hidden>
     <button type="button" data-action="pdf">Günlük İcraat PDF</button>
     <button type="button" data-action="import">JSON İçe Aktar</button>
-    <button type="button" data-action="export">Tüm EVK’leri Dışa Aktar</button>
-    <button type="button" data-action="share">Tüm EVK’leri Paylaş</button>
-    <button type="button" data-action="about">Uygulama Bilgisi</button>
+    <button type="button" data-action="share">Tüm İcraatleri Paylaş</button>
+    <button type="button" class="danger-text" data-action="delete-all">Tüm İcraatleri Sil</button>
+    <button type="button" data-action="about">Kullanım Kılavuzu</button>
   </nav>
 
   <dialog id="teamDialog" class="sheet-dialog">
@@ -166,7 +166,7 @@
       <div class="sheet-body report-sheet-body">
         <section class="report-intro">
           <strong id="reportPeriod">Kayıtlar hazırlanıyor…</strong>
-          <p>Her birimin yılbaşından raporun bitiş tarihine kadar birikmiş kaza ve kişi sayılarını girin. EVK içindeki vardiya kazaları buraya aktarılmaz. Yoksa 0 yazın.</p>
+          <p>Ekiplerden gelen son 24 saatlik kaza verileri her birimin kartında bilgi olarak gösterilir. Bu değerleri önceki günün PDF'indeki birikimli sayılara ekleyerek alttaki alanları doldurun. KGYS ve PTS boş bırakılırsa 0 kabul edilir.</p>
         </section>
         <form id="reportForm" novalidate>
           <div id="reportAccidentSections" class="report-accident-sections"></div>
@@ -214,8 +214,8 @@
     <div class="action-card">
       <h2 id="cardMenuTitle">Ekip işlemleri</h2>
       <button type="button" data-card-action="edit">Ekibi Güncelle</button>
-      <button type="button" data-card-action="share">EVK’yi Paylaş</button>
-      <button type="button" class="danger-text" data-card-action="delete">EVK’yi Sil</button>
+      <button type="button" data-card-action="share">İcraatı Paylaş</button>
+      <button type="button" class="danger-text" data-card-action="delete">İcraatı Sil</button>
       <button type="button" data-card-action="cancel">Vazgeç</button>
     </div>
   </dialog>
@@ -236,11 +236,21 @@
     </form>
   </dialog>
 
-  <dialog id="infoDialog" class="mini-dialog">
-    <div class="dialog-card">
-      <h2>İcraat Mobil</h2>
-      <p>EVK verileri bu cihazın tarayıcı hafızasında saklanır. Uygulama ana ekrana eklendikten sonra çevrimdışı kullanılabilir.</p>
-      <p class="small-copy">Günlük İcraat PDF; kayıtlı EVK’leri, aylık hedefleri ve PDF öncesinde elle girilen birim kaza toplamlarını kullanır.</p>
+  <dialog id="infoDialog" class="mini-dialog guide-dialog">
+    <div class="dialog-card guide-card">
+      <h2>Kullanım Kılavuzu</h2>
+      <div class="guide-content">
+        <p>EVK verileri bu cihazın tarayıcı hafızasında saklanır. Uygulama ana ekrana eklendikten sonra çevrimdışı kullanılabilir.</p>
+        <p>Ekip personeli kendi ekibini eklerken tüm verileri muhakkak eksiksiz ve doğru bir şekilde girmelidir; aksi takdirde oluşturulan icraat metni ve PDF hatalı olacaktır.</p>
+        <p>Ceza ekleme işlemi sırasında, örneğin bir sürücüye birden fazla maddeden ceza yazdıysanız, tüm maddeleri eklemeden <strong>KAYDET</strong> butonuna basmayınız.</p>
+        <p>Kaza verilerini ve kontrol sayılarını da muhakkak giriniz. Veri yoksa boş bırakabilirsiniz.</p>
+        <p>Görev sonunda <strong>İcraat</strong> sekmesine tıklayarak varsa notunuzu ekleyip <strong>Metin Olarak Paylaş</strong> seçeneği ile Yıldız uygulaması üzerinden paylaşınız.</p>
+        <p>Görev sonunda ekip kaydına uzun basarak <strong>İcraatı Paylaş</strong> seçeneği ile icraatınızı telefonunuza indiriniz. Daha sonra telefonunuzun İndirilenler klasöründeki dosyayı WhatsApp ya da Yıldız uygulaması ile bağlı bulunduğunuz 20'deki personele gönderiniz.</p>
+        <p>24 saatin sonunda 20'deki personelin telefonunda tüm ekiplerin kayıtları toplanmış olmalıdır.</p>
+        <p>20'deki personel menüden <strong>Tüm İcraatleri Paylaş</strong> seçeneği ile ekranında gördüğü tüm kayıtları telefonuna tek dosya olarak indirir ve İndirilenler klasöründeki dosyayı 5920'ye gönderir.</p>
+        <p>5920 personeli kendisine toplu olarak gelen verileri sağ üst menüden <strong>JSON İçe Aktar</strong> seçeneği ile İndirilenler klasöründen seçerek kendi ekranına aktarır. Bu işlemi yapmadan önce ekranda başka günlere ait herhangi bir kayıt olmamalıdır; aksi takdirde yanlış veriler içeren PDF üretilmesine sebep olur.</p>
+        <p>5920 personeli tüm ekip ve istasyonlardan verileri aldığına emin olduktan sonra sağ üst menüden <strong>Günlük İcraat PDF</strong> seçeneğine dokunur. Ekranda istenen verileri doldurup <strong>PDF Oluştur</strong> seçeneği ile raporu oluşturabilir ve ilgili yerlerle paylaşabilir.</p>
+      </div>
       <div class="dialog-actions"><button type="button" class="primary-button" data-close-info>Tamam</button></div>
     </div>
   </dialog>

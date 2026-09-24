@@ -12,6 +12,7 @@
 - `Icraat_pdf`: Ekip türü, ekip kodu, tarih/saat, görevliler ve yollar.
 - `IcraatPdfYeni`: Birim seçimi, EVK kimlik/revizyon kuralları, birim odaklı kart listesi, ceza/kontrol/kaza payload yapısı ve JSON sözleşmesi.
 - Kart sağa kaydırılırsa güncelleme, sola kaydırılırsa onaylı silme açılır. Uzun basma aynı işlemleri menüyle sunar.
+- Ekip kartları birinci projedeki kalkan/yıldız ekip simgesini kullanır; kart üzerindeki ayrı paylaşım oku bulunmaz. Kullanıcıya görünen kayıt adı `İcraat`tır; EVK terimi yalnızca veri sözleşmesi ve teknik kimliklerde korunur.
 - Normal görevlerde kart ayrıntısında sabit sekmeler Ceza Ekle, Kontroller, Kazalar ve İcraat'tır. İcraat sekmesi birinci projenin ekip faaliyet metnini, ayrıca Hız/Kemer/Alkol adetlerini gösterir; EVK'ya bağlı not girişi ve sistem metin paylaşımı sunar.
 - Radar görevlerinde `Ekip · Yüzüne`, `Operatör · Plakaya` ve `İcraat` sekmeleri gösterilir; Kontroller, Kazalar ve standart ceza arama arayüzü gösterilmez.
 
@@ -38,12 +39,14 @@
 - Radar adet ekranı açıldığında hiçbir giriş alanı otomatik odaklanmaz; klavye yalnızca kullanıcının seçtiği alana dokunmasıyla açılır.
 - Radar İcraat sekmesi birinci projenin radar faaliyet metnini kullanır: K3 ve kontrol edilen araç sayısı radar ceza işlemlerinden hesaplanır; ceza maddeleri ekip/operatör ayrımı olmadan toplam adetle listelenir, ardından sürücüye/plakasına toplamları, toplam tutar, not ve `Arz ederim.` satırı gösterilir. Radar için Kontroller, Kazalar ve Hız/Kemer/Alkol ek özeti gösterilmez.
 - İcraat başlığı Merkez EVK'larında `Tekirdağ Bölge Trafik Denetleme Şube Müdürlüğü`, Çorlu ve Malkara EVK'larında `Malkara Bölge Trafik Denetleme İstasyon Amirliği` olarak gösterilir. Not `payload.note` alanında saklanır ve EVK JSON aktarımında korunur. Metin paylaşımı Web Share ile WhatsApp dahil cihaz paylaşım ekranını açar; desteklenmiyorsa metni panoya kopyalar.
+- Ana menüde tek toplu aktarım işlemi **Tüm İcraatleri Paylaş**tır; paylaşım desteklenmezse aynı JSON dosyası indirilir. **Tüm İcraatleri Sil** tüm EVK kayıtlarını açık onaydan sonra temizler. Kaydırılabilir **Kullanım Kılavuzu**, ekip personeli, 20 ve 5920 için veri giriş/aktarım adımlarını gösterir.
 
 ## Günlük İcraat PDF
 
 - Ana menüdeki **Günlük İcraat PDF** işlemi cihazda kayıtlı bütün EVK’leri rapora alır; PDF oluşturmak EVK kimlik, revision veya updatedAt değerlerini değiştirmez.
 - Rapor aralığı EVK’lerin en erken başlangıcı ile en geç bitişidir. `12/36`, Gündüz ve Gece ekiplerinin toplamıdır; Ara Ekip ve Radar ayrı satırlardır.
-- PDF öncesinde Merkez, Çorlu ve Malkara için Ölümlü Kaza, Ölü, Yaralanmalı Kaza ve Yaralı toplamları elle ve zorunlu olarak girilir. Bunlar yılbaşından raporun bitiş tarihine kadar birikmiş değerlerdir; yoksa `0` girilir ve EVK payload’ına kaydedilmez.
+- PDF öncesinde her birim kartında, ekrandaki icraatların `payload.accidents` alanlarından toplanan son 24 saatlik Ölümlü Kaza, Ölü, Yaralanmalı Kaza ve Yaralı değerleri salt okunur bilgi olarak gösterilir. Kullanıcı bunları önceki günün PDF'indeki birikimli değerlere ekleyerek yıllık toplam alanlarını doldurur.
+- Merkez, Çorlu ve Malkara için Ölümlü Kaza, Ölü, Yaralanmalı Kaza ve Yaralı birikimli toplamları elle ve zorunlu olarak girilir. Üçüncü giriş satırındaki KGYS ve PTS ceza adetleri isteğe bağlıdır; boş alan `0` kabul edilir. PTS ve KGYS adetleri ilgili birimin Sürücüye, Plakaya, PTS ve KGYS toplamına katılarak PDF yüzdeleri hesaplanır. Bu geçici form değerleri EVK payload’ına kaydedilmez.
 - Birim bazlı K1/A, K2/A, K2/B, K4/A, K5 ve K6 gerçekleşenleri EVK kontrollerinden; hedefleri `assets/reference_data.json` içindeki rapor bitiş ayından gelir.
 - Ceza adetleri madde çarpanlarıyla hesaplanır. Radar EVK’de mükerrer ekip/yüzüne değerleri dışlanır; yalnızca `RADAR_OPERATOR` + `PLATE` kayıtları toplu rapora eklenir.
 - Şablon `assets/daily_report/template.json` ve iki resmi logodan tarayıcı Canvas’ına çizilir; tek sayfalık A4 PDF cihaz içinde oluşturulur. Kullanıcı önizleyebilir, indirebilir veya desteklenen cihazlarda sistem paylaşım ekranıyla gönderebilir.

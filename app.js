@@ -1,5 +1,5 @@
 import {
-  deleteEvk, evkIdExists, getAllEvks, getEvk, getSetting, openDatabase,
+  deleteAllEvks, deleteEvk, evkIdExists, getAllEvks, getEvk, getSetting, openDatabase,
   putEvk, putManyEvks, setSetting, updateEvk
 } from './db.js';
 import {
@@ -9,6 +9,7 @@ import {
   toIstanbulIso, unitLabel, validateEnvelope
 } from './domain.js';
 import { createDailyReportPdf } from './pdf-report.js';
+import { summarizeDailyReport } from './report.js';
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
@@ -42,6 +43,11 @@ const cardMenuDialog = $('#cardMenuDialog');
 const articleSearch = $('#articleSearch');
 const articleResults = $('#articleResults');
 const RADAR_ARTICLE_CODES = Array.from({ length: 9 }, (_, index) => `51/2-b-${index + 1}`);
+const REPORT_INPUT_FIELDS = [
+  ...ACCIDENT_FIELDS.map(field => [...field, true]),
+  ['kgysPenaltyCount', 'KGYS Ceza Sayısı', false],
+  ['ptsPenaltyCount', 'PTS Ceza Sayısı', false]
+];
 
 let toastTimer;
 let largestVisualViewportHeight = window.visualViewport?.height || window.innerHeight;
@@ -97,7 +103,7 @@ function renderTeamList() {
 
   if (!sorted.length) {
     teamList.innerHTML = `<div class="empty-state">
-      <div class="empty-mark" aria-hidden="true">EVK</div>
+      <div class="empty-mark" aria-hidden="true"><img src="./assets/ekip.svg" alt=""></div>
       <h2>Henüz ekip kaydı yok</h2>
       <p>İlk vardiya kaydını oluşturmak için artı düğmesine dokunun.</p>
     </div>`;
@@ -239,10 +245,9 @@ function teamCardHtml(evk) {
     <span class="swipe-label edit">GÜNCELLE</span>
     <span class="swipe-label delete">SİL</span>
     <article class="team-card" data-id="${escapeHtml(evk.evkId)}" tabindex="0" aria-label="${escapeHtml(evk.teamCode)} numaralı ekip">
-      <div class="team-icon" aria-hidden="true">EK</div>
+      <div class="team-icon" aria-hidden="true"><img src="./assets/ekip.svg" alt=""></div>
       <div class="team-code"><strong>${escapeHtml(evk.teamCode)}</strong><span>(${escapeHtml(dutyLabel(evk.dutyType))})</span></div>
       <div class="team-meta"><strong>${escapeHtml(unitLabel(evk.sourceUnit))}</strong><span>${escapeHtml(displayDateTime(evk.startEpochMillis))}</span><span>${escapeHtml(displayDateTime(evk.endEpochMillis))}</span></div>
-      <button type="button" class="share-button" aria-label="EVK’yi paylaş" data-share-id="${escapeHtml(evk.evkId)}">↗</button>
     </article>
   </div>`;
 }
@@ -254,11 +259,6 @@ function bindCardGestures(card) {
   let offsetX = 0;
   let longPressed = false;
   let longPressTimer;
-
-  card.querySelector('.share-button').addEventListener('click', event => {
-    event.stopPropagation();
-    shareSingleEvk(id);
-  });
 
   card.addEventListener('keydown', event => {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -403,7 +403,7 @@ async function saveTeam(event) {
   if (duplicate) {
     const proceed = await askConfirm(
       'Benzer ekip kaydı bulundu',
-      'Aynı birim, ekip kodu, başlangıç ve bitiş zamanına sahip başka bir EVK var. Yine de kaydedilsin mi?',
+      'Aynı birim, ekip kodu, başlangıç ve bitiş zamanına sahip başka bir icraat var. Yine de kaydedilsin mi?',
       'Yine de Kaydet'
     );
     if (!proceed) return;
@@ -541,7 +541,7 @@ function renderRadarCounts(records, origin, selector) {
 function renderPenaltyList(records) {
   const container = $('#penaltyList');
   if (!records.length) {
-    container.innerHTML = '<div class="penalty-empty">Bu EVK için henüz ceza kaydı yok.</div>';
+    container.innerHTML = '<div class="penalty-empty">Bu icraat için henüz ceza kaydı yok.</div>';
     return;
   }
   container.innerHTML = records.map(record => {
@@ -921,11 +921,29 @@ async function saveCountValue(input) {
 async function requestDeleteEvk(id) {
   const evk = state.evks.find(item => item.evkId === id);
   if (!evk) return;
-  const confirmed = await askConfirm('EVK silinsin mi?', `Ekip ${evk.teamCode} kaydı ve içindeki ceza, kontrol ve kaza verileri silinecek.`, 'Sil', true);
+  const confirmed = await askConfirm('İcraat silinsin mi?', `Ekip ${evk.teamCode} icraatı ve içindeki ceza, kontrol ve kaza verileri silinecek.`, 'Sil', true);
   if (!confirmed) return;
   await deleteEvk(id);
   await refreshEvks();
-  showToast('EVK silindi.');
+  showToast('İcraat silindi.');
+}
+
+async function requestDeleteAllEvks() {
+  if (!state.evks.length) {
+    showToast('Silinecek icraat bulunmuyor.');
+    return;
+  }
+  const confirmed = await askConfirm(
+    'Tüm icraatler silinsin mi?',
+    `Ekrandaki ${state.evks.length} icraat ve içlerindeki tüm ceza, kontrol ve kaza verileri kalıcı olarak silinecek.`,
+    'Tümünü Sil',
+    true
+  );
+  if (!confirmed) return;
+  await deleteAllEvks();
+  showListView();
+  await refreshEvks();
+  showToast('Tüm icraatler silindi.');
 }
 
 function askConfirm(title, message, okLabel = 'Onayla', danger = false) {
@@ -977,7 +995,7 @@ function downloadFile(file) {
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
-async function shareFile(file, title, text = 'İcraat EVK kaydı', fallbackMessage = 'Paylaşım desteklenmediği için dosya indirildi.') {
+async function shareFile(file, title, text = 'İcraat kaydı', fallbackMessage = 'Paylaşım desteklenmediği için dosya indirildi.') {
   if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
     try {
       await navigator.share({ files: [file], title, text });
@@ -1002,22 +1020,31 @@ function clearReportOutput(message = '') {
 }
 
 function renderReportAccidentInputs() {
+  const incoming = summarizeDailyReport(state.evks).units;
   $('#reportAccidentSections').innerHTML = UNITS.map(unit => `<section class="report-unit-card">
     <h3>${escapeHtml(unit.label)}</h3>
-    <div class="report-count-grid">${ACCIDENT_FIELDS.map(([key, label]) => `<label class="field" data-report-field>
+    <section class="report-incoming" aria-label="${escapeHtml(unit.label)} ekiplerden gelen kaza özeti">
+      <strong>Ekiplerden gelen son 24 saat</strong>
+      <div class="report-incoming-grid">${ACCIDENT_FIELDS.map(([key, label]) => `<div>
+        <span>${escapeHtml(label.replace(' Sayısı', ''))}</span><b>${escapeHtml(incoming[unit.code].accidentCounts[key])}</b>
+      </div>`).join('')}</div>
+      <p>Bir önceki günün birikimli değerlerine ekleyebilirsiniz.</p>
+    </section>
+    <h4>PDF'ye yazılacak birikimli değerler</h4>
+    <div class="report-count-grid">${REPORT_INPUT_FIELDS.map(([key, label, required]) => `<label class="field" data-report-field>
       <span>${escapeHtml(label)}</span>
-      <input type="number" min="0" step="1" inputmode="numeric" data-report-unit="${unit.code}" data-report-key="${key}" required>
+      <input type="number" min="0" step="1" inputmode="numeric" data-report-unit="${unit.code}" data-report-key="${key}" data-report-required="${required}" ${required ? 'required' : ''} placeholder="0">
     </label>`).join('')}</div>
   </section>`).join('');
 }
 
 function openReportDialog() {
   if (!state.evks.length) {
-    showToast('PDF oluşturmak için en az bir EVK kaydı ekleyin.');
+    showToast('PDF oluşturmak için en az bir icraat kaydı ekleyin.');
     return;
   }
   renderReportAccidentInputs();
-  clearReportOutput('Kaza toplamlarını girip PDF Oluştur’a dokunun.');
+  clearReportOutput('Birikimli değerleri girip PDF Oluştur’a dokunun. KGYS ve PTS boşsa 0 kabul edilir.');
   const earliest = Math.min(...state.evks.map(evk => Number(evk.startEpochMillis)));
   const latest = Math.max(...state.evks.map(evk => Number(evk.endEpochMillis)));
   $('#reportPeriod').textContent = `${state.evks.length} ekip kaydı · ${displayDateTime(earliest)} – ${displayDateTime(latest)}`;
@@ -1025,24 +1052,25 @@ function openReportDialog() {
 }
 
 function readReportAccidents() {
-  const values = Object.fromEntries(UNITS.map(unit => [unit.code, []]));
+  const values = Object.fromEntries(UNITS.map(unit => [unit.code, {}]));
   let firstInvalid = null;
   $$('[data-report-unit]').forEach(input => {
     const wrapper = input.closest('[data-report-field]');
     wrapper.classList.remove('invalid');
     const text = input.value.trim();
-    const valid = /^\d+$/.test(text) && Number.isSafeInteger(Number(text));
+    const required = input.dataset.reportRequired === 'true';
+    const valid = (!required && text === '') || (/^\d+$/.test(text) && Number.isSafeInteger(Number(text)));
     if (!valid) {
       wrapper.classList.add('invalid');
       if (!firstInvalid) firstInvalid = input;
       return;
     }
-    values[input.dataset.reportUnit].push(Number(text));
+    values[input.dataset.reportUnit][input.dataset.reportKey] = text === '' ? 0 : Number(text);
   });
   if (firstInvalid) {
     firstInvalid.focus();
     firstInvalid.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    throw new Error('Tüm kaza alanlarına sıfır veya daha büyük bir tam sayı girin.');
+    throw new Error('Dört birikimli kaza alanına sıfır veya daha büyük bir tam sayı girin.');
   }
   return values;
 }
@@ -1061,7 +1089,7 @@ async function generateDailyReport(event) {
   const button = $('#generateReport');
   button.disabled = true;
   status.classList.remove('error');
-  status.textContent = 'Güncel EVK kayıtlarıyla PDF hazırlanıyor…';
+  status.textContent = 'Güncel icraat kayıtlarıyla PDF hazırlanıyor…';
   try {
     const result = await createDailyReportPdf(state.evks.map(evk => structuredClone(evk)), accidents);
     state.reportFile = result.file;
@@ -1104,27 +1132,27 @@ async function shareSingleEvk(id) {
   try {
     const [evk] = await prepareEvksForExport([id]);
     const envelope = buildEnvelope([evk], 'SINGLE_EVK');
-    const file = makeJsonFile(envelope, `EVK_${evk.sourceUnit}_${evk.teamCode}_${evk.reportPeriod}.json`);
-    await shareFile(file, `Ekip ${evk.teamCode} EVK`);
+    const file = makeJsonFile(envelope, `ICRAAT_${evk.sourceUnit}_${evk.teamCode}_${evk.reportPeriod}.json`);
+    await shareFile(file, `Ekip ${evk.teamCode} İcraatı`);
   } catch (error) {
-    showToast(error.message || 'EVK paylaşılamadı.');
+    showToast(error.message || 'İcraat paylaşılamadı.');
   }
 }
 
 async function exportAll(share) {
   if (!state.evks.length) {
-    showToast('Dışa aktarılacak EVK yok.');
+    showToast('Paylaşılacak icraat yok.');
     return;
   }
   try {
     const prepared = await prepareEvksForExport(state.evks.map(item => item.evkId));
     const envelope = buildEnvelope(prepared, 'ALL_EVK');
     const today = new Date().toISOString().slice(0, 10);
-    const file = makeJsonFile(envelope, `ICRAAT_TUM_EVK_${today}.json`);
-    if (share) await shareFile(file, 'Tüm İcraat EVK kayıtları');
+    const file = makeJsonFile(envelope, `ICRAAT_TUM_KAYITLAR_${today}.json`);
+    if (share) await shareFile(file, 'Tüm İcraat Kayıtları');
     else {
       downloadFile(file);
-      showToast('EVK arşivi indirildi.');
+      showToast('İcraat arşivi indirildi.');
     }
   } catch (error) {
     showToast(error.message || 'Dışa aktarma tamamlanamadı.');
@@ -1265,7 +1293,7 @@ function bindEvents() {
     if (remove) {
       const person = state.personnelDirectory.find(item => item.id === remove.dataset.deleteOfficer);
       if (!person) return;
-      const confirmed = await askConfirm('Görevli kaydı silinsin mi?', `${person.ad} ${person.soyad} kayıtlı görevli listesinden silinecek. Geçmiş EVK kayıtları değişmez.`, 'Sil', true);
+      const confirmed = await askConfirm('Görevli kaydı silinsin mi?', `${person.ad} ${person.soyad} kayıtlı görevli listesinden silinecek. Geçmiş icraat kayıtları değişmez.`, 'Sil', true);
       if (!confirmed) return;
       const key = directoryItemKey(person, 'personnel');
       state.personnelDirectory = state.personnelDirectory.filter(item => item.id !== person.id);
@@ -1327,7 +1355,7 @@ function bindEvents() {
     if (remove) {
       const road = state.roadDirectory.find(item => item.id === remove.dataset.deleteRoad);
       if (!road) return;
-      const confirmed = await askConfirm('Yol kaydı silinsin mi?', `${road.yolad} kayıtlı yol listesinden silinecek. Geçmiş EVK kayıtları değişmez.`, 'Sil', true);
+      const confirmed = await askConfirm('Yol kaydı silinsin mi?', `${road.yolad} kayıtlı yol listesinden silinecek. Geçmiş icraat kayıtları değişmez.`, 'Sil', true);
       if (!confirmed) return;
       const key = directoryItemKey(road, 'roads');
       state.roadDirectory = state.roadDirectory.filter(item => item.id !== road.id);
@@ -1406,8 +1434,8 @@ function bindEvents() {
     toggleMenu(false);
     if (button.dataset.action === 'pdf') openReportDialog();
     if (button.dataset.action === 'import') $('#importInput').click();
-    if (button.dataset.action === 'export') exportAll(false);
     if (button.dataset.action === 'share') exportAll(true);
+    if (button.dataset.action === 'delete-all') requestDeleteAllEvks();
     if (button.dataset.action === 'about') $('#infoDialog').showModal();
   });
   $('[data-close-report]').addEventListener('click', () => $('#reportDialog').close());

@@ -2,6 +2,7 @@ import { ensurePayload } from './domain.js';
 
 export const REPORT_UNITS = ['MERKEZ', 'CORLU', 'MALKARA'];
 export const REPORT_CONTROL_KEYS = ['K1_A', 'K2_A', 'K2_B', 'K4_A', 'K5', 'K6'];
+export const REPORT_ACCIDENT_KEYS = ['fatalAccidentCount', 'deathCount', 'injuryAccidentCount', 'injuredCount'];
 
 const REPORT_DUTIES = ['GUNDUZ', 'GECE', 'ARA_EKIP', 'RADAR'];
 const LEGACY_CONTROL_KEYS = ['k1', 'k2A', 'k2B', 'k4', 'k5', 'k6'];
@@ -76,6 +77,7 @@ function emptyUnitSummary() {
   return {
     teamCounts: Object.fromEntries(REPORT_DUTIES.map(duty => [duty, 0])),
     controlCounts: Object.fromEntries(REPORT_CONTROL_KEYS.map(key => [key, 0])),
+    accidentCounts: Object.fromEntries(REPORT_ACCIDENT_KEYS.map(key => [key, 0])),
     driverArticles: 0,
     plateArticles: 0,
     speed: 0,
@@ -121,6 +123,10 @@ export function summarizeDailyReport(evks) {
       const value = countFromSection(payload.controls, key, LEGACY_CONTROL_KEYS[index], `${teamLabel} ${key}`);
       unit.controlCounts[key] = safeAdd(unit.controlCounts[key], value);
     });
+    REPORT_ACCIDENT_KEYS.forEach(key => {
+      const value = countFromSection(payload.accidents, key, null, `${teamLabel} ${key}`);
+      unit.accidentCounts[key] = safeAdd(unit.accidentCounts[key], value);
+    });
 
     for (const record of payload.penalties) {
       if (evk.dutyType === 'RADAR'
@@ -159,9 +165,24 @@ function validateReference(reference, month) {
 export function validateAccidentCounts(accidents) {
   const result = {};
   REPORT_UNITS.forEach(unit => {
-    const values = accidents?.[unit];
+    const source = accidents?.[unit];
+    const values = Array.isArray(source) ? source : REPORT_ACCIDENT_KEYS.map(key => source?.[key]);
     if (!Array.isArray(values) || values.length !== 4) throw new Error(`Kaza bilgileri eksik: ${unit}.`);
     result[unit] = values.map((value, index) => integerValue(value, `${unit} kaza alanı ${index + 1}`));
+  });
+  return result;
+}
+
+function validatePenaltySourceCounts(input) {
+  const result = {};
+  REPORT_UNITS.forEach(unit => {
+    const source = input?.[unit];
+    const kgysValue = Array.isArray(source) ? source[4] ?? 0 : source?.kgysPenaltyCount ?? 0;
+    const ptsValue = Array.isArray(source) ? source[5] ?? 0 : source?.ptsPenaltyCount ?? 0;
+    result[unit] = {
+      kgys: integerValue(kgysValue, `${unit} KGYS ceza sayısı`),
+      pts: integerValue(ptsValue, `${unit} PTS ceza sayısı`)
+    };
   });
   return result;
 }
@@ -211,6 +232,7 @@ function putPenalties(cells, index, counts, period, year) {
 export function buildDailyReportData(evks, accidentInput, reference) {
   const summary = summarizeDailyReport(evks);
   const accidents = validateAccidentCounts(accidentInput);
+  const penaltySources = validatePenaltySourceCounts(accidentInput);
   const startDate = dateParts(summary.earliest);
   const endDate = dateParts(summary.latest);
   const periodLabel = reportPeriodLabel(startDate, endDate);
@@ -250,7 +272,12 @@ export function buildDailyReportData(evks, accidentInput, reference) {
     });
     putAccidents(cells, unitIndex, accidents[unitCode], endDate);
 
-    const penalties = [unit.driverArticles, unit.plateArticles, 0, 0];
+    const penalties = [
+      unit.driverArticles,
+      unit.plateArticles,
+      penaltySources[unitCode].pts,
+      penaltySources[unitCode].kgys
+    ];
     const articles = [unit.speed, unit.belt, unit.alcohol];
     putPenalties(cells, unitIndex, penalties, periodLabel, endDate.year);
     penalties.forEach((value, index) => { totalPenalties[index] = safeAdd(totalPenalties[index], value); });

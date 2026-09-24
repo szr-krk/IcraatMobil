@@ -1,4 +1,4 @@
-const CACHE_NAME = 'icraat-mobil-v14';
+const CACHE_NAME = 'icraat-mobil-v15';
 const APP_SHELL = [
   './',
   './index.html',
@@ -13,6 +13,7 @@ const APP_SHELL = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './assets/trafik-armasi.png',
+  './assets/ekip.svg',
   './assets/ceza_rehberi.json',
   './assets/reference_data.json',
   './assets/daily_report/template.json',

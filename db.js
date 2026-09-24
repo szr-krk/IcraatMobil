@@ -73,6 +73,12 @@ export async function deleteEvk(evkId) {
   await requestResult(transaction.objectStore(EVK_STORE).delete(evkId));
 }
 
+export async function deleteAllEvks() {
+  const database = await openDatabase();
+  const transaction = database.transaction(EVK_STORE, 'readwrite');
+  await requestResult(transaction.objectStore(EVK_STORE).clear());
+}
+
 export async function updateEvk(evkId, mutator) {
   const database = await openDatabase();
   return new Promise((resolve, reject) => {
