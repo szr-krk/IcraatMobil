@@ -85,6 +85,34 @@ export function makeChildId(prefix) {
   return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1e8)}`;
 }
 
+export function directoryItemKey(item, type) {
+  const normalize = value => String(value || '').trim().toLocaleLowerCase('tr-TR').replace(/\s+/g, ' ');
+  if (type === 'personnel') {
+    const registry = normalize(item.sicil);
+    return registry ? `sicil:${registry}` : `ad:${normalize(item.ad)}|${normalize(item.soyad)}`;
+  }
+  return `yol:${normalize(item.yolad)}`;
+}
+
+export function mergeDirectoryItems(current, incoming, type) {
+  const merged = [];
+  const keys = new Set();
+  for (const item of [...(current || []), ...(incoming || [])]) {
+    if (!item || typeof item !== 'object') continue;
+    const key = directoryItemKey(item, type);
+    if (!key || keys.has(key)) continue;
+    keys.add(key);
+    merged.push(structuredClone(item));
+  }
+  return merged;
+}
+
+export function calculateKeyboardInset(layoutHeight, visualHeight, offsetTop = 0) {
+  const values = [layoutHeight, visualHeight, offsetTop].map(Number);
+  if (!values.every(Number.isFinite)) return 0;
+  return Math.max(0, Math.round(values[0] - values[1] - values[2]));
+}
+
 export function ensurePayload(evk) {
   let payload = evk.payload;
   if (!payload && typeof evk.payloadJson === 'string') {

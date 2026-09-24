@@ -27,9 +27,9 @@
 
     <main id="listScreen" class="screen" tabindex="-1">
       <section class="summary-strip" aria-label="Kayıt özeti">
-        <div><strong id="teamCount">0</strong><span>EVK</span></div>
-        <div><strong id="unitCount">0</strong><span>Birim</span></div>
-        <div><strong id="offlineState">Hazır</strong><span>Çevrimdışı</span></div>
+        <div><strong>Merkez</strong><span id="merkezCount">0</span></div>
+        <div><strong>Çorlu</strong><span id="corluCount">0</span></div>
+        <div><strong>Malkara</strong><span id="malkaraCount">0</span></div>
       </section>
       <section id="teamList" class="team-list" aria-live="polite"></section>
     </main>
@@ -151,21 +151,31 @@
   </dialog>
 
   <dialog id="officerDialog" class="mini-dialog">
-    <form id="officerForm" class="dialog-card">
-      <h2>Görevli Ekle</h2>
-      <label class="field"><span>Sicil</span><input id="officerRegistry" inputmode="numeric"></label>
-      <label class="field"><span>Ad</span><input id="officerName" autocomplete="given-name" required></label>
-      <label class="field"><span>Soyad</span><input id="officerSurname" autocomplete="family-name" required></label>
-      <div class="dialog-actions"><button type="button" class="secondary-button" data-close-officer>İptal</button><button class="primary-button" type="submit">Ekle</button></div>
-    </form>
+    <div class="dialog-card directory-card">
+      <div class="directory-heading"><div><h2>Görevli Seç</h2><p>Kayıtlı görevlilere dokunarak ekibe ekleyin.</p></div><button type="button" class="small-action" id="newOfficerButton">+ Yeni</button></div>
+      <div id="savedOfficerList" class="directory-list"></div>
+      <form id="officerForm" class="directory-editor" hidden>
+        <h3 id="officerEditorTitle">Yeni Görevli</h3>
+        <label class="field"><span>Sicil</span><input id="officerRegistry" inputmode="numeric"></label>
+        <label class="field"><span>Ad</span><input id="officerName" autocomplete="given-name" required></label>
+        <label class="field"><span>Soyad</span><input id="officerSurname" autocomplete="family-name" required></label>
+        <div class="dialog-actions"><button type="button" class="secondary-button" id="cancelOfficerEdit">Vazgeç</button><button class="primary-button" type="submit">Kaydet</button></div>
+      </form>
+      <div class="dialog-actions"><button type="button" class="primary-button" data-close-officer>Tamam</button></div>
+    </div>
   </dialog>
 
   <dialog id="roadDialog" class="mini-dialog">
-    <form id="roadForm" class="dialog-card">
-      <h2>Yol Ekle</h2>
-      <label class="field"><span>Yol Adı</span><input id="roadName" required></label>
-      <div class="dialog-actions"><button type="button" class="secondary-button" data-close-road>İptal</button><button class="primary-button" type="submit">Ekle</button></div>
-    </form>
+    <div class="dialog-card directory-card">
+      <div class="directory-heading"><div><h2>Yol Seç</h2><p>Kayıtlı yollara dokunarak ekibe ekleyin.</p></div><button type="button" class="small-action" id="newRoadButton">+ Yeni</button></div>
+      <div id="savedRoadList" class="directory-list"></div>
+      <form id="roadForm" class="directory-editor" hidden>
+        <h3 id="roadEditorTitle">Yeni Yol</h3>
+        <label class="field"><span>Yol Adı</span><input id="roadName" required></label>
+        <div class="dialog-actions"><button type="button" class="secondary-button" id="cancelRoadEdit">Vazgeç</button><button class="primary-button" type="submit">Kaydet</button></div>
+      </form>
+      <div class="dialog-actions"><button type="button" class="primary-button" data-close-road>Tamam</button></div>
+    </div>
   </dialog>
 
   <dialog id="cardMenuDialog" class="action-dialog">

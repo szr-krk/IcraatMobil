@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  buildEnvelope, compareIncoming, ensurePayload, exportRecord, normalizeEvk,
-  sameLogicalShift, toIstanbulIso, validateEnvelope
+  buildEnvelope, calculateKeyboardInset, compareIncoming, ensurePayload, exportRecord, normalizeEvk,
+  mergeDirectoryItems, sameLogicalShift, toIstanbulIso, validateEnvelope
 } from '../domain.js';
 
 function record(overrides = {}) {
@@ -60,4 +60,29 @@ test('farklı kimlikli kesin mükerrer vardiya yakalanır', () => {
 test('revizyon karşılaştırması eski kaydın yeniyi ezmesini önler', () => {
   assert.equal(compareIncoming(record({ revision: 5 }), record({ revision: 4 })), 'OLDER');
   assert.equal(compareIncoming(record({ revision: 4 }), record({ revision: 5 })), 'NEWER');
+});
+
+test('görevli rehberi sicile göre mükerrer kayıt oluşturmaz', () => {
+  const merged = mergeDirectoryItems(
+    [{ id: '1', sicil: '123', ad: 'Ali', soyad: 'Yılmaz' }],
+    [{ id: '2', sicil: '123', ad: 'ALİ', soyad: 'YILMAZ' }, { id: '3', ad: 'Ayşe', soyad: 'Kara' }],
+    'personnel'
+  );
+  assert.equal(merged.length, 2);
+  assert.equal(merged[0].id, '1');
+});
+
+test('yol rehberi büyük küçük harf ve boşluk farkını yok sayar', () => {
+  const merged = mergeDirectoryItems(
+    [{ id: '1', yolad: 'D-100' }],
+    [{ id: '2', yolad: '  d-100  ' }, { id: '3', yolad: 'TEM' }],
+    'roads'
+  );
+  assert.deepEqual(merged.map(item => item.yolad), ['D-100', 'TEM']);
+});
+
+test('sanal klavye yüksekliği görsel görünüm farkından hesaplanır', () => {
+  assert.equal(calculateKeyboardInset(844, 510, 0), 334);
+  assert.equal(calculateKeyboardInset(844, 510, 24), 310);
+  assert.equal(calculateKeyboardInset(600, 600, 0), 0);
 });

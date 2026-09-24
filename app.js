@@ -3,8 +3,9 @@ import {
   putEvk, putManyEvks, setSetting, updateEvk
 } from './db.js';
 import {
-  ACCIDENT_FIELDS, CONTROLS, PENALTY_TYPES, UNITS, buildEnvelope, compareIncoming,
-  displayDateTime, dutyLabel, ensurePayload, makeChildId, makeRandomId, sameLogicalShift,
+  ACCIDENT_FIELDS, CONTROLS, PENALTY_TYPES, UNITS, buildEnvelope, calculateKeyboardInset, compareIncoming,
+  directoryItemKey, displayDateTime, dutyLabel, ensurePayload, makeChildId, makeRandomId,
+  mergeDirectoryItems, sameLogicalShift,
   toIstanbulIso, unitLabel, validateEnvelope
 } from './domain.js';
 
@@ -18,6 +19,11 @@ const state = {
   cardActionId: null,
   draftPersonnel: [],
   draftRoads: [],
+  personnelDirectory: [],
+  roadDirectory: [],
+  directoriesLoaded: false,
+  editingOfficerId: null,
+  editingRoadId: null,
   selectedArticles: [],
   guide: [],
   saveTimers: new Map()
@@ -59,6 +65,7 @@ function toggleMenu(force) {
 
 async function refreshEvks() {
   state.evks = await getAllEvks();
+  if (!state.directoriesLoaded) await loadDirectories();
   renderTeamList();
   if (state.selectedEvkId) {
     const current = state.evks.find(item => item.evkId === state.selectedEvkId);
@@ -77,8 +84,11 @@ function sortedEvks() {
 
 function renderTeamList() {
   const sorted = sortedEvks();
-  $('#teamCount').textContent = String(sorted.length);
-  $('#unitCount').textContent = String(new Set(sorted.map(item => item.sourceUnit)).size);
+  const unitCounts = Object.fromEntries(UNITS.map(unit => [unit.code, 0]));
+  sorted.forEach(evk => { unitCounts[evk.sourceUnit] = (unitCounts[evk.sourceUnit] || 0) + 1; });
+  $('#merkezCount').textContent = String(unitCounts.MERKEZ);
+  $('#corluCount').textContent = String(unitCounts.CORLU);
+  $('#malkaraCount').textContent = String(unitCounts.MALKARA);
 
   if (!sorted.length) {
     teamList.innerHTML = `<div class="empty-state">
@@ -99,6 +109,124 @@ function renderTeamList() {
   }).join('');
 
   $$('.team-card').forEach(card => bindCardGestures(card));
+}
+
+function withDirectoryIds(items, prefix) {
+  return items.map(item => ({ ...item, id: item.id || makeChildId(prefix) }));
+}
+
+async function loadDirectories() {
+  const existingPersonnel = await getSetting('personnel_directory', null);
+  const existingRoads = await getSetting('road_directory', null);
+  const evkPersonnel = state.evks.flatMap(evk => ensurePayload(evk).personnel);
+  const evkRoads = state.evks.flatMap(evk => ensurePayload(evk).roads);
+  state.personnelDirectory = withDirectoryIds(
+    existingPersonnel === null
+      ? mergeDirectoryItems([], evkPersonnel, 'personnel')
+      : (Array.isArray(existingPersonnel) ? existingPersonnel : []),
+    'person'
+  );
+  state.roadDirectory = withDirectoryIds(
+    existingRoads === null
+      ? mergeDirectoryItems([], evkRoads, 'roads')
+      : (Array.isArray(existingRoads) ? existingRoads : []),
+    'road'
+  );
+  if (existingPersonnel === null) await setSetting('personnel_directory', state.personnelDirectory);
+  if (existingRoads === null) await setSetting('road_directory', state.roadDirectory);
+  state.directoriesLoaded = true;
+}
+
+async function absorbDirectoriesFromEvks(evks) {
+  state.personnelDirectory = withDirectoryIds(mergeDirectoryItems(
+    state.personnelDirectory,
+    evks.flatMap(evk => ensurePayload(evk).personnel),
+    'personnel'
+  ), 'person');
+  state.roadDirectory = withDirectoryIds(mergeDirectoryItems(
+    state.roadDirectory,
+    evks.flatMap(evk => ensurePayload(evk).roads),
+    'roads'
+  ), 'road');
+  await Promise.all([
+    setSetting('personnel_directory', state.personnelDirectory),
+    setSetting('road_directory', state.roadDirectory)
+  ]);
+}
+
+function directorySelectionContains(item, type) {
+  const selected = type === 'personnel' ? state.draftPersonnel : state.draftRoads;
+  const key = directoryItemKey(item, type);
+  return selected.some(value => directoryItemKey(value, type) === key);
+}
+
+function renderOfficerDirectory() {
+  const list = $('#savedOfficerList');
+  if (!state.personnelDirectory.length) {
+    list.innerHTML = '<div class="directory-empty">Henüz kayıtlı görevli yok. “Yeni” düğmesiyle ilk kaydı oluşturun.</div>';
+    return;
+  }
+  list.innerHTML = state.personnelDirectory.map(person => {
+    const selected = directorySelectionContains(person, 'personnel');
+    const name = `${person.ad || ''} ${person.soyad || ''}`.trim();
+    return `<div class="directory-row ${selected ? 'selected' : ''}">
+      <button type="button" class="directory-select" data-toggle-officer="${escapeHtml(person.id)}" aria-pressed="${selected}">
+        <span class="directory-check">${selected ? '✓' : '+'}</span><span><strong>${escapeHtml(name)}</strong><small>${escapeHtml(person.sicil || 'Sicil belirtilmedi')}</small></span>
+      </button>
+      <button type="button" class="directory-icon" data-edit-officer="${escapeHtml(person.id)}" aria-label="Görevliyi güncelle">✎</button>
+      <button type="button" class="directory-icon danger-text" data-delete-officer="${escapeHtml(person.id)}" aria-label="Görevliyi sil">×</button>
+    </div>`;
+  }).join('');
+}
+
+function renderRoadDirectory() {
+  const list = $('#savedRoadList');
+  if (!state.roadDirectory.length) {
+    list.innerHTML = '<div class="directory-empty">Henüz kayıtlı yol yok. “Yeni” düğmesiyle ilk kaydı oluşturun.</div>';
+    return;
+  }
+  list.innerHTML = state.roadDirectory.map(road => {
+    const selected = directorySelectionContains(road, 'roads');
+    return `<div class="directory-row ${selected ? 'selected' : ''}">
+      <button type="button" class="directory-select" data-toggle-road="${escapeHtml(road.id)}" aria-pressed="${selected}">
+        <span class="directory-check">${selected ? '✓' : '+'}</span><span><strong>${escapeHtml(road.yolad)}</strong><small>${selected ? 'Ekibe eklendi' : 'Ekibe eklemek için dokunun'}</small></span>
+      </button>
+      <button type="button" class="directory-icon" data-edit-road="${escapeHtml(road.id)}" aria-label="Yolu güncelle">✎</button>
+      <button type="button" class="directory-icon danger-text" data-delete-road="${escapeHtml(road.id)}" aria-label="Yolu sil">×</button>
+    </div>`;
+  }).join('');
+}
+
+function showOfficerEditor(id = null) {
+  state.editingOfficerId = id;
+  const person = state.personnelDirectory.find(item => item.id === id);
+  $('#officerForm').reset();
+  $('#officerEditorTitle').textContent = person ? 'Görevliyi Güncelle' : 'Yeni Görevli';
+  $('#officerRegistry').value = person?.sicil || '';
+  $('#officerName').value = person?.ad || '';
+  $('#officerSurname').value = person?.soyad || '';
+  $('#officerForm').hidden = false;
+  $('#officerName').focus();
+}
+
+function showRoadEditor(id = null) {
+  state.editingRoadId = id;
+  const road = state.roadDirectory.find(item => item.id === id);
+  $('#roadForm').reset();
+  $('#roadEditorTitle').textContent = road ? 'Yolu Güncelle' : 'Yeni Yol';
+  $('#roadName').value = road?.yolad || '';
+  $('#roadForm').hidden = false;
+  $('#roadName').focus();
+}
+
+function toggleDirectorySelection(item, type) {
+  const target = type === 'personnel' ? 'draftPersonnel' : 'draftRoads';
+  const key = directoryItemKey(item, type);
+  const index = state[target].findIndex(value => directoryItemKey(value, type) === key);
+  if (index >= 0) state[target].splice(index, 1);
+  else state[target].push(structuredClone(item));
+  renderTeamDraftLists();
+  if (type === 'personnel') renderOfficerDirectory(); else renderRoadDirectory();
 }
 
 function teamCardHtml(evk) {
@@ -352,6 +480,7 @@ function selectTab(name) {
   $$('.tabs [role="tab"]').forEach(button => button.setAttribute('aria-selected', String(button.dataset.tab === name)));
   const names = ['penalties', 'controls', 'accidents', 'performance'];
   names.forEach(value => { $(`#${value}Panel`).hidden = value !== name; });
+  if (name === 'penalties') requestAnimationFrame(updatePenaltyComposerMetrics);
 }
 
 function renderPenaltyList(records) {
@@ -453,6 +582,22 @@ function resetPenaltyForm() {
   articleSearch.value = '';
   articleResults.hidden = true;
   renderSelectedArticles();
+}
+
+function selectPenaltyCount() {
+  const input = $('#penaltyCount');
+  requestAnimationFrame(() => input.select());
+}
+
+function updatePenaltyComposerMetrics() {
+  const composer = $('#penaltyForm');
+  const height = composer && !composer.closest('[hidden]') ? Math.ceil(composer.getBoundingClientRect().height) : 0;
+  if (height) document.documentElement.style.setProperty('--composer-height', `${height}px`);
+  const viewport = window.visualViewport;
+  const keyboardInset = viewport
+    ? calculateKeyboardInset(window.innerHeight, viewport.height, viewport.offsetTop)
+    : 0;
+  document.documentElement.style.setProperty('--keyboard-inset', `${keyboardInset}px`);
 }
 
 async function editPenaltyCount(penaltyId) {
@@ -718,6 +863,7 @@ async function importJsonFile(file) {
     }
 
     await putManyEvks(accepted);
+    await absorbDirectoriesFromEvks(accepted);
     await refreshEvks();
     showToast(`${accepted.length} kayıt alındı, ${skipped} kayıt atlandı${warnings ? `, ${warnings} uyarı gösterildi` : ''}.`, 4800);
   } catch (error) {
@@ -755,19 +901,62 @@ function bindEvents() {
   $('#backButton').addEventListener('click', () => history.back());
 
   $('#addOfficerButton').addEventListener('click', () => {
-    $('#officerForm').reset();
+    state.editingOfficerId = null;
+    $('#officerForm').hidden = true;
+    renderOfficerDirectory();
     $('#officerDialog').showModal();
   });
   $('[data-close-officer]').addEventListener('click', () => $('#officerDialog').close());
-  $('#officerForm').addEventListener('submit', event => {
+  $('#newOfficerButton').addEventListener('click', () => showOfficerEditor());
+  $('#cancelOfficerEdit').addEventListener('click', () => { $('#officerForm').hidden = true; });
+  $('#officerForm').addEventListener('submit', async event => {
     event.preventDefault();
     if (!event.currentTarget.reportValidity()) return;
-    state.draftPersonnel.push({
-      id: makeChildId('person'), sicil: $('#officerRegistry').value.trim(),
+    const current = state.personnelDirectory.find(item => item.id === state.editingOfficerId);
+    const person = {
+      id: current?.id || makeChildId('person'), sicil: $('#officerRegistry').value.trim(),
       ad: $('#officerName').value.trim(), soyad: $('#officerSurname').value.trim()
-    });
-    $('#officerDialog').close();
+    };
+    const duplicate = state.personnelDirectory.find(item => item.id !== current?.id
+      && directoryItemKey(item, 'personnel') === directoryItemKey(person, 'personnel'));
+    if (duplicate) {
+      showToast('Bu görevli zaten kayıtlı.');
+      return;
+    }
+    if (current) {
+      state.personnelDirectory = state.personnelDirectory.map(item => item.id === current.id ? person : item);
+      const oldKey = directoryItemKey(current, 'personnel');
+      state.draftPersonnel = state.draftPersonnel.map(item => directoryItemKey(item, 'personnel') === oldKey ? structuredClone(person) : item);
+    } else {
+      state.personnelDirectory.push(person);
+      state.draftPersonnel.push(structuredClone(person));
+    }
+    await setSetting('personnel_directory', state.personnelDirectory);
+    $('#officerForm').hidden = true;
     renderTeamDraftLists();
+    renderOfficerDirectory();
+  });
+  $('#savedOfficerList').addEventListener('click', async event => {
+    const toggle = event.target.closest('[data-toggle-officer]');
+    const edit = event.target.closest('[data-edit-officer]');
+    const remove = event.target.closest('[data-delete-officer]');
+    if (toggle) {
+      const person = state.personnelDirectory.find(item => item.id === toggle.dataset.toggleOfficer);
+      if (person) toggleDirectorySelection(person, 'personnel');
+    }
+    if (edit) showOfficerEditor(edit.dataset.editOfficer);
+    if (remove) {
+      const person = state.personnelDirectory.find(item => item.id === remove.dataset.deleteOfficer);
+      if (!person) return;
+      const confirmed = await askConfirm('Görevli kaydı silinsin mi?', `${person.ad} ${person.soyad} kayıtlı görevli listesinden silinecek. Geçmiş EVK kayıtları değişmez.`, 'Sil', true);
+      if (!confirmed) return;
+      const key = directoryItemKey(person, 'personnel');
+      state.personnelDirectory = state.personnelDirectory.filter(item => item.id !== person.id);
+      state.draftPersonnel = state.draftPersonnel.filter(item => directoryItemKey(item, 'personnel') !== key);
+      await setSetting('personnel_directory', state.personnelDirectory);
+      renderTeamDraftLists();
+      renderOfficerDirectory();
+    }
   });
   $('#officerList').addEventListener('click', event => {
     const button = event.target.closest('[data-remove-officer]');
@@ -777,16 +966,59 @@ function bindEvents() {
   });
 
   $('#addRoadButton').addEventListener('click', () => {
-    $('#roadForm').reset();
+    state.editingRoadId = null;
+    $('#roadForm').hidden = true;
+    renderRoadDirectory();
     $('#roadDialog').showModal();
   });
   $('[data-close-road]').addEventListener('click', () => $('#roadDialog').close());
-  $('#roadForm').addEventListener('submit', event => {
+  $('#newRoadButton').addEventListener('click', () => showRoadEditor());
+  $('#cancelRoadEdit').addEventListener('click', () => { $('#roadForm').hidden = true; });
+  $('#roadForm').addEventListener('submit', async event => {
     event.preventDefault();
     if (!event.currentTarget.reportValidity()) return;
-    state.draftRoads.push({ id: makeChildId('road'), yolad: $('#roadName').value.trim() });
-    $('#roadDialog').close();
+    const current = state.roadDirectory.find(item => item.id === state.editingRoadId);
+    const road = { id: current?.id || makeChildId('road'), yolad: $('#roadName').value.trim() };
+    const duplicate = state.roadDirectory.find(item => item.id !== current?.id
+      && directoryItemKey(item, 'roads') === directoryItemKey(road, 'roads'));
+    if (duplicate) {
+      showToast('Bu yol zaten kayıtlı.');
+      return;
+    }
+    if (current) {
+      state.roadDirectory = state.roadDirectory.map(item => item.id === current.id ? road : item);
+      const oldKey = directoryItemKey(current, 'roads');
+      state.draftRoads = state.draftRoads.map(item => directoryItemKey(item, 'roads') === oldKey ? structuredClone(road) : item);
+    } else {
+      state.roadDirectory.push(road);
+      state.draftRoads.push(structuredClone(road));
+    }
+    await setSetting('road_directory', state.roadDirectory);
+    $('#roadForm').hidden = true;
     renderTeamDraftLists();
+    renderRoadDirectory();
+  });
+  $('#savedRoadList').addEventListener('click', async event => {
+    const toggle = event.target.closest('[data-toggle-road]');
+    const edit = event.target.closest('[data-edit-road]');
+    const remove = event.target.closest('[data-delete-road]');
+    if (toggle) {
+      const road = state.roadDirectory.find(item => item.id === toggle.dataset.toggleRoad);
+      if (road) toggleDirectorySelection(road, 'roads');
+    }
+    if (edit) showRoadEditor(edit.dataset.editRoad);
+    if (remove) {
+      const road = state.roadDirectory.find(item => item.id === remove.dataset.deleteRoad);
+      if (!road) return;
+      const confirmed = await askConfirm('Yol kaydı silinsin mi?', `${road.yolad} kayıtlı yol listesinden silinecek. Geçmiş EVK kayıtları değişmez.`, 'Sil', true);
+      if (!confirmed) return;
+      const key = directoryItemKey(road, 'roads');
+      state.roadDirectory = state.roadDirectory.filter(item => item.id !== road.id);
+      state.draftRoads = state.draftRoads.filter(item => directoryItemKey(item, 'roads') !== key);
+      await setSetting('road_directory', state.roadDirectory);
+      renderTeamDraftLists();
+      renderRoadDirectory();
+    }
   });
   $('#roadList').addEventListener('click', event => {
     const button = event.target.closest('[data-remove-road]');
@@ -807,6 +1039,8 @@ function bindEvents() {
 
   $$('.tabs [role="tab"]').forEach(button => button.addEventListener('click', () => selectTab(button.dataset.tab)));
   $('#penaltyForm').addEventListener('submit', savePenalty);
+  $('#penaltyCount').addEventListener('focus', selectPenaltyCount);
+  $('#penaltyCount').addEventListener('click', selectPenaltyCount);
   articleSearch.addEventListener('input', () => renderArticleResults(articleSearch.value));
   $('#clearArticleSearch').addEventListener('click', () => {
     articleSearch.value = '';
@@ -863,18 +1097,18 @@ function bindEvents() {
     if (event.state?.evkId && state.evks.some(item => item.evkId === event.state.evkId)) openDetail(event.state.evkId, false);
     else showListView();
   });
-  window.addEventListener('online', updateConnectivity);
-  window.addEventListener('offline', updateConnectivity);
-}
-
-function updateConnectivity() {
-  $('#offlineState').textContent = navigator.onLine ? 'Hazır' : 'Offline';
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', updatePenaltyComposerMetrics);
+    window.visualViewport.addEventListener('scroll', updatePenaltyComposerMetrics);
+  }
+  window.addEventListener('resize', updatePenaltyComposerMetrics);
 }
 
 async function init() {
   bindEvents();
   renderSelectedArticles();
-  updateConnectivity();
+  new ResizeObserver(updatePenaltyComposerMetrics).observe($('#penaltyForm'));
+  updatePenaltyComposerMetrics();
   try {
     await openDatabase();
     await Promise.all([refreshEvks(), loadPenaltyGuide()]);
