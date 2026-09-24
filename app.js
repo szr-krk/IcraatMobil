@@ -39,6 +39,7 @@ const menuBackdrop = $('#menuBackdrop');
 const cardMenuDialog = $('#cardMenuDialog');
 const articleSearch = $('#articleSearch');
 const articleResults = $('#articleResults');
+const RADAR_ARTICLE_CODES = Array.from({ length: 9 }, (_, index) => `51/2-b-${index + 1}`);
 
 let toastTimer;
 let largestVisualViewportHeight = window.visualViewport?.height || window.innerHeight;
@@ -460,8 +461,8 @@ function openDetail(id, pushHistory = true) {
   $('#pageTitle').textContent = `Ekip ${evk.teamCode}`;
   $('#pageEyebrow').textContent = unitLabel(evk.sourceUnit).toLocaleUpperCase('tr-TR');
   document.title = `Ekip ${evk.teamCode} · İcraat`;
-  selectTab('penalties');
   renderDetail(evk);
+  selectTab(evk.dutyType === 'RADAR' ? 'radarTeam' : 'penalties');
   if (pushHistory) history.pushState({ evkId: id }, '', `#evk=${encodeURIComponent(id)}`);
   window.scrollTo({ top: 0 });
 }
@@ -470,19 +471,61 @@ function renderDetail(evk) {
   const payload = ensurePayload(evk);
   $('#detailSummary').innerHTML = `<span><strong>${escapeHtml(dutyLabel(evk.dutyType))}</strong> · ${escapeHtml(unitLabel(evk.sourceUnit))}</span><span>${escapeHtml(displayDateTime(evk.startEpochMillis))}</span>`;
   const radar = evk.dutyType === 'RADAR';
-  $('#radarOriginField').hidden = !radar;
-  $('#penaltyTypeGroup').hidden = radar;
-  renderPenaltyList(payload.penalties);
+  configureDetailTabs(radar);
+  renderPenaltyList(payload.penalties.filter(record => !String(record.origin || '').startsWith('RADAR_')));
+  renderRadarCounts(payload.penalties, 'RADAR_TEAM', '#radarTeamGrid');
+  renderRadarCounts(payload.penalties, 'RADAR_OPERATOR', '#radarOperatorGrid');
   renderControls(payload.controls);
   renderAccidents(payload.accidents);
-  if (radar) enforceRadarType();
+}
+
+function configureDetailTabs(radar) {
+  const normalTabs = ['penalties', 'controls', 'accidents', 'performance'];
+  const radarTabs = ['radarTeam', 'radarOperator'];
+  normalTabs.forEach(name => { $(`[data-tab="${name}"]`).hidden = radar; });
+  radarTabs.forEach(name => { $(`[data-tab="${name}"]`).hidden = !radar; });
+  $('.tabs').classList.toggle('radar-tabs', radar);
 }
 
 function selectTab(name) {
   $$('.tabs [role="tab"]').forEach(button => button.setAttribute('aria-selected', String(button.dataset.tab === name)));
-  const names = ['penalties', 'controls', 'accidents', 'performance'];
+  const names = ['penalties', 'radarTeam', 'radarOperator', 'controls', 'accidents', 'performance'];
   names.forEach(value => { $(`#${value}Panel`).hidden = value !== name; });
   if (name === 'penalties') requestAnimationFrame(updatePenaltyComposerMetrics);
+}
+
+function radarGuideArticles() {
+  return RADAR_ARTICLE_CODES.map(code => state.guide.find(article => article.code.trim().toLocaleLowerCase('tr-TR') === code.toLocaleLowerCase('tr-TR')) || {
+    code,
+    amount: 0,
+    year: new Date().getFullYear(),
+    description: 'Radar hız ihlali'
+  });
+}
+
+function radarCountsForOrigin(records, origin) {
+  const counts = Object.fromEntries(RADAR_ARTICLE_CODES.map(code => [code, 0]));
+  records.filter(record => record.origin === origin).forEach(record => {
+    const count = Number.parseInt(record.count, 10);
+    if (!Number.isInteger(count) || count < 1) return;
+    (record.articles || []).forEach(article => {
+      const code = RADAR_ARTICLE_CODES.find(value => value.toLocaleLowerCase('tr-TR') === String(article.code || '').trim().toLocaleLowerCase('tr-TR'));
+      if (code) counts[code] += count;
+    });
+  });
+  return counts;
+}
+
+function renderRadarCounts(records, origin, selector) {
+  const counts = radarCountsForOrigin(records, origin);
+  $(selector).innerHTML = radarGuideArticles().map(article => {
+    const value = counts[article.code] || '';
+    return `<label class="radar-count-field">
+      <strong>${escapeHtml(article.code)}</strong>
+      <input type="number" min="0" inputmode="numeric" pattern="[0-9]*" data-radar-origin="${escapeHtml(origin)}" data-radar-code="${escapeHtml(article.code)}" value="${escapeHtml(value)}" aria-label="${escapeHtml(article.code)} ceza adedi">
+      <span>${escapeHtml(article.description)}</span>
+    </label>`;
+  }).join('');
 }
 
 function renderPenaltyList(records) {
@@ -552,9 +595,7 @@ function renderSelectedArticles() {
 }
 
 function availableGuide() {
-  const evk = state.evks.find(item => item.evkId === state.selectedEvkId);
-  if (evk?.dutyType !== 'RADAR') return state.guide;
-  return state.guide.filter(article => /^51\/2-b-[1-9]$/i.test(article.code.trim()));
+  return state.guide;
 }
 
 function renderArticleResults(query) {
@@ -575,12 +616,6 @@ function renderArticleResults(query) {
   $('#penaltyForm').classList.add('search-active');
 }
 
-function enforceRadarType() {
-  const origin = document.querySelector('[name="radarOrigin"]:checked')?.value || 'RADAR_OPERATOR';
-  const typeInput = document.querySelector(`[name="penaltyType"][value="${origin === 'RADAR_OPERATOR' ? 'PLATE' : 'DRIVER'}"]`);
-  if (typeInput) typeInput.checked = true;
-}
-
 async function savePenalty(event) {
   event.preventDefault();
   const evk = state.evks.find(item => item.evkId === state.selectedEvkId);
@@ -595,11 +630,8 @@ async function savePenalty(event) {
     showToast('En az bir ceza maddesi seçin.');
     return;
   }
-  const radar = evk.dutyType === 'RADAR';
-  const origin = radar ? document.querySelector('[name="radarOrigin"]:checked').value : 'NORMAL';
-  const type = parkingOnly ? null : radar
-    ? (origin === 'RADAR_OPERATOR' ? 'PLATE' : 'DRIVER')
-    : document.querySelector('[name="penaltyType"]:checked').value;
+  const origin = 'NORMAL';
+  const type = parkingOnly ? null : document.querySelector('[name="penaltyType"]:checked').value;
   const record = {
     penaltyId: makeChildId('penalty'),
     type,
@@ -660,7 +692,7 @@ function updatePenaltyComposerMetrics() {
 function keepArticleSearchFocused(event) {
   if (document.activeElement !== articleSearch) return;
   const control = event.target.closest(
-    '.type-scroll label, .check-row label, .choice-pills label, .clear-button, .article-chip button, .article-result'
+    '.type-scroll label, .check-row label, .clear-button, .article-chip button, .article-result'
   );
   if (control) event.preventDefault();
 }
@@ -669,9 +701,57 @@ function scheduleFocusedCountVisibility() {
   clearTimeout(focusedCountScrollTimer);
   focusedCountScrollTimer = setTimeout(() => {
     const input = document.activeElement;
-    if (!input?.matches('[data-count-section]')) return;
+    if (!input?.matches('[data-count-section], [data-radar-code]')) return;
     input.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' });
   }, 180);
+}
+
+function scheduleRadarCountSave(input) {
+  const evkId = state.selectedEvkId;
+  const timerKey = `${evkId}:${input.dataset.radarOrigin}:${input.dataset.radarCode}`;
+  clearTimeout(state.saveTimers.get(timerKey));
+  state.saveTimers.set(timerKey, setTimeout(() => saveRadarCount(input, evkId), 280));
+}
+
+async function saveRadarCount(input, evkId) {
+  const origin = input.dataset.radarOrigin;
+  const code = input.dataset.radarCode;
+  if (!evkId || !['RADAR_TEAM', 'RADAR_OPERATOR'].includes(origin) || !RADAR_ARTICLE_CODES.includes(code)) return;
+  const trimmed = input.value.trim();
+  const numeric = trimmed === '' ? 0 : Number.parseInt(trimmed, 10);
+  if (!Number.isInteger(numeric) || numeric < 0) {
+    input.setCustomValidity('0 veya daha büyük bir sayı girin.');
+    input.reportValidity();
+    return;
+  }
+  input.setCustomValidity('');
+  await updateEvk(evkId, current => {
+    const payload = ensurePayload(current);
+    const counts = radarCountsForOrigin(payload.penalties, origin);
+    if (counts[code] === numeric) return current;
+    counts[code] = numeric;
+    const preserved = payload.penalties.filter(record => {
+      if (record.origin !== origin) return true;
+      return !(record.articles || []).some(article => RADAR_ARTICLE_CODES.includes(String(article.code || '').trim()));
+    });
+    const type = origin === 'RADAR_OPERATOR' ? 'PLATE' : 'DRIVER';
+    const normalized = radarGuideArticles().flatMap(article => counts[article.code] > 0 ? [{
+      penaltyId: makeChildId('penalty'),
+      type,
+      articles: [structuredClone(article)],
+      vehicleBan: false,
+      parking: false,
+      licenseCancel: false,
+      count: counts[article.code],
+      parkingOnly: false,
+      origin
+    }] : []);
+    payload.penalties = [...normalized, ...preserved];
+    return { ...current, payload, updatedAt: Date.now() };
+  });
+  const updated = await getEvk(evkId);
+  const index = state.evks.findIndex(item => item.evkId === evkId);
+  if (index >= 0 && updated) state.evks[index] = updated;
 }
 
 async function editPenaltyCount(penaltyId) {
@@ -1140,7 +1220,6 @@ function bindEvents() {
     state.selectedArticles.splice(Number(button.dataset.removeArticle), 1);
     renderSelectedArticles();
   });
-  document.querySelectorAll('[name="radarOrigin"]').forEach(input => input.addEventListener('change', enforceRadarType));
   $('#penaltyList').addEventListener('click', event => {
     const edit = event.target.closest('[data-edit-penalty]');
     if (edit) editPenaltyCount(edit.dataset.editPenalty);
@@ -1148,9 +1227,11 @@ function bindEvents() {
   detailScreen.addEventListener('input', event => {
     const input = event.target.closest('[data-count-section]');
     if (input) scheduleCountSave(input);
+    const radarInput = event.target.closest('[data-radar-code]');
+    if (radarInput) scheduleRadarCountSave(radarInput);
   });
   detailScreen.addEventListener('focusin', event => {
-    if (event.target.matches('[data-count-section]')) scheduleFocusedCountVisibility();
+    if (event.target.matches('[data-count-section], [data-radar-code]')) scheduleFocusedCountVisibility();
   });
 
   overflowMenu.addEventListener('click', event => {

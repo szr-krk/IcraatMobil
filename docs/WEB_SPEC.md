@@ -12,7 +12,8 @@
 - `Icraat_pdf`: Ekip türü, ekip kodu, tarih/saat, görevliler ve yollar.
 - `IcraatPdfYeni`: Birim seçimi, EVK kimlik/revizyon kuralları, birim odaklı kart listesi, ceza/kontrol/kaza payload yapısı ve JSON sözleşmesi.
 - Kart sağa kaydırılırsa güncelleme, sola kaydırılırsa onaylı silme açılır. Uzun basma aynı işlemleri menüyle sunar.
-- Kart ayrıntısında sabit sekmeler: Ceza Ekle, Kontroller, Kazalar, İcraat. İcraat içeriği bu fazda boştur.
+- Normal görevlerde kart ayrıntısında sabit sekmeler Ceza Ekle, Kontroller, Kazalar ve İcraat'tır. İcraat içeriği bu fazda boştur.
+- Radar görevlerinde yalnızca `Ekip · Yüzüne` ve `Operatör · Plakaya` sekmeleri gösterilir; Kontroller, Kazalar, İcraat ve standart ceza arama arayüzü gösterilmez.
 
 ## Veri kuralları
 
@@ -31,6 +32,7 @@
 - Kontrol ve kaza sayısı alanları klavye açıldığında görünür alanın ortasına kaydırılır; son satırlar için klavye yüksekliği kadar ek kaydırma alanı ayrılır.
 - Madde filtresi açıkken ceza türü, radar kaynağı, ek işlem kutuları ve seçili madde satırı geçici olarak gizlenir; sonuç penceresinin alt kenarı Madde Ara satırının hemen üstünde kalır.
 - Eklenmiş ceza kartı tek bir düz cümlede tür, maddeler, toplam tutar, ek işlemler ve adet bilgisini gösterir. Kart iki yönden de en az 68 piksel kaydırıldığında ek onay istemeden silinir ve yalnızca sonuç bildirimi gösterilir; kart üzerindeki silme düğmesi bulunmaz.
+- Radar görevindeki iki ceza sekmesi de `51/2-b-1` ile `51/2-b-9` arasındaki dokuz maddeyi, madde açıklaması ve adet alanıyla gösterir. Ekip sekmesindeki adetler `RADAR_TEAM`/`DRIVER`, operatör sekmesindekiler `RADAR_OPERATOR`/`PLATE` olarak mevcut `payload.penalties` listesine otomatik kaydedilir. Boş veya sıfır adet ilgili kaydın kaldırılmasıdır.
 
 ## Web uzantısı
 

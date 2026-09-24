@@ -1,4 +1,4 @@
-const CACHE_NAME = 'icraat-mobil-v8';
+const CACHE_NAME = 'icraat-mobil-v9';
 const APP_SHELL = [
   './',
   './index.html',

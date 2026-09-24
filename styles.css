@@ -149,6 +149,7 @@ button { touch-action: manipulation; }
 .detail-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--line); color: var(--muted); background: white; font-size: .78rem; }
 .detail-summary strong { color: var(--navy-800); }
 .tabs { position: sticky; top: calc(76px + env(safe-area-inset-top)); z-index: 16; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--line); background: white; box-shadow: 0 3px 10px rgb(8 24 44 / 7%); }
+.tabs.radar-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .tabs button { min-width: 0; min-height: 52px; padding: 8px 2px; border: 0; border-bottom: 3px solid transparent; color: var(--muted); background: transparent; font-size: .76rem; font-weight: 800; }
 .tabs button[aria-selected="true"] { border-bottom-color: var(--red-600); color: var(--navy-800); }
 .tab-panel { min-height: calc(100dvh - 190px); padding: 13px 12px calc(24px + env(safe-area-inset-bottom)); }
@@ -168,15 +169,12 @@ button { touch-action: manipulation; }
 .penalty-card-actions { display: flex; }
 .penalty-card-actions button { width: 40px; height: 42px; border: 0; border-radius: 10px; color: var(--navy-800); background: var(--surface-soft); font-weight: 900; }
 .penalty-composer { position: fixed; left: 50%; right: auto; bottom: calc(var(--keyboard-inset, 0px) + env(safe-area-inset-bottom)); z-index: 30; width: min(544px, calc(100vw - 10px)); display: grid; gap: 4px; transform: translateX(-50%); padding: 6px; border: 1px solid #b8c5d2; border-radius: 12px; background: rgb(255 255 255 / 98%); box-shadow: 0 -8px 28px rgb(8 24 44 / 18%); }
-.penalty-composer.search-active > .radar-origin,
 .penalty-composer.search-active > .penalty-row,
 .penalty-composer.search-active > .check-row,
 .penalty-composer.search-active > .selected-articles { display: none; }
-.radar-origin { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 6px; color: var(--muted); font-size: .68rem; font-weight: 700; }
-.choice-pills { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
-.choice-pills input, .type-scroll input { position: absolute; opacity: 0; }
-.choice-pills span, .type-scroll span { display: block; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; text-align: center; background: white; }
-.choice-pills input:checked + span, .type-scroll input:checked + span { border-color: var(--navy-800); color: white; background: var(--navy-800); }
+.type-scroll input { position: absolute; opacity: 0; }
+.type-scroll span { display: block; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; text-align: center; background: white; }
+.type-scroll input:checked + span { border-color: var(--navy-800); color: white; background: var(--navy-800); }
 .penalty-row { display: grid; grid-template-columns: 50px minmax(0, 1fr); align-items: end; gap: 5px; }
 .count-field { position: relative; display: block; color: var(--muted); text-align: center; font-size: .62rem; font-weight: 700; }
 .count-field > span { position: absolute; inset: 2px 0 auto; z-index: 1; pointer-events: none; }
@@ -203,11 +201,17 @@ button { touch-action: manipulation; }
 
 .autosave-note { margin: 0 0 12px; color: var(--muted); font-size: .79rem; }
 .controls-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+.radar-count-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+.radar-count-field { min-width: 0; display: grid; grid-template-rows: auto auto 1fr; gap: 6px; padding: 9px 7px; border: 1px solid var(--line); border-radius: 11px; background: rgb(255 255 255 / 94%); }
+.radar-count-field strong { overflow: hidden; color: var(--navy-800); text-align: center; text-overflow: ellipsis; white-space: nowrap; font-size: .78rem; }
+.radar-count-field input { width: 100%; min-height: 42px; border: 1px solid #bac6d2; border-radius: 8px; appearance: textfield; text-align: center; font-size: 1rem; font-weight: 800; }
+.radar-count-field input::-webkit-inner-spin-button, .radar-count-field input::-webkit-outer-spin-button { margin: 0; appearance: none; }
+.radar-count-field span { color: var(--muted); text-align: center; font-size: .67rem; line-height: 1.28; }
 .control-field { display: grid; gap: 5px; min-width: 0; padding: 9px 7px; border: 1px solid var(--line); border-radius: 11px; background: rgb(255 255 255 / 94%); }
 .control-field strong { overflow: hidden; color: var(--navy-800); text-align: center; text-overflow: ellipsis; white-space: nowrap; font-size: .78rem; }
 .control-field span { min-height: 30px; color: var(--muted); text-align: center; font-size: .75rem; line-height: 1.25; }
 .control-field input { width: 100%; min-height: 42px; border: 1px solid #bac6d2; border-radius: 8px; text-align: center; font-size: 1rem; }
-.keyboard-open #controlsPanel, .keyboard-open #accidentsPanel { padding-bottom: calc(var(--keyboard-height, 0px) + 80px); }
+.keyboard-open #controlsPanel, .keyboard-open #accidentsPanel, .keyboard-open #radarTeamPanel, .keyboard-open #radarOperatorPanel { padding-bottom: calc(var(--keyboard-height, 0px) + 80px); }
 .accident-fields { display: grid; gap: 12px; }
 .accident-fields .field { padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: rgb(255 255 255 / 94%); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
@@ -223,4 +227,5 @@ button { touch-action: manipulation; }
   .date-grid { grid-template-columns: 1fr; }
   .team-card { grid-template-columns: 38px 70px minmax(0, 1fr) 40px; }
   .controls-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .radar-count-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

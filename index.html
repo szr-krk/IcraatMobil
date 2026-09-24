@@ -38,21 +38,26 @@
       <section id="detailSummary" class="detail-summary"></section>
       <nav class="tabs" role="tablist" aria-label="EVK bölümleri">
         <button role="tab" aria-selected="true" data-tab="penalties">Ceza Ekle</button>
+        <button role="tab" aria-selected="false" data-tab="radarTeam" hidden>Ekip · Yüzüne</button>
+        <button role="tab" aria-selected="false" data-tab="radarOperator" hidden>Operatör · Plakaya</button>
         <button role="tab" aria-selected="false" data-tab="controls">Kontroller</button>
         <button role="tab" aria-selected="false" data-tab="accidents">Kazalar</button>
         <button role="tab" aria-selected="false" data-tab="performance">İcraat</button>
       </nav>
 
+      <section id="radarTeamPanel" class="tab-panel watermark-panel" role="tabpanel" hidden>
+        <p class="autosave-note">Ekibin yüzüne yazdığı radar cezalarının adetlerini girin. Değerler otomatik kaydedilir.</p>
+        <div id="radarTeamGrid" class="radar-count-grid"></div>
+      </section>
+
+      <section id="radarOperatorPanel" class="tab-panel watermark-panel" role="tabpanel" hidden>
+        <p class="autosave-note">Radar operatörünün plakaya yazdığı cezaların adetlerini girin. Değerler otomatik kaydedilir.</p>
+        <div id="radarOperatorGrid" class="radar-count-grid"></div>
+      </section>
+
       <section id="penaltiesPanel" class="tab-panel watermark-panel" role="tabpanel">
         <div id="penaltyList" class="penalty-list"></div>
         <form id="penaltyForm" class="penalty-composer">
-          <div id="radarOriginField" class="radar-origin" hidden>
-            <span>Kayıt Kaynağı</span>
-            <div class="choice-pills">
-              <label><input type="radio" name="radarOrigin" value="RADAR_OPERATOR" checked><span>Plakasına</span></label>
-              <label><input type="radio" name="radarOrigin" value="RADAR_TEAM"><span>Ekip Cezaları</span></label>
-            </div>
-          </div>
           <div class="penalty-row">
             <label class="count-field"><span>Adet</span><input id="penaltyCount" type="number" min="1" inputmode="numeric" value="1" required></label>
             <div class="type-scroll" id="penaltyTypeGroup">
