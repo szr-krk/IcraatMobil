@@ -166,11 +166,12 @@
       <div class="sheet-body report-sheet-body">
         <section class="report-intro">
           <strong id="reportPeriod">Kayıtlar hazırlanıyor…</strong>
-          <p>Ekiplerden gelen son 24 saatlik kaza verileri her birimin kartında bilgi olarak gösterilir. Bu değerleri önceki günün PDF'indeki birikimli sayılara ekleyerek alttaki alanları doldurun. KGYS ve PTS boş bırakılırsa 0 kabul edilir.</p>
+          <p>Ekiplerden gelen son 24 saatlik kaza verileri her birimin kartında bilgi olarak gösterilir. Bu değerleri önceki günün PDF'indeki birikimli sayılara ekleyerek alttaki alanları doldurun. Tüm alanlar doldurulmalıdır; veri yoksa 0 giriniz. Değerler yalnızca bu cihazda saklanır.</p>
         </section>
         <form id="reportForm" novalidate>
           <div id="reportAccidentSections" class="report-accident-sections"></div>
           <p id="reportStatus" class="report-status" role="status" aria-live="polite"></p>
+          <button type="button" class="secondary-button report-clear" id="clearReportInputs">KAYITLI VERİLERİ TEMİZLE</button>
           <button type="submit" class="primary-button report-generate" id="generateReport">PDF OLUŞTUR</button>
         </form>
         <div class="report-actions" aria-label="PDF işlemleri">

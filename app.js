@@ -46,13 +46,15 @@ const articleResults = $('#articleResults');
 const RADAR_ARTICLE_CODES = Array.from({ length: 9 }, (_, index) => `51/2-b-${index + 1}`);
 const REPORT_INPUT_FIELDS = [
   ...ACCIDENT_FIELDS.map(field => [...field, true]),
-  ['kgysPenaltyCount', 'KGYS Ceza Sayısı', false],
-  ['ptsPenaltyCount', 'PTS Ceza Sayısı', false]
+  ['kgysPenaltyCount', 'KGYS Ceza Sayısı', true],
+  ['ptsPenaltyCount', 'PTS Ceza Sayısı', true]
 ];
+const REPORT_INPUTS_SETTING = 'daily_report_inputs_v1';
 
 let toastTimer;
 let largestVisualViewportHeight = window.visualViewport?.height || window.innerHeight;
 let focusedCountScrollTimer;
+let reportInputSaveTimer;
 
 function showToast(message, duration = 2400) {
   const toast = $('#toast');
@@ -1082,7 +1084,7 @@ function clearReportOutput(message = '') {
   status.classList.remove('error');
 }
 
-function renderReportAccidentInputs() {
+function renderReportAccidentInputs(savedValues = {}) {
   const incoming = summarizeDailyReport(state.evks).units;
   $('#reportAccidentSections').innerHTML = UNITS.map(unit => `<section class="report-unit-card">
     <h3>${escapeHtml(unit.label)}</h3>
@@ -1094,20 +1096,65 @@ function renderReportAccidentInputs() {
       <p>Bir önceki günün birikimli değerlerine ekleyebilirsiniz.</p>
     </section>
     <h4>PDF'ye yazılacak birikimli değerler</h4>
-    <div class="report-count-grid">${REPORT_INPUT_FIELDS.map(([key, label, required]) => `<label class="field" data-report-field>
+    <div class="report-count-grid">${REPORT_INPUT_FIELDS.map(([key, label, required]) => {
+      const saved = savedValues?.[unit.code]?.[key];
+      const value = /^\d+$/.test(String(saved ?? '')) ? ` value="${escapeHtml(saved)}"` : '';
+      return `<label class="field" data-report-field>
       <span>${escapeHtml(label)}</span>
-      <input type="number" min="0" step="1" inputmode="numeric" data-report-unit="${unit.code}" data-report-key="${key}" data-report-required="${required}" ${required ? 'required' : ''} placeholder="0">
-    </label>`).join('')}</div>
+      <input type="number" min="0" step="1" inputmode="numeric" data-report-unit="${unit.code}" data-report-key="${key}" data-report-required="${required}" ${required ? 'required' : ''}${value}>
+    </label>`;
+    }).join('')}</div>
   </section>`).join('');
 }
 
-function openReportDialog() {
+function collectReportInputDraft() {
+  const values = Object.fromEntries(UNITS.map(unit => [unit.code, {}]));
+  $$('[data-report-unit]').forEach(input => {
+    const text = input.value.trim();
+    if (/^\d+$/.test(text)) values[input.dataset.reportUnit][input.dataset.reportKey] = text;
+  });
+  return values;
+}
+
+async function saveReportInputDraft() {
+  clearTimeout(reportInputSaveTimer);
+  reportInputSaveTimer = null;
+  if (!$$('[data-report-unit]').length) return;
+  await setSetting(REPORT_INPUTS_SETTING, collectReportInputDraft());
+}
+
+function scheduleReportInputSave() {
+  clearTimeout(reportInputSaveTimer);
+  reportInputSaveTimer = setTimeout(() => { saveReportInputDraft(); }, 250);
+}
+
+async function clearSavedReportInputs() {
+  const confirmed = await askConfirm(
+    'Kayıtlı PDF verileri temizlensin mi?',
+    'Üç birime ait elle girilmiş 18 PDF alanı bu cihazdan temizlenecek. İcraat kayıtları etkilenmez.',
+    'Temizle',
+    true
+  );
+  if (!confirmed) return;
+  clearTimeout(reportInputSaveTimer);
+  reportInputSaveTimer = null;
+  await setSetting(REPORT_INPUTS_SETTING, {});
+  $$('[data-report-unit]').forEach(input => {
+    input.value = '';
+    input.closest('[data-report-field]').classList.remove('invalid');
+  });
+  clearReportOutput('Kayıtlı PDF girişleri temizlendi. Veri yoksa ilgili alana sıfır giriniz.');
+  showToast('Kayıtlı PDF girişleri temizlendi.');
+}
+
+async function openReportDialog() {
   if (!state.evks.length) {
     showToast('PDF oluşturmak için en az bir icraat kaydı ekleyin.');
     return;
   }
-  renderReportAccidentInputs();
-  clearReportOutput('Birikimli değerleri girip PDF Oluştur’a dokunun. KGYS ve PTS boşsa 0 kabul edilir.');
+  const savedValues = await getSetting(REPORT_INPUTS_SETTING, {});
+  renderReportAccidentInputs(savedValues && typeof savedValues === 'object' ? savedValues : {});
+  clearReportOutput('Tüm alanları doldurun. Veri yoksa sıfır giriniz. Girilen değerler bu cihazda saklanır.');
   const earliest = Math.min(...state.evks.map(evk => Number(evk.startEpochMillis)));
   const latest = Math.max(...state.evks.map(evk => Number(evk.endEpochMillis)));
   $('#reportPeriod').textContent = `${state.evks.length} ekip kaydı · ${displayDateTime(earliest)} – ${displayDateTime(latest)}`;
@@ -1121,19 +1168,18 @@ function readReportAccidents() {
     const wrapper = input.closest('[data-report-field]');
     wrapper.classList.remove('invalid');
     const text = input.value.trim();
-    const required = input.dataset.reportRequired === 'true';
-    const valid = (!required && text === '') || (/^\d+$/.test(text) && Number.isSafeInteger(Number(text)));
+    const valid = /^\d+$/.test(text) && Number.isSafeInteger(Number(text));
     if (!valid) {
       wrapper.classList.add('invalid');
       if (!firstInvalid) firstInvalid = input;
       return;
     }
-    values[input.dataset.reportUnit][input.dataset.reportKey] = text === '' ? 0 : Number(text);
+    values[input.dataset.reportUnit][input.dataset.reportKey] = Number(text);
   });
   if (firstInvalid) {
     firstInvalid.focus();
     firstInvalid.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    throw new Error('Dört birikimli kaza alanına sıfır veya daha büyük bir tam sayı girin.');
+    throw new Error('Veri yoksa sıfır giriniz.');
   }
   return values;
 }
@@ -1144,6 +1190,7 @@ async function generateDailyReport(event) {
   let accidents;
   try {
     accidents = readReportAccidents();
+    await saveReportInputDraft();
   } catch (error) {
     status.textContent = error.message;
     status.classList.add('error');
@@ -1509,13 +1556,18 @@ function bindEvents() {
     if (button.dataset.action === 'delete-all') requestDeleteAllEvks();
     if (button.dataset.action === 'about') $('#infoDialog').showModal();
   });
-  $('[data-close-report]').addEventListener('click', () => $('#reportDialog').close());
+  $('[data-close-report]').addEventListener('click', async () => {
+    await saveReportInputDraft();
+    $('#reportDialog').close();
+  });
   $('#reportForm').addEventListener('submit', generateDailyReport);
   $('#reportForm').addEventListener('input', event => {
     if (!event.target.matches('[data-report-unit]')) return;
     event.target.closest('[data-report-field]').classList.remove('invalid');
+    scheduleReportInputSave();
     if (state.reportFile) clearReportOutput('Kaza verileri değişti. Güncel PDF için yeniden PDF Oluştur’a dokunun.');
   });
+  $('#clearReportInputs').addEventListener('click', clearSavedReportInputs);
   $('#previewReport').addEventListener('click', previewDailyReport);
   $('#downloadReport').addEventListener('click', () => {
     if (!state.reportFile) return;
