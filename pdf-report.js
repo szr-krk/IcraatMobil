@@ -13,14 +13,15 @@ function loadImage(url) {
   });
 }
 
-function formatNumber(value, sourceFormat = 'General') {
+export function formatNumber(value, sourceFormat = 'General') {
   const number = Number(value);
   if (!Number.isFinite(number)) return String(value);
   if (sourceFormat.includes('%')) {
     const decimals = sourceFormat.includes('0.0%') ? 1 : 0;
-    return new Intl.NumberFormat('tr-TR', {
-      style: 'percent', minimumFractionDigits: decimals, maximumFractionDigits: decimals
-    }).format(number);
+    const percentage = new Intl.NumberFormat('tr-TR', {
+      useGrouping: false, minimumFractionDigits: decimals, maximumFractionDigits: decimals
+    }).format(number * 100);
+    return `${percentage}%`;
   }
   const decimals = sourceFormat.includes('0.00') ? 2 : sourceFormat.includes('0.0') ? 1 : 0;
   return new Intl.NumberFormat('tr-TR', {
@@ -65,7 +66,58 @@ function readableTextColor(foreground, background) {
   return backgroundLight > 0.5 ? '#111827' : '#FFFFFF';
 }
 
-function drawCellText(context, cell, value) {
+function cellRow(address) {
+  const match = /^(?:[A-Z]+)(\d+)$/.exec(address);
+  return match ? Number(match[1]) : null;
+}
+
+function resolvedCellValue(address, cells, templateCells) {
+  if (Object.hasOwn(cells, address)) return cells[address];
+  return templateCells.get(address)?.value;
+}
+
+function numericCellValue(address, cells, templateCells) {
+  const value = resolvedCellValue(address, cells, templateCells);
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : null;
+}
+
+function controlStatus(address, cells, templateCells) {
+  const match = /^([EIMQ])(4[5-9]|50|51)$/.exec(address);
+  if (!match) return null;
+  const targetColumn = { E: 'C', I: 'G', M: 'K', Q: 'O' }[match[1]];
+  const target = numericCellValue(`${targetColumn}${match[2]}`, cells, templateCells);
+  const actual = numericCellValue(address, cells, templateCells);
+  if (target === null || actual === null) return null;
+  if (target === 0) return actual > 0 ? 'met' : 'neutral';
+  return actual >= target ? 'met' : 'missed';
+}
+
+function semanticFill(cell, cells, templateCells) {
+  const status = controlStatus(cell.address, cells, templateCells);
+  if (status === 'met') return '#86C99A';
+  if (status === 'missed') return '#E58A78';
+  if (status === 'neutral') return '#DDE3E9';
+  if (/^[CGKO]53$/.test(cell.address) || /^[DFHJLNPR](84|86|88|90|92)$/.test(cell.address)) {
+    return '#FFFFFF';
+  }
+  const row = cellRow(cell.address);
+  const column = /^([A-Z]+)/.exec(cell.address)?.[1];
+  const totalBodyRows = [23, 26, 29, 32, 45, 46, 47, 48, 49, 50, 51,
+    64, 65, 66, 67, 68, 69, 70, 71, 72, 82, 83, 84, 86, 88, 90, 92, 103, 104, 105, 106];
+  if (['O', 'P', 'Q', 'R'].includes(column) && totalBodyRows.includes(row)) {
+    return [26, 32, 45, 47, 49, 51, 65, 66, 68, 69, 70, 72, 84, 88, 92, 104, 106].includes(row)
+      ? '#C9D5E2' : '#E8EDF3';
+  }
+  if ([26, 32, 45, 47, 49, 51, 65, 66, 68, 69, 70, 72, 84, 88, 92, 104, 106].includes(row)) {
+    return '#D9E0E8';
+  }
+  if ([23, 29, 46, 48, 50, 67, 71, 86, 90, 105].includes(row)) return '#FFFFFF';
+  if (/^#CCFF(?:00|33)$/i.test(String(cell.fill || ''))) return '#D7E8BE';
+  return cell.fill || '#FFFFFF';
+}
+
+function drawCellText(context, cell, value, background) {
   const text = typeof value === 'number' ? formatNumber(value, cell.format) : String(value);
   const bold = cell.bold ? 'bold ' : '';
   const italic = cell.italic ? 'italic ' : '';
@@ -98,12 +150,119 @@ function drawCellText(context, cell, value) {
   context.beginPath();
   context.rect(cell.x, cell.y, cell.width, cell.height);
   context.clip();
-  context.fillStyle = readableTextColor(cell.color || '#000000', cell.fill || '#FFFFFF');
+  context.fillStyle = readableTextColor(cell.color || '#000000', background || '#FFFFFF');
   context.textBaseline = 'top';
   context.textAlign = cell.alignment === 'center' ? 'center' : cell.alignment === 'right' ? 'right' : 'left';
   const x = cell.alignment === 'center' ? cell.x + cell.width / 2
     : cell.alignment === 'right' ? cell.x + cell.width - 4 : cell.x + 4;
   lines.forEach((line, index) => context.fillText(line, x, cell.y + Math.max(0, vertical) + index * lineHeight));
+  context.restore();
+}
+
+function drawControlIcon(context, cell, status) {
+  if (!status || status === 'neutral') return;
+  const centerX = cell.x + Math.min(18, cell.width * 0.13);
+  const centerY = cell.y + cell.height / 2;
+  const radius = Math.min(12, cell.height * 0.27);
+  context.save();
+  context.beginPath();
+  context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  context.fillStyle = status === 'met' ? '#2C7242' : '#913629';
+  context.fill();
+  context.strokeStyle = '#FFFFFF';
+  context.lineWidth = Math.max(2, radius * 0.2);
+  context.lineCap = 'round';
+  context.lineJoin = 'round';
+  context.beginPath();
+  if (status === 'met') {
+    context.moveTo(centerX - radius * 0.48, centerY);
+    context.lineTo(centerX - radius * 0.1, centerY + radius * 0.38);
+    context.lineTo(centerX + radius * 0.55, centerY - radius * 0.42);
+  } else {
+    context.moveTo(centerX - radius * 0.42, centerY - radius * 0.42);
+    context.lineTo(centerX + radius * 0.42, centerY + radius * 0.42);
+    context.moveTo(centerX + radius * 0.42, centerY - radius * 0.42);
+    context.lineTo(centerX - radius * 0.42, centerY + radius * 0.42);
+  }
+  context.stroke();
+  context.restore();
+}
+
+function drawAchievementBar(context, cell, ratio) {
+  const safeRatio = Number.isFinite(ratio) ? Math.max(0, ratio) : 0;
+  const inset = 6;
+  const x = cell.x + inset;
+  const y = cell.y + Math.max(6, cell.height * 0.18);
+  const width = Math.max(1, cell.width - inset * 2);
+  const height = Math.max(8, cell.height - Math.max(12, cell.height * 0.36));
+  const color = safeRatio >= 1 ? '#79B889' : safeRatio >= 0.8 ? '#E4BE42' : '#D97A68';
+  context.save();
+  context.fillStyle = '#F4F5F7';
+  context.fillRect(x, y, width, height);
+  context.fillStyle = color;
+  context.fillRect(x, y, width * Math.min(1, safeRatio), height);
+  context.strokeStyle = '#27313D';
+  context.lineWidth = 2;
+  context.strokeRect(x, y, width, height);
+  context.restore();
+}
+
+function drawShareBar(context, cell, ratio) {
+  if (!Number.isFinite(ratio) || ratio < 0) return;
+  const width = Math.max(0, cell.width * Math.min(1, ratio));
+  context.save();
+  context.fillStyle = '#B8D7C0';
+  context.fillRect(cell.x, cell.y, width, cell.height);
+  if (width > 2) {
+    context.strokeStyle = '#77B78A';
+    context.lineWidth = 1;
+    for (let x = cell.x + 5; x < cell.x + width; x += 9) {
+      context.beginPath();
+      context.moveTo(x, cell.y + cell.height);
+      context.lineTo(Math.min(x + cell.height, cell.x + width), cell.y);
+      context.stroke();
+    }
+  }
+  context.restore();
+}
+
+function drawTrendArrow(context, cell, direction) {
+  const centerX = cell.x + Math.min(19, cell.width * 0.13);
+  const centerY = cell.y + cell.height / 2;
+  const size = Math.min(15, cell.height * 0.3);
+  context.save();
+  context.fillStyle = direction === 'up' ? '#3C7D4E' : direction === 'down' ? '#A9473A' : '#606A75';
+  context.strokeStyle = context.fillStyle;
+  context.lineWidth = Math.max(4, size * 0.33);
+  context.lineCap = 'square';
+  context.beginPath();
+  if (direction === 'up') {
+    context.moveTo(centerX, centerY + size * 0.62);
+    context.lineTo(centerX, centerY - size * 0.42);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(centerX, centerY - size);
+    context.lineTo(centerX - size * 0.62, centerY - size * 0.22);
+    context.lineTo(centerX + size * 0.62, centerY - size * 0.22);
+  } else if (direction === 'down') {
+    context.moveTo(centerX, centerY - size * 0.62);
+    context.lineTo(centerX, centerY + size * 0.42);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(centerX, centerY + size);
+    context.lineTo(centerX - size * 0.62, centerY + size * 0.22);
+    context.lineTo(centerX + size * 0.62, centerY + size * 0.22);
+  } else {
+    context.moveTo(centerX - size * 0.7, centerY);
+    context.lineTo(centerX + size * 0.34, centerY);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(centerX + size, centerY);
+    context.lineTo(centerX + size * 0.25, centerY - size * 0.62);
+    context.lineTo(centerX + size * 0.25, centerY + size * 0.62);
+  }
+  context.closePath();
+  context.fill();
   context.restore();
 }
 
@@ -131,16 +290,33 @@ async function renderReportCanvas(template, cells) {
   context.fillStyle = '#ffffff';
   context.fillRect(0, 0, canvas.width, canvas.height);
 
+  const templateCells = new Map(template.cells.map(cell => [cell.address, cell]));
+  const backgrounds = new Map();
   template.cells.forEach(cell => {
-    if (cell.fill) {
-      context.fillStyle = cell.fill;
-      context.fillRect(cell.x, cell.y, cell.width, cell.height);
-    }
+    const background = semanticFill(cell, cells, templateCells);
+    backgrounds.set(cell.address, background);
+    context.fillStyle = background;
+    context.fillRect(cell.x, cell.y, cell.width, cell.height);
+  });
+  template.cells.forEach(cell => {
+    const value = resolvedCellValue(cell.address, cells, templateCells);
+    if (/^[CGKO]53$/.test(cell.address)) drawAchievementBar(context, cell, Number(value));
+    if (/^[DFHJLNPR](84|86|88|90|92)$/.test(cell.address)) drawShareBar(context, cell, Number(value));
   });
   template.cells.forEach(cell => {
     drawBorders(context, cell);
-    const value = Object.hasOwn(cells, cell.address) ? cells[cell.address] : cell.value;
-    if (value !== null && value !== undefined) drawCellText(context, cell, value);
+    const value = resolvedCellValue(cell.address, cells, templateCells);
+    if (value !== null && value !== undefined) drawCellText(context, cell, value, backgrounds.get(cell.address));
+    drawControlIcon(context, cell, controlStatus(cell.address, cells, templateCells));
+    const trend = /^([EIMQ])(104|105|106)$/.exec(cell.address);
+    if (trend) {
+      const baselineColumn = { E: 'C', I: 'G', M: 'K', Q: 'O' }[trend[1]];
+      const baseline = numericCellValue(`${baselineColumn}${trend[2]}`, cells, templateCells);
+      const actual = numericCellValue(cell.address, cells, templateCells);
+      if (baseline !== null && actual !== null) {
+        drawTrendArrow(context, cell, actual > baseline ? 'up' : actual < baseline ? 'down' : 'flat');
+      }
+    }
   });
 
   const images = await Promise.all(template.images.map(entry => loadImage(`./assets/daily_report/${entry.file}`)));

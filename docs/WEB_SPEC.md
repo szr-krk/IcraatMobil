@@ -47,6 +47,7 @@
 - Birim bazlı K1/A, K2/A, K2/B, K4/A, K5 ve K6 gerçekleşenleri EVK kontrollerinden; hedefleri `assets/reference_data.json` içindeki rapor bitiş ayından gelir.
 - Ceza adetleri madde çarpanlarıyla hesaplanır. Radar EVK’de mükerrer ekip/yüzüne değerleri dışlanır; yalnızca `RADAR_OPERATOR` + `PLATE` kayıtları toplu rapora eklenir.
 - Şablon `assets/daily_report/template.json` ve iki resmi logodan tarayıcı Canvas’ına çizilir; tek sayfalık A4 PDF cihaz içinde oluşturulur. Kullanıcı önizleyebilir, indirebilir veya desteklenen cihazlarda sistem paylaşım ekranıyla gönderebilir.
+- PDF'nin kurumsal görsel dili lacivert başlıklar, ölçülü açık yeşil bölüm başlıkları ve mavi-gri `TOPLAM` alanlarından oluşur. Hedef karşılaştırmalarında başarı/eksik durumları yalnızca renkle değil sırasıyla `✓`/`✕`, gerçekleşme çubuğu ve yön oku ile de belirtilir. Böylece renkli ekranda hızlı okunur, siyah-beyaz yazıcı çıktısında anlamını ve tablo hiyerarşisini korur.
 - `reference_data.json` Service Worker tarafından ağ öncelikli okunur; ağ yoksa son geçerli çevrimdışı kopya kullanılır. Yeni ay hedefleri eklenirken uygulama kodu değişmez.
 
 ## Web uzantısı

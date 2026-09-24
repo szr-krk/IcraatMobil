@@ -1,6 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { makePdfWithJpeg } from '../pdf-report.js';
+import { formatNumber, makePdfWithJpeg } from '../pdf-report.js';
+
+test('yüzde değeri Türkçe ondalıkla ve yüzde işareti sonda yazılır', () => {
+  assert.equal(formatNumber(0.388, '0.0%'), '38,8%');
+  assert.equal(formatNumber(1, '0%'), '100%');
+});
 
 test('JPEG gömülü A4 PDF geçerli başlık, nesne ve xref üretir', () => {
   const jpeg = Uint8Array.from(Buffer.from(

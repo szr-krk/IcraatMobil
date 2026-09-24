@@ -2,7 +2,7 @@
 
 HTML, CSS ve JavaScript ile yazılmış; Android ve iPhone için mobil odaklı, çevrimdışı çalışabilen EVK uygulaması.
 
-Uygulama kayıtlı EVK’lerden Excel düzenine denk tek sayfalık A4 Günlük İcraat PDF üretir. PDF öncesinde üç birimin yılbaşından rapor gününe kadar birikmiş kaza toplamları elle girilir; çıktı önizlenebilir, indirilebilir veya cihazın paylaşım ekranıyla gönderilebilir.
+Uygulama kayıtlı EVK’lerden Excel düzenine denk tek sayfalık A4 Günlük İcraat PDF üretir. PDF öncesinde üç birimin yılbaşından rapor gününe kadar birikmiş kaza toplamları elle girilir; çıktı önizlenebilir, indirilebilir veya cihazın paylaşım ekranıyla gönderilebilir. Kurumsal renkler, durum simgeleri, gerçekleşme çubukları ve yön okları renkli ekranda hızlı okuma sağlarken siyah-beyaz yazıcı çıktısında da anlamını korur.
 
 Canlı uygulama: https://szr-krk.github.io/IcraatMobil/
 
