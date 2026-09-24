@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   buildEnvelope, calculateKeyboardInset, compareIncoming, ensurePayload, exportRecord, normalizeEvk,
-  mergeDirectoryItems, sameLogicalShift, toIstanbulIso, validateEnvelope
+  mergeDirectoryItems, penaltySummary, sameLogicalShift, toIstanbulIso, validateEnvelope
 } from '../domain.js';
 
 function record(overrides = {}) {
@@ -85,4 +85,13 @@ test('sanal klavye yüksekliği görsel görünüm farkından hesaplanır', () =
   assert.equal(calculateKeyboardInset(844, 510, 0), 334);
   assert.equal(calculateKeyboardInset(844, 510, 24), 310);
   assert.equal(calculateKeyboardInset(600, 600, 0), 0);
+});
+
+test('ceza kartı düz cümle özetini toplam tutar ve ek işlemlerle oluşturur', () => {
+  const summary = penaltySummary({
+    type: 'DRIVER', count: 3,
+    articles: [{ code: '78/1-a', amount: 500 }, { code: '34/a', amount: 500 }],
+    vehicleBan: true, licenseCancel: true, parking: true
+  });
+  assert.equal(summary, 'Sürücüye: 78/1-a, 34/a → 3.000 ₺. Araç Men. Belge İptal. Otoparka (3 Adet)');
 });

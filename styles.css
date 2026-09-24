@@ -159,12 +159,19 @@ button { touch-action: manipulation; }
 
 .penalty-list { display: grid; gap: 8px; }
 .penalty-empty { padding: 22px 14px; border: 1px dashed #aab8c7; border-radius: 13px; color: var(--muted); background: rgb(255 255 255 / 75%); text-align: center; font-size: .88rem; }
-.penalty-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: rgb(255 255 255 / 94%); box-shadow: 0 2px 7px rgb(8 24 44 / 7%); }
-.penalty-card h3 { margin: 0; color: var(--navy-800); font-size: .9rem; }
-.penalty-card p { margin: 4px 0 0; color: var(--muted); font-size: .8rem; line-height: 1.4; }
-.penalty-card-actions { display: flex; gap: 4px; }
-.penalty-card-actions button { width: 39px; height: 39px; border: 0; border-radius: 10px; color: var(--navy-800); background: var(--surface-soft); }
+.penalty-swipe-shell { position: relative; overflow: hidden; border-radius: 12px; background: var(--red-600); }
+.penalty-swipe-label { position: absolute; inset-block: 0; display: grid; place-items: center; color: white; font-size: .72rem; font-weight: 900; letter-spacing: .06em; }
+.penalty-swipe-label.left { left: 15px; }
+.penalty-swipe-label.right { right: 15px; }
+.penalty-card { position: relative; z-index: 1; min-height: 66px; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 10px 8px 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: rgb(255 255 255 / 97%); box-shadow: 0 2px 7px rgb(8 24 44 / 7%); transition: transform .16s ease; touch-action: pan-y; user-select: none; }
+.penalty-card p { margin: 0; color: var(--text); font-size: .82rem; line-height: 1.42; overflow-wrap: anywhere; }
+.penalty-card-actions { display: flex; }
+.penalty-card-actions button { width: 40px; height: 42px; border: 0; border-radius: 10px; color: var(--navy-800); background: var(--surface-soft); font-weight: 900; }
 .penalty-composer { position: fixed; left: 50%; right: auto; bottom: calc(var(--keyboard-inset, 0px) + env(safe-area-inset-bottom)); z-index: 30; width: min(544px, calc(100vw - 10px)); display: grid; gap: 4px; transform: translateX(-50%); padding: 6px; border: 1px solid #b8c5d2; border-radius: 12px; background: rgb(255 255 255 / 98%); box-shadow: 0 -8px 28px rgb(8 24 44 / 18%); }
+.penalty-composer.search-active > .radar-origin,
+.penalty-composer.search-active > .penalty-row,
+.penalty-composer.search-active > .check-row,
+.penalty-composer.search-active > .selected-articles { display: none; }
 .radar-origin { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 6px; color: var(--muted); font-size: .68rem; font-weight: 700; }
 .choice-pills { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
 .choice-pills input, .type-scroll input { position: absolute; opacity: 0; }

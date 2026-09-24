@@ -113,6 +113,27 @@ export function calculateKeyboardInset(layoutHeight, visualHeight, offsetTop = 0
   return Math.max(0, Math.round(values[0] - values[1] - values[2]));
 }
 
+export function penaltySummary(record) {
+  const count = Number.isInteger(Number(record?.count)) && Number(record.count) > 0 ? Number(record.count) : 1;
+  const articles = Array.isArray(record?.articles) ? record.articles : [];
+  const codes = articles.map(article => String(article.code || '').trim()).filter(Boolean).join(', ') || 'Madde yok';
+  const unitAmount = articles.reduce((total, article) => total + (Number(article.amount) || 0), 0);
+  const totalAmount = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 2 }).format(unitAmount * count);
+  const type = record?.parkingOnly
+    ? 'Yalnızca Otopark'
+    : record?.origin === 'RADAR_OPERATOR'
+      ? 'Radar · Plaka'
+      : record?.origin === 'RADAR_TEAM'
+        ? 'Radar · Ekip'
+        : (PENALTY_TYPES[record?.type] || record?.type || 'Diğer');
+  const flags = [
+    record?.vehicleBan && 'Araç Men',
+    record?.licenseCancel && 'Belge İptal',
+    record?.parking && 'Otoparka'
+  ].filter(Boolean);
+  return `${type}: ${codes} → ${totalAmount} ₺.${flags.length ? ` ${flags.join('. ')} ` : ' '}(${count} Adet)`;
+}
+
 export function ensurePayload(evk) {
   let payload = evk.payload;
   if (!payload && typeof evk.payloadJson === 'string') {

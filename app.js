@@ -3,9 +3,9 @@ import {
   putEvk, putManyEvks, setSetting, updateEvk
 } from './db.js';
 import {
-  ACCIDENT_FIELDS, CONTROLS, PENALTY_TYPES, UNITS, buildEnvelope, calculateKeyboardInset, compareIncoming,
+  ACCIDENT_FIELDS, CONTROLS, UNITS, buildEnvelope, calculateKeyboardInset, compareIncoming,
   directoryItemKey, displayDateTime, dutyLabel, ensurePayload, makeChildId, makeRandomId,
-  mergeDirectoryItems, sameLogicalShift,
+  mergeDirectoryItems, penaltySummary, sameLogicalShift,
   toIstanbulIso, unitLabel, validateEnvelope
 } from './domain.js';
 
@@ -492,15 +492,59 @@ function renderPenaltyList(records) {
     return;
   }
   container.innerHTML = records.map(record => {
-    const codes = record.articles?.map(article => article.code).join(', ') || 'Madde yok';
-    const flags = [record.vehicleBan && 'Araç Men', record.parking && 'Otoparka', record.licenseCancel && 'Belge İptal'].filter(Boolean).join(' · ');
-    const type = record.parkingOnly ? 'Yalnızca Otopark' : (PENALTY_TYPES[record.type] || record.type || 'Diğer');
-    const origin = record.origin === 'RADAR_OPERATOR' ? 'Radar · Plaka' : record.origin === 'RADAR_TEAM' ? 'Radar · Ekip' : type;
-    return `<article class="penalty-card">
-      <div><h3>${escapeHtml(record.count)} × ${escapeHtml(origin)}</h3><p>${escapeHtml(codes)}${flags ? `<br>${escapeHtml(flags)}` : ''}</p></div>
-      <div class="penalty-card-actions"><button type="button" data-edit-penalty="${escapeHtml(record.penaltyId)}" aria-label="Adedi düzenle">#</button><button type="button" data-delete-penalty="${escapeHtml(record.penaltyId)}" aria-label="Cezayı sil">×</button></div>
-    </article>`;
+    const summary = penaltySummary(record);
+    return `<div class="penalty-swipe-shell">
+      <span class="penalty-swipe-label left" aria-hidden="true">SİL</span><span class="penalty-swipe-label right" aria-hidden="true">SİL</span>
+      <article class="penalty-card" data-penalty-id="${escapeHtml(record.penaltyId)}" aria-label="${escapeHtml(summary)}">
+        <p>${escapeHtml(summary)}</p>
+        <div class="penalty-card-actions"><button type="button" data-edit-penalty="${escapeHtml(record.penaltyId)}" aria-label="Adedi düzenle">#</button></div>
+      </article>
+    </div>`;
   }).join('');
+  container.querySelectorAll('.penalty-card').forEach(card => bindPenaltySwipe(card));
+}
+
+function bindPenaltySwipe(card) {
+  const penaltyId = card.dataset.penaltyId;
+  let startX = 0;
+  let startY = 0;
+  let offsetX = 0;
+  let swiping = false;
+
+  card.addEventListener('pointerdown', event => {
+    if (event.target.closest('button')) return;
+    startX = event.clientX;
+    startY = event.clientY;
+    offsetX = 0;
+    swiping = false;
+    card.style.transition = 'none';
+    card.setPointerCapture?.(event.pointerId);
+  });
+  card.addEventListener('pointermove', event => {
+    if (!card.hasPointerCapture?.(event.pointerId)) return;
+    const deltaX = event.clientX - startX;
+    const deltaY = event.clientY - startY;
+    if (!swiping && Math.abs(deltaY) > Math.abs(deltaX)) return;
+    if (Math.abs(deltaX) > 7) swiping = true;
+    if (!swiping) return;
+    offsetX = Math.max(-110, Math.min(110, deltaX));
+    card.style.transform = `translateX(${offsetX}px)`;
+  });
+  const finish = () => {
+    const shouldDelete = swiping && Math.abs(offsetX) >= 68;
+    card.style.transition = '';
+    card.style.transform = 'translateX(0)';
+    offsetX = 0;
+    swiping = false;
+    if (shouldDelete) deletePenalty(penaltyId);
+  };
+  card.addEventListener('pointerup', finish);
+  card.addEventListener('pointercancel', () => {
+    card.style.transition = '';
+    card.style.transform = 'translateX(0)';
+    offsetX = 0;
+    swiping = false;
+  });
 }
 
 function renderSelectedArticles() {
@@ -518,6 +562,7 @@ function renderArticleResults(query) {
   if (!normalized) {
     articleResults.hidden = true;
     articleResults.innerHTML = '';
+    $('#penaltyForm').classList.remove('search-active');
     return;
   }
   const matches = availableGuide().filter(article =>
@@ -527,6 +572,7 @@ function renderArticleResults(query) {
   articleResults.innerHTML = matches.length ? matches.map((article, index) => `<button type="button" class="article-result" data-guide-index="${index}"><strong>${escapeHtml(article.code)}</strong><span>${escapeHtml(article.description)} · ${escapeHtml(article.amount)} TL</span></button>`).join('') : '<div class="penalty-empty">Eşleşen madde bulunamadı.</div>';
   articleResults.dataset.resultCodes = JSON.stringify(matches.map(article => article.code));
   articleResults.hidden = false;
+  $('#penaltyForm').classList.add('search-active');
 }
 
 function enforceRadarType() {
@@ -583,6 +629,7 @@ function resetPenaltyForm() {
   $('#licenseCancel').checked = false;
   articleSearch.value = '';
   articleResults.hidden = true;
+  $('#penaltyForm').classList.remove('search-active');
   renderSelectedArticles();
 }
 
@@ -672,10 +719,9 @@ function requestPenaltyCount(currentCount) {
   });
 }
 
-async function removePenalty(penaltyId) {
-  const confirmed = await askConfirm('Ceza kaydı silinsin mi?', 'Bu işlem yalnızca seçili ceza grubunu siler.', 'Sil', true);
-  if (!confirmed) return;
+async function deletePenalty(penaltyId) {
   const evk = state.evks.find(item => item.evkId === state.selectedEvkId);
+  if (!evk) return;
   await updateEvk(evk.evkId, current => {
     const payload = ensurePayload(current);
     payload.penalties = payload.penalties.filter(item => item.penaltyId !== penaltyId);
@@ -1072,7 +1118,7 @@ function bindEvents() {
   articleSearch.addEventListener('input', () => renderArticleResults(articleSearch.value));
   $('#clearArticleSearch').addEventListener('click', () => {
     articleSearch.value = '';
-    articleResults.hidden = true;
+    renderArticleResults('');
     articleSearch.focus();
   });
   articleResults.addEventListener('click', event => {
@@ -1086,7 +1132,7 @@ function bindEvents() {
       renderSelectedArticles();
     }
     articleSearch.value = '';
-    articleResults.hidden = true;
+    renderArticleResults('');
   });
   $('#selectedArticles').addEventListener('click', event => {
     const button = event.target.closest('[data-remove-article]');
@@ -1097,9 +1143,7 @@ function bindEvents() {
   document.querySelectorAll('[name="radarOrigin"]').forEach(input => input.addEventListener('change', enforceRadarType));
   $('#penaltyList').addEventListener('click', event => {
     const edit = event.target.closest('[data-edit-penalty]');
-    const remove = event.target.closest('[data-delete-penalty]');
     if (edit) editPenaltyCount(edit.dataset.editPenalty);
-    if (remove) removePenalty(remove.dataset.deletePenalty);
   });
   detailScreen.addEventListener('input', event => {
     const input = event.target.closest('[data-count-section]');
