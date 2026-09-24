@@ -202,14 +202,12 @@ button { touch-action: manipulation; }
 .autosave-note { margin: 0 0 12px; color: var(--muted); font-size: .79rem; }
 .controls-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
 .radar-count-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
-.radar-count-field { min-width: 0; display: grid; grid-template-rows: auto auto 1fr; gap: 6px; padding: 9px 7px; border: 1px solid var(--line); border-radius: 11px; background: rgb(255 255 255 / 94%); }
+.radar-count-field { min-width: 0; display: grid; gap: 6px; padding: 9px 7px; border: 1px solid var(--line); border-radius: 11px; background: rgb(255 255 255 / 94%); }
 .radar-count-field strong { overflow: hidden; color: var(--navy-800); text-align: center; text-overflow: ellipsis; white-space: nowrap; font-size: .78rem; }
 .radar-count-field input { width: 100%; min-height: 42px; border: 1px solid #bac6d2; border-radius: 8px; appearance: textfield; text-align: center; font-size: 1rem; font-weight: 800; }
 .radar-count-field input::-webkit-inner-spin-button, .radar-count-field input::-webkit-outer-spin-button { margin: 0; appearance: none; }
-.radar-count-field span { color: var(--muted); text-align: center; font-size: .67rem; line-height: 1.28; }
 .control-field { display: grid; gap: 5px; min-width: 0; padding: 9px 7px; border: 1px solid var(--line); border-radius: 11px; background: rgb(255 255 255 / 94%); }
 .control-field strong { overflow: hidden; color: var(--navy-800); text-align: center; text-overflow: ellipsis; white-space: nowrap; font-size: .78rem; }
-.control-field span { min-height: 30px; color: var(--muted); text-align: center; font-size: .75rem; line-height: 1.25; }
 .control-field input { width: 100%; min-height: 42px; border: 1px solid #bac6d2; border-radius: 8px; text-align: center; font-size: 1rem; }
 .keyboard-open #controlsPanel, .keyboard-open #accidentsPanel, .keyboard-open #radarTeamPanel, .keyboard-open #radarOperatorPanel { padding-bottom: calc(var(--keyboard-height, 0px) + 80px); }
 .accident-fields { display: grid; gap: 12px; }

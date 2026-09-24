@@ -523,7 +523,6 @@ function renderRadarCounts(records, origin, selector) {
     return `<label class="radar-count-field">
       <strong>${escapeHtml(article.code)}</strong>
       <input type="number" min="0" inputmode="numeric" pattern="[0-9]*" data-radar-origin="${escapeHtml(origin)}" data-radar-code="${escapeHtml(article.code)}" value="${escapeHtml(value)}" aria-label="${escapeHtml(article.code)} ceza adedi">
-      <span>${escapeHtml(article.description)}</span>
     </label>`;
   }).join('');
 }
@@ -818,9 +817,9 @@ function readControlValue(controls, key) {
 }
 
 function renderControls(controls) {
-  $('#controlsGrid').innerHTML = CONTROLS.map(([key, code, description]) => {
+  $('#controlsGrid').innerHTML = CONTROLS.map(([key, code]) => {
     const value = readControlValue(controls, key);
-    return `<label class="control-field"><strong>${escapeHtml(code)}</strong><span>${escapeHtml(description)}</span><input type="number" min="0" inputmode="numeric" data-count-section="controls" data-count-key="${escapeHtml(key)}" value="${value === 0 ? '' : escapeHtml(value)}"></label>`;
+    return `<label class="control-field"><strong>${escapeHtml(code)}</strong><input type="number" min="0" inputmode="numeric" data-count-section="controls" data-count-key="${escapeHtml(key)}" value="${value === 0 ? '' : escapeHtml(value)}" aria-label="${escapeHtml(code)} kontrol adedi"></label>`;
   }).join('');
 }
 
