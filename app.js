@@ -23,7 +23,6 @@ const state = {
   summaries: [],
   selectedEvkId: null,
   editingEvkId: null,
-  cardActionId: null,
   draftPersonnel: [],
   draftRoads: [],
   personnelDirectory: [],
@@ -46,7 +45,6 @@ const teamDialog = $('#teamDialog');
 const teamForm = $('#teamForm');
 const overflowMenu = $('#overflowMenu');
 const menuBackdrop = $('#menuBackdrop');
-const cardMenuDialog = $('#cardMenuDialog');
 const articleSearch = $('#articleSearch');
 const articleResults = $('#articleResults');
 const RADAR_ARTICLE_CODES = Array.from({ length: 9 }, (_, index) => `51/2-b-${index + 1}`);
@@ -131,7 +129,7 @@ function renderTeamList() {
     <div class="card-stack">${sorted.map(teamCardHtml).join('')}</div>
   </section>` : '';
   const action = transferAction(incoming);
-  const actionLabel = action === TRANSFER_KINDS.DAY ? 'GÜNDÜZ TOPLAMINI PAYLAŞ'
+  const actionLabel = action === TRANSFER_KINDS.DAY ? 'TÜM İCRAATLERİ PAYLAŞ'
     : action === TRANSFER_KINDS.UNIT ? 'BİRİM TOPLAMINI PAYLAŞ'
       : action === 'PDF' ? 'GÜNLÜK İCRAAT PDF' : '';
   const received = `<section class="home-section">
@@ -142,6 +140,7 @@ function renderTeamList() {
   teamList.innerHTML = personal + received;
 
   $$('.team-card:not(.summary-card)').forEach(card => bindCardGestures(card));
+  $$('[data-share-evk]').forEach(button => bindTeamShareButton(button));
   $$('.summary-card').forEach(card => bindSummaryGestures(card));
 }
 
@@ -266,8 +265,21 @@ function teamCardHtml(evk) {
       <div class="team-icon" aria-hidden="true"><img src="./assets/ekip.svg" alt=""></div>
       <div class="team-code"><strong>${escapeHtml(evk.teamCode)}</strong><span>(${escapeHtml(dutyLabel(evk.dutyType))})</span></div>
       <div class="team-meta"><strong>${escapeHtml(unitLabel(evk.sourceUnit))}</strong><span>${escapeHtml(displayDateTime(evk.startEpochMillis))}</span><span>${escapeHtml(displayDateTime(evk.endEpochMillis))}</span></div>
+      <button type="button" class="team-share-button" data-share-evk="${escapeHtml(evk.evkId)}" aria-label="20'ye icraat özeti gönder">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a3 3 0 1 0-2.83-4A3 3 0 0 0 15 5c0 .2.02.39.06.57L8.9 9.08A3 3 0 0 0 7 8.4a3 3 0 1 0 1.9 5.52l6.16 3.51A3 3 0 0 0 15 18a3 3 0 1 0 .9-2.14l-6.15-3.51c.08-.28.12-.56.12-.85s-.04-.57-.12-.85l6.15-3.51A3 3 0 0 0 18 8Z"/></svg>
+      </button>
     </article>
   </div>`;
+}
+
+function bindTeamShareButton(button) {
+  button.addEventListener('pointerdown', event => event.stopPropagation());
+  button.addEventListener('pointerup', event => event.stopPropagation());
+  button.addEventListener('click', event => {
+    event.preventDefault();
+    event.stopPropagation();
+    shareTeamSummary(button.dataset.shareEvk);
+  });
 }
 
 function summaryTitle(record) {
@@ -330,35 +342,22 @@ function bindCardGestures(card) {
   let startX = 0;
   let startY = 0;
   let offsetX = 0;
-  let longPressed = false;
-  let longPressTimer;
 
   card.addEventListener('keydown', event => {
+    if (event.target.closest('button')) return;
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       openDetail(id);
     }
-    if (event.key === 'ContextMenu') openCardMenu(id);
   });
-
-  card.addEventListener('contextmenu', event => {
-    event.preventDefault();
-    openCardMenu(id);
-  });
+  card.addEventListener('contextmenu', event => event.preventDefault());
 
   card.addEventListener('pointerdown', event => {
     if (event.target.closest('button')) return;
     startX = event.clientX;
     startY = event.clientY;
     offsetX = 0;
-    longPressed = false;
     card.setPointerCapture?.(event.pointerId);
-    longPressTimer = setTimeout(() => {
-      longPressed = true;
-      navigator.vibrate?.(25);
-      resetCardPosition(card);
-      openCardMenu(id);
-    }, 560);
   });
 
   card.addEventListener('pointermove', event => {
@@ -366,17 +365,13 @@ function bindCardGestures(card) {
     const deltaX = event.clientX - startX;
     const deltaY = event.clientY - startY;
     if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 8) {
-      clearTimeout(longPressTimer);
       return;
     }
-    if (Math.abs(deltaX) > 8) clearTimeout(longPressTimer);
     offsetX = Math.max(-105, Math.min(105, deltaX));
     card.style.transform = `translateX(${offsetX}px)`;
   });
 
   const finishGesture = () => {
-    clearTimeout(longPressTimer);
-    if (longPressed) return;
     const actionOffset = offsetX;
     resetCardPosition(card);
     if (actionOffset >= 72) openTeamDialog(id);
@@ -384,21 +379,11 @@ function bindCardGestures(card) {
     else if (Math.abs(actionOffset) < 8) openDetail(id);
   };
   card.addEventListener('pointerup', finishGesture);
-  card.addEventListener('pointercancel', () => {
-    clearTimeout(longPressTimer);
-    resetCardPosition(card);
-  });
+  card.addEventListener('pointercancel', () => resetCardPosition(card));
 }
 
 function resetCardPosition(card) {
   card.style.transform = 'translateX(0)';
-}
-
-function openCardMenu(id) {
-  state.cardActionId = id;
-  const evk = state.evks.find(item => item.evkId === id);
-  $('#cardMenuTitle').textContent = evk ? `Ekip ${evk.teamCode}` : 'Ekip işlemleri';
-  if (!cardMenuDialog.open) cardMenuDialog.showModal();
 }
 
 function renderTeamDraftLists() {
@@ -1063,6 +1048,13 @@ async function requestDeleteEvk(id) {
 async function requestDeleteSummary(id) {
   const record = state.summaries.find(item => item.summaryId === id);
   if (!record) return;
+  const confirmed = await askConfirm(
+    'Alınan icraat silinsin mi?',
+    `${summaryTitle(record)} kaydı alınan icraatlar listesinden silinecek.`,
+    'Sil',
+    true
+  );
+  if (!confirmed) return;
   await deleteSummary(id);
   await refreshEvks();
   showToast('Alınan icraat silindi.');
@@ -1086,7 +1078,9 @@ async function requestDeleteAllSummaries() {
 }
 
 function detailGroup(title, rows) {
-  return `<section class="summary-detail-group"><h3>${escapeHtml(title)}</h3>${rows.map(([label, value]) => `<div class="summary-detail-row"><span>${escapeHtml(label)}</span><b>${escapeHtml(value)}</b></div>`).join('')}</section>`;
+  const cells = rows.map(([label, value]) => `<div class="summary-detail-row"><span>${escapeHtml(label)}</span><b>${escapeHtml(value)}</b></div>`).join('');
+  const filler = rows.length % 2 ? '<div class="summary-detail-filler" aria-hidden="true"></div>' : '';
+  return `<section class="summary-detail-group"><h3>${escapeHtml(title)}</h3>${cells}${filler}</section>`;
 }
 
 function openSummaryDialog(id) {
@@ -1572,16 +1566,6 @@ function bindEvents() {
     if (!button) return;
     state.draftRoads = state.draftRoads.filter(road => road.id !== button.dataset.removeRoad);
     renderTeamDraftLists();
-  });
-
-  cardMenuDialog.addEventListener('click', event => {
-    const button = event.target.closest('[data-card-action]');
-    if (!button) return;
-    const id = state.cardActionId;
-    cardMenuDialog.close();
-    if (button.dataset.cardAction === 'edit') openTeamDialog(id);
-    if (button.dataset.cardAction === 'share') shareTeamSummary(id);
-    if (button.dataset.cardAction === 'delete') requestDeleteEvk(id);
   });
 
   $$('.tabs [role="tab"]').forEach(button => button.addEventListener('click', () => selectTab(button.dataset.tab)));

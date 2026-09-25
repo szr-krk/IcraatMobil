@@ -18,8 +18,8 @@
 
 - `Icraat_pdf`: Ekip türü, ekip kodu, tarih/saat, görevliler ve yollar.
 - `IcraatPdfYeni`: Birim seçimi, EVK kimlik/revizyon kuralları, birim odaklı kart listesi, ceza/kontrol/kaza payload yapısı ve JSON sözleşmesi.
-- Kişisel ekip kartı sağa kaydırılırsa güncelleme, sola kaydırılırsa onaylı silme açılır. Uzun basma güncelleme, 20'ye özet gönderme ve silme işlemlerini sunar.
-- Ekip kartları birinci projedeki kalkan/yıldız ekip simgesini kullanır; kart üzerindeki ayrı paylaşım oku bulunmaz. Kullanıcıya görünen kayıt adı `İcraat`tır; EVK terimi yalnızca veri sözleşmesi ve teknik kimliklerde korunur.
+- Kişisel ekip kartı sağa kaydırılırsa güncelleme, sola kaydırılırsa onaylı silme açılır; karta dokunmak ayrıntıya girer. Uzun basma menüsü bulunmaz.
+- Ekip kartları birinci projedeki kalkan/yıldız ekip simgesini kullanır. Kartın sağındaki paylaşım simgesi ekip özet bağlantısını doğrudan 20'ye göndermek için kullanılır. Kullanıcıya görünen kayıt adı `İcraat`tır; EVK terimi yalnızca veri sözleşmesi ve teknik kimliklerde korunur.
 - Normal görevlerde kart ayrıntısında sabit sekmeler Ceza Ekle, Kontroller, Kazalar ve İcraat'tır. İcraat sekmesi birinci projenin ekip faaliyet metnini, ayrıca Hız/Kemer/Alkol adetlerini gösterir; EVK'ya bağlı not girişi ve sistem metin paylaşımı sunar.
 - Radar görevlerinde `Ekip · Yüzüne`, `Operatör · Plakaya` ve `İcraat` sekmeleri gösterilir; Kontroller, Kazalar ve standart ceza arama arayüzü gösterilmez.
 
@@ -34,7 +34,7 @@
 - Bilinmeyen payload alanları korunur.
 - Görevli ve yol listeleri, birinci projenin modelleriyle uyumlu olarak `payload.personnel` ve `payload.roads` alanlarında taşınır.
 - Ana ekrandaki eski Merkez/Çorlu/Malkara sayaç satırı kaldırılmıştır. Kişisel ekip varsa listenin üstünde **Benim İcraatım**, bağlantıyla alınan kayıtlar altta **Alınan İcraatlar** olarak gösterilir. Kişisel ekip yoksa yalnızca alınanlar listelenir.
-- Alınan özet kartına dokunulduğunda başlıkta ekip kodu/görev türü, altında birim ve zaman aralığı gösterilir. Ayrıntıda gereksiz ekip toplam bölümü bulunmaz; altı kontrol, dört kaza, sürücü/plaka ve hız/kemer/alkol değerlerinin tamamı kompakt iki sütunlu düzende gösterilir. Kart sola kaydırılarak silinir; tüm alınan özetler menüden topluca temizlenebilir.
+- Alınan özet kartına dokunulduğunda başlıkta ekip kodu/görev türü, altında birim ve zaman aralığı gösterilir. Ayrıntıda gereksiz ekip toplam bölümü bulunmaz; altı kontrol, dört kaza, sürücü/plaka ve hız/kemer/alkol değerlerinin tamamı eksiksiz kenarlıklı, kompakt iki sütunlu düzende gösterilir. Kart sola kaydırıldığında açık silme onayı istenir; tüm alınan özetler menüden topluca temizlenebilir.
 - Görevli ve yol bilgileri ayrıca IndexedDB `settings` deposunda cihaz genelinde seçilebilir rehberler olarak tutulur. İlk kullanımda mevcut EVK payload kayıtları rehberlere alınır. Rehber kaydı güncellenebilir veya silinebilir; silme geçmiş EVK payload verilerini değiştirmez.
 - Mobil görevli ve yol rehberlerinde **Yeni** veya **Güncelle** seçildiğinde seçim penceresinden ayrı, tam ekran ve kaydırma gerektirmeyen bir kayıt ekranı açılır. Bu ekranda yalnızca ilgili alanlar ile geri/Kaydet işlemleri bulunur; seçim penceresinin **Tamam** düğmesi gösterilmez ve klavye kendiliğinden açılmaz. Görevli soyadı Türkçe büyük harfe çevrilir. Görevliler seçim listesinde, ekip kaydında ve icraat metninde sayısal sicil numarası küçükten büyüğe sıralanır; sicilsiz kayıtlar listenin sonunda yer alır.
 - Ceza ekleme çerçevesi Ceza Ekle sekmesinde ekranın altında sabittir ve sanal klavye açıldığında görünür alanın altına taşınır. Ceza listesi düşey kaydırılabilir; madde arama sonuçları sabit çerçevenin üstünde açılır.
@@ -59,7 +59,7 @@
 - Sayısal özet; dört ekip türü, K1/K2-A/K2-B/K4/K5/K6, dört kaza değeri, sürücü/plaka ceza adetleri ve hız/kemer/alkol adetlerinden oluşur. PTS ve KGYS, mevcut PDF öncesi ekranda elle girilmeye devam eder.
 - Bir ekip paketi ile yüz ekiplik toplam aynı alan yapısını kullanır; toplam bağlantısında kaynak kayıtlar tek tek taşınmaz, alanlar toplanır. Böylece bağlantı boyutu ekip sayısıyla büyümez.
 - Aynı bağlantının tekrar açılması özet kimliğiyle engellenir. Düzeltilmiş içerik yeni kayıt olarak gelir; kullanıcı kendisine bildirilen eski kartı elle siler. Revizyon bilgisi taşınmaz.
-- Yalnız `E` kayıtları bulunan cihaz **Gündüz Toplamını Paylaş**, bir `G` kaydı ile gece ekip kayıtları bulunan cihaz **Birim Toplamını Paylaş** işlemini görür. Yalnız `B` kayıtları bulunan cihaz PDF işlemine yönlendirilir.
+- Yalnız `E` kayıtları bulunan cihaz **Tüm İcraatleri Paylaş**, bir `G` kaydı ile gece ekip kayıtları bulunan cihaz **Birim Toplamını Paylaş** işlemini görür. Yalnız `B` kayıtları bulunan cihaz PDF işlemine yönlendirilir.
 - PDF işlemi kişisel EVK kayıtlarını dikkate almaz ve o anda **Alınan İcraatlar** listesinde bulunan özetlerin tamamını rapor kaynağı olarak kullanır. Normal akışta 5920 listesi Merkez, Çorlu ve Malkara `B` kayıtlarından oluşur.
 
 ## Günlük İcraat PDF
