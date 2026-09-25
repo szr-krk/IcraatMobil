@@ -162,12 +162,14 @@ button { touch-action: manipulation; }
 .guide-content { display: grid; gap: 13px; padding-right: 5px; overflow-y: auto; overscroll-behavior: contain; }
 .guide-content p { color: var(--text); font-size: .85rem; line-height: 1.55; }
 .guide-content p:first-child { padding: 10px; border: 1px solid #c4d2df; border-radius: 10px; color: var(--muted); background: #f4f7fa; font-size: .8rem; }
-.summary-detail-card { max-height: min(88dvh, 720px); grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; }
+.summary-detail-card { width: 100%; height: min(88dvh, 720px); max-height: min(88dvh, 720px); grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; }
 .summary-detail-card > div:first-child p { margin-top: 5px; font-size: .78rem; }
-.summary-detail-content { display: grid; gap: 12px; padding-right: 4px; overflow-y: auto; }
-.summary-detail-group { overflow: hidden; border: 1px solid var(--line); border-radius: 11px; }
-.summary-detail-group h3 { margin: 0; padding: 8px 10px; color: var(--navy-800); background: #edf3f8; font-size: .77rem; letter-spacing: .03em; }
-.summary-detail-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 10px; border-top: 1px solid var(--line); font-size: .8rem; }
+.summary-detail-content { min-height: 0; display: grid; align-content: start; gap: 8px; padding-right: 4px; overflow-y: auto; overscroll-behavior: contain; }
+.summary-detail-group { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: hidden; border: 1px solid var(--line); border-radius: 11px; }
+.summary-detail-group h3 { grid-column: 1 / -1; margin: 0; padding: 7px 9px; color: var(--navy-800); background: #edf3f8; font-size: .75rem; letter-spacing: .03em; }
+.summary-detail-row { min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 7px; padding: 7px 9px; border-top: 1px solid var(--line); font-size: .78rem; }
+.summary-detail-row:nth-of-type(even) { border-left: 1px solid var(--line); }
+.summary-detail-row span { min-width: 0; line-height: 1.2; }
 .summary-detail-row b { color: var(--navy-800); }
 
 .directory-card { width: 100%; max-height: min(88dvh, 720px); grid-template-rows: auto minmax(80px, 1fr) auto; overflow: hidden; }

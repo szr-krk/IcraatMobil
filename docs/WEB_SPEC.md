@@ -12,7 +12,7 @@
 - Kişisel ekip kaydı isteğe bağlıdır ve yeni kurulumlarda en fazla bir adet oluşturulur.
 - Ekip → gündüz 20 → gece 20 → 5920 aktarımı kısa, tıklanabilir ve dosyasız özet bağlantılarıyla uygulanmıştır.
 - Alınan ekip, gündüz ve birim özetleri kişisel EVK’den ayrı IndexedDB deposunda ve ayrı ana ekran listesinde tutulur.
-- Merkez, Çorlu ve Malkara birim toplamları mevcut PDF veri giriş ekranını ve PDF üreticisini değiştirmeden besler.
+- PDF yalnızca **Alınan İcraatlar** listesindeki özetlerden beslenir; kişisel ekip kartı PDF hesabına doğrudan katılmaz. Mevcut PDF veri giriş ekranı ve PDF üreticisi değişmez.
 
 ## Birleştirilen özellikler
 
@@ -34,7 +34,7 @@
 - Bilinmeyen payload alanları korunur.
 - Görevli ve yol listeleri, birinci projenin modelleriyle uyumlu olarak `payload.personnel` ve `payload.roads` alanlarında taşınır.
 - Ana ekrandaki eski Merkez/Çorlu/Malkara sayaç satırı kaldırılmıştır. Kişisel ekip varsa listenin üstünde **Benim İcraatım**, bağlantıyla alınan kayıtlar altta **Alınan İcraatlar** olarak gösterilir. Kişisel ekip yoksa yalnızca alınanlar listelenir.
-- Alınan özet kartına dokunulduğunda ekip, kontrol, kaza, ceza kaynağı ve ceza türü sayıları gösterilir. Kart sola kaydırılarak silinir; tüm alınan özetler menüden topluca temizlenebilir.
+- Alınan özet kartına dokunulduğunda başlıkta ekip kodu/görev türü, altında birim ve zaman aralığı gösterilir. Ayrıntıda gereksiz ekip toplam bölümü bulunmaz; altı kontrol, dört kaza, sürücü/plaka ve hız/kemer/alkol değerlerinin tamamı kompakt iki sütunlu düzende gösterilir. Kart sola kaydırılarak silinir; tüm alınan özetler menüden topluca temizlenebilir.
 - Görevli ve yol bilgileri ayrıca IndexedDB `settings` deposunda cihaz genelinde seçilebilir rehberler olarak tutulur. İlk kullanımda mevcut EVK payload kayıtları rehberlere alınır. Rehber kaydı güncellenebilir veya silinebilir; silme geçmiş EVK payload verilerini değiştirmez.
 - Mobil görevli ve yol rehberlerinde **Yeni** veya **Güncelle** seçildiğinde seçim penceresinden ayrı, tam ekran ve kaydırma gerektirmeyen bir kayıt ekranı açılır. Bu ekranda yalnızca ilgili alanlar ile geri/Kaydet işlemleri bulunur; seçim penceresinin **Tamam** düğmesi gösterilmez ve klavye kendiliğinden açılmaz. Görevli soyadı Türkçe büyük harfe çevrilir. Görevliler seçim listesinde, ekip kaydında ve icraat metninde sayısal sicil numarası küçükten büyüğe sıralanır; sicilsiz kayıtlar listenin sonunda yer alır.
 - Ceza ekleme çerçevesi Ceza Ekle sekmesinde ekranın altında sabittir ve sanal klavye açıldığında görünür alanın altına taşınır. Ceza listesi düşey kaydırılabilir; madde arama sonuçları sabit çerçevenin üstünde açılır.
@@ -60,11 +60,11 @@
 - Bir ekip paketi ile yüz ekiplik toplam aynı alan yapısını kullanır; toplam bağlantısında kaynak kayıtlar tek tek taşınmaz, alanlar toplanır. Böylece bağlantı boyutu ekip sayısıyla büyümez.
 - Aynı bağlantının tekrar açılması özet kimliğiyle engellenir. Düzeltilmiş içerik yeni kayıt olarak gelir; kullanıcı kendisine bildirilen eski kartı elle siler. Revizyon bilgisi taşınmaz.
 - Yalnız `E` kayıtları bulunan cihaz **Gündüz Toplamını Paylaş**, bir `G` kaydı ile gece ekip kayıtları bulunan cihaz **Birim Toplamını Paylaş** işlemini görür. Yalnız `B` kayıtları bulunan cihaz PDF işlemine yönlendirilir.
-- 5920 cihazında PDF açılabilmesi için Merkez, Çorlu ve Malkara birimlerinin her birinden tam bir `B` kaydı bulunmalıdır; eksik veya mükerrer birim açık uyarıyla engellenir.
+- PDF işlemi kişisel EVK kayıtlarını dikkate almaz ve o anda **Alınan İcraatlar** listesinde bulunan özetlerin tamamını rapor kaynağı olarak kullanır. Normal akışta 5920 listesi Merkez, Çorlu ve Malkara `B` kayıtlarından oluşur.
 
 ## Günlük İcraat PDF
 
-- Ana menüdeki **Günlük İcraat PDF** işlemi üç birim toplamı alınmışsa bu `B` özetlerini, aksi durumda cihazdaki kişisel EVK kayıtlarını rapora alır. PDF oluşturmak EVK veya özet kayıtlarını değiştirmez.
+- Ana menüdeki **Günlük İcraat PDF** işlemi yalnızca bağlantıyla alınmış özet kayıtlarını rapora alır. Kişisel ekip kaydı hiçbir durumda PDF hesabına eklenmez; PDF oluşturmak EVK veya özet kayıtlarını değiştirmez.
 - Rapor aralığı EVK’lerin en erken başlangıcı ile en geç bitişidir. `12/36`, Gündüz ve Gece ekiplerinin toplamıdır; Ara Ekip ve Radar ayrı satırlardır.
 - PDF öncesinde her birim kartında, ekrandaki icraatların `payload.accidents` alanlarından toplanan son 24 saatlik Ölümlü Kaza, Ölü, Yaralanmalı Kaza ve Yaralı değerleri salt okunur bilgi olarak gösterilir. Kullanıcı bunları önceki günün PDF'indeki birikimli değerlere ekleyerek yıllık toplam alanlarını doldurur.
 - Merkez, Çorlu ve Malkara için Ölümlü Kaza, Ölü, Yaralanmalı Kaza, Yaralı, KGYS ve PTS alanlarının tamamı elle ve zorunlu olarak girilir; alanlarda yanıltıcı `0` ipucu gösterilmez. Veri yoksa kullanıcı açıkça `0` girmelidir; boş alanlarda **Veri yoksa sıfır giriniz.** uyarısı gösterilir. Bu 18 değer cihazdaki IndexedDB `settings` deposunda yalnızca PDF form tercihi olarak saklanır, ekran yeniden açıldığında geri yüklenir ve **Kayıtlı Verileri Temizle** işlemiyle topluca silinebilir. EVK payload’ına ve JSON aktarımına eklenmez. PTS ve KGYS adetleri ilgili birimin Sürücüye, Plakaya, PTS ve KGYS toplamına katılarak PDF yüzdeleri hesaplanır.

@@ -1093,14 +1093,9 @@ function openSummaryDialog(id) {
   const record = state.summaries.find(item => item.summaryId === id);
   if (!record) return;
   const summary = record.summary;
-  const teams = summary.teamCounts || {};
   $('#summaryDialogTitle').textContent = summaryTitle(record);
   $('#summaryDialogMeta').textContent = `${unitLabel(record.sourceUnit)} · ${displayDateTime(record.startEpochMillis)} – ${displayDateTime(record.endEpochMillis)}`;
   $('#summaryDialogContent').innerHTML = [
-    detailGroup('Ekipler', [
-      ['12/36', Number(teams.GUNDUZ || 0) + Number(teams.GECE || 0)],
-      ['Ara ekip', teams.ARA_EKIP || 0], ['Radar', teams.RADAR || 0], ['Toplam', summary.teamTotal || 0]
-    ]),
     detailGroup('Kontroller', [
       ['K1', summary.controlCounts.K1_A], ['K2-A', summary.controlCounts.K2_A],
       ['K2-B', summary.controlCounts.K2_B], ['K4', summary.controlCounts.K4_A],
@@ -1321,25 +1316,9 @@ async function clearSavedReportInputs() {
 }
 
 async function openReportDialog() {
-  const unitSummaries = state.summaries.filter(record => record.packetKind === TRANSFER_KINDS.UNIT);
-  if (unitSummaries.length) {
-    const counts = new Map();
-    unitSummaries.forEach(record => counts.set(record.sourceUnit, (counts.get(record.sourceUnit) || 0) + 1));
-    const missing = UNITS.filter(unit => !counts.has(unit.code)).map(unit => unit.label);
-    const duplicates = UNITS.filter(unit => (counts.get(unit.code) || 0) > 1).map(unit => unit.label);
-    if (missing.length || duplicates.length) {
-      const parts = [];
-      if (missing.length) parts.push(`Eksik birim: ${missing.join(', ')}`);
-      if (duplicates.length) parts.push(`Birden fazla kayıt: ${duplicates.join(', ')}`);
-      showToast(`${parts.join('. ')}. PDF için her birimden bir kayıt bulunmalıdır.`, 5200);
-      return;
-    }
-    state.reportRecords = unitSummaries.map(toReportRecord);
-  } else {
-    state.reportRecords = state.evks.map(evk => structuredClone(evk));
-  }
+  state.reportRecords = state.summaries.map(toReportRecord);
   if (!state.reportRecords.length) {
-    showToast('PDF oluşturmak için en az bir icraat kaydı ekleyin.');
+    showToast('PDF oluşturmak için alınan icraat bulunmuyor.');
     return;
   }
   const savedValues = await getSetting(REPORT_INPUTS_SETTING, {});
