@@ -1,21 +1,26 @@
 import {
-  deleteAllEvks, deleteEvk, evkIdExists, getAllEvks, getEvk, getSetting, openDatabase,
-  putEvk, putManyEvks, setSetting, updateEvk
+  deleteAllSummaries, deleteEvk, deleteSummary, evkIdExists, getAllEvks, getAllSummaries, getEvk, getSetting, openDatabase,
+  putEvk, putSummary, setSetting, updateEvk
 } from './db.js';
 import {
-  ACCIDENT_FIELDS, CONTROLS, UNITS, buildEnvelope, buildJsonFileName, buildPerformanceReport, buildSharePerformanceText, calculateKeyboardInset, compareIncoming,
+  ACCIDENT_FIELDS, CONTROLS, UNITS, buildPerformanceReport, buildSharePerformanceText, calculateKeyboardInset,
   directoryItemKey, displayDateTime, dutyLabel, ensurePayload, makeChildId, makeRandomId,
-  mergeDirectoryItems, penaltySummary, sameLogicalShift, sortPersonnelByRegistry,
-  toIstanbulIso, unitLabel, validateEnvelope
+  mergeDirectoryItems, penaltySummary, sortPersonnelByRegistry,
+  toIstanbulIso, unitLabel
 } from './domain.js';
 import { createDailyReportPdf } from './pdf-report.js';
 import { summarizeDailyReport } from './report.js';
+import {
+  TRANSFER_KINDS, TRANSFER_KIND_LABELS, aggregateTransfers, createTeamTransfer, decodeTransfer,
+  encodeTransfer, storedTransfer, toReportRecord, transferAction
+} from './transfer.js';
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
 
 const state = {
   evks: [],
+  summaries: [],
   selectedEvkId: null,
   editingEvkId: null,
   cardActionId: null,
@@ -29,6 +34,7 @@ const state = {
   selectedArticles: [],
   guide: [],
   reportFile: null,
+  reportRecords: [],
   saveTimers: new Map(),
   pendingDetailInputs: new Set()
 };
@@ -50,6 +56,9 @@ const REPORT_INPUT_FIELDS = [
   ['ptsPenaltyCount', 'PTS Ceza Sayısı', true]
 ];
 const REPORT_INPUTS_SETTING = 'daily_report_inputs_v1';
+const APP_SHARE_URL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname)
+  ? 'https://szr-krk.github.io/IcraatMobil/'
+  : new URL('./', location.href).href;
 
 let toastTimer;
 let largestVisualViewportHeight = window.visualViewport?.height || window.innerHeight;
@@ -78,7 +87,7 @@ function toggleMenu(force) {
 }
 
 async function refreshEvks() {
-  state.evks = await getAllEvks();
+  [state.evks, state.summaries] = await Promise.all([getAllEvks(), getAllSummaries()]);
   if (!state.directoriesLoaded) await loadDirectories();
   renderTeamList();
   if (state.selectedEvkId) {
@@ -96,33 +105,44 @@ function sortedEvks() {
   });
 }
 
+function sortedSummaries() {
+  return [...state.summaries].sort((left, right) => {
+    const timeDifference = Number(right.receivedAt || 0) - Number(left.receivedAt || 0);
+    return timeDifference || Number(right.startEpochMillis) - Number(left.startEpochMillis);
+  });
+}
+
 function renderTeamList() {
   const sorted = sortedEvks();
-  const unitCounts = Object.fromEntries(UNITS.map(unit => [unit.code, 0]));
-  sorted.forEach(evk => { unitCounts[evk.sourceUnit] = (unitCounts[evk.sourceUnit] || 0) + 1; });
-  $('#merkezCount').textContent = String(unitCounts.MERKEZ);
-  $('#corluCount').textContent = String(unitCounts.CORLU);
-  $('#malkaraCount').textContent = String(unitCounts.MALKARA);
+  const incoming = sortedSummaries();
+  $('#addTeamButton').hidden = sorted.length > 0;
 
-  if (!sorted.length) {
+  if (!sorted.length && !incoming.length) {
     teamList.innerHTML = `<div class="empty-state">
       <div class="empty-mark" aria-hidden="true"><img src="./assets/ekip.svg" alt=""></div>
-      <h2>Henüz ekip kaydı yok</h2>
-      <p>İlk vardiya kaydını oluşturmak için artı düğmesine dokunun.</p>
+      <h2>Henüz alınan icraat yok</h2>
+      <p>Gelen bağlantıyı açın veya kendi ekibinizi oluşturmak için artı düğmesine dokunun.</p>
     </div>`;
     return;
   }
 
-  teamList.innerHTML = UNITS.map(unit => {
-    const records = sorted.filter(evk => evk.sourceUnit === unit.code);
-    if (!records.length) return '';
-    return `<section class="unit-section">
-      <div class="unit-heading"><h2>${escapeHtml(unit.label)}</h2><span>${records.length}</span></div>
-      <div class="card-stack">${records.map(teamCardHtml).join('')}</div>
-    </section>`;
-  }).join('');
+  const personal = sorted.length ? `<section class="home-section">
+    <div class="home-heading"><h2>${sorted.length === 1 ? 'Benim İcraatım' : 'Kayıtlı İcraatlarım'}</h2><span>${sorted.length}</span></div>
+    <div class="card-stack">${sorted.map(teamCardHtml).join('')}</div>
+  </section>` : '';
+  const action = transferAction(incoming);
+  const actionLabel = action === TRANSFER_KINDS.DAY ? 'GÜNDÜZ TOPLAMINI PAYLAŞ'
+    : action === TRANSFER_KINDS.UNIT ? 'BİRİM TOPLAMINI PAYLAŞ'
+      : action === 'PDF' ? 'GÜNLÜK İCRAAT PDF' : '';
+  const received = `<section class="home-section">
+    <div class="home-heading"><h2>Alınan İcraatlar</h2><span>${incoming.length}</span></div>
+    ${incoming.length ? `<div class="card-stack">${incoming.map(summaryCardHtml).join('')}</div>` : '<div class="incoming-empty">Henüz bağlantı ile alınmış icraat bulunmuyor.</div>'}
+    ${actionLabel ? `<button type="button" class="transfer-action" data-transfer-action="${escapeHtml(action)}">${actionLabel}</button>` : ''}
+  </section>`;
+  teamList.innerHTML = personal + received;
 
-  $$('.team-card').forEach(card => bindCardGestures(card));
+  $$('.team-card:not(.summary-card)').forEach(card => bindCardGestures(card));
+  $$('.summary-card').forEach(card => bindSummaryGestures(card));
 }
 
 function withDirectoryIds(items, prefix) {
@@ -149,23 +169,6 @@ async function loadDirectories() {
   if (existingPersonnel === null) await setSetting('personnel_directory', state.personnelDirectory);
   if (existingRoads === null) await setSetting('road_directory', state.roadDirectory);
   state.directoriesLoaded = true;
-}
-
-async function absorbDirectoriesFromEvks(evks) {
-  state.personnelDirectory = sortPersonnelByRegistry(withDirectoryIds(mergeDirectoryItems(
-    state.personnelDirectory,
-    evks.flatMap(evk => ensurePayload(evk).personnel),
-    'personnel'
-  ), 'person'));
-  state.roadDirectory = withDirectoryIds(mergeDirectoryItems(
-    state.roadDirectory,
-    evks.flatMap(evk => ensurePayload(evk).roads),
-    'roads'
-  ), 'road');
-  await Promise.all([
-    setSetting('personnel_directory', state.personnelDirectory),
-    setSetting('road_directory', state.roadDirectory)
-  ]);
 }
 
 function directorySelectionContains(item, type) {
@@ -267,6 +270,61 @@ function teamCardHtml(evk) {
   </div>`;
 }
 
+function summaryTitle(record) {
+  if (record.packetKind === TRANSFER_KINDS.TEAM) return `${record.teamCode} · ${dutyLabel(summaryDuty(record))}`;
+  return `${unitLabel(record.sourceUnit)} · ${TRANSFER_KIND_LABELS[record.packetKind]}`;
+}
+
+function summaryDuty(record) {
+  const counts = record.summary?.teamCounts || {};
+  return ['GUNDUZ', 'GECE', 'ARA_EKIP', 'RADAR'].find(key => Number(counts[key]) === 1
+    && Object.entries(counts).every(([other, value]) => other === key || Number(value) === 0)) || 'GUNDUZ';
+}
+
+function summaryCardHtml(record) {
+  const total = Number(record.summary?.teamTotal) || Object.values(record.summary?.teamCounts || {}).reduce((sum, value) => sum + Number(value || 0), 0);
+  return `<div class="swipe-shell summary-swipe">
+    <span class="swipe-label delete">SİL</span>
+    <article class="team-card summary-card" data-summary-id="${escapeHtml(record.summaryId)}" tabindex="0" aria-label="${escapeHtml(summaryTitle(record))}">
+      <div class="team-icon" aria-hidden="true">${escapeHtml(record.packetKind)}</div>
+      <div class="team-code"><strong>${escapeHtml(summaryTitle(record))}</strong><span>${escapeHtml(unitLabel(record.sourceUnit))} · ${total} ekip</span></div>
+      <div class="team-meta"><strong>${escapeHtml(TRANSFER_KIND_LABELS[record.packetKind])}</strong><span>${escapeHtml(displayDateTime(record.startEpochMillis))}</span><span>${escapeHtml(displayDateTime(record.endEpochMillis))}</span></div>
+    </article>
+  </div>`;
+}
+
+function bindSummaryGestures(card) {
+  const id = card.dataset.summaryId;
+  let startX = 0;
+  let startY = 0;
+  let offsetX = 0;
+  card.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openSummaryDialog(id); }
+    if (event.key === 'Delete') requestDeleteSummary(id);
+  });
+  card.addEventListener('pointerdown', event => {
+    startX = event.clientX;
+    startY = event.clientY;
+    offsetX = 0;
+    card.setPointerCapture?.(event.pointerId);
+  });
+  card.addEventListener('pointermove', event => {
+    if (!card.hasPointerCapture?.(event.pointerId)) return;
+    const deltaX = event.clientX - startX;
+    const deltaY = event.clientY - startY;
+    if (Math.abs(deltaY) > Math.abs(deltaX)) return;
+    offsetX = Math.max(-105, Math.min(0, deltaX));
+    card.style.transform = `translateX(${offsetX}px)`;
+  });
+  card.addEventListener('pointerup', () => {
+    const actionOffset = offsetX;
+    resetCardPosition(card);
+    if (actionOffset <= -72) requestDeleteSummary(id);
+    else if (Math.abs(actionOffset) < 8) openSummaryDialog(id);
+  });
+  card.addEventListener('pointercancel', () => resetCardPosition(card));
+}
+
 function bindCardGestures(card) {
   const id = card.dataset.id;
   let startX = 0;
@@ -357,6 +415,10 @@ function renderTeamDraftLists() {
 }
 
 async function openTeamDialog(id = null) {
+  if (!id && state.evks.length) {
+    showToast('Bu cihazda zaten bir kişisel ekip bulunuyor.');
+    return;
+  }
   state.editingEvkId = id;
   state.draftPersonnel = [];
   state.draftRoads = [];
@@ -392,6 +454,11 @@ async function openTeamDialog(id = null) {
 
 async function saveTeam(event) {
   event.preventDefault();
+  if (!state.editingEvkId && state.evks.length) {
+    showToast('Bu cihazda yalnızca bir kişisel ekip oluşturulabilir.');
+    teamDialog.close();
+    return;
+  }
   if (!teamForm.reportValidity()) return;
   const teamCode = $('#teamCode').value.trim();
   if (!/^\d+$/.test(teamCode)) {
@@ -460,9 +527,9 @@ function showListView() {
   state.selectedEvkId = null;
   listScreen.hidden = false;
   detailScreen.hidden = true;
-  $('#addTeamButton').hidden = false;
+  $('#addTeamButton').hidden = state.evks.length > 0;
   $('#backButton').hidden = true;
-  $('#pageTitle').textContent = 'Ekipler';
+  $('#pageTitle').textContent = 'İcraatlar';
   $('#pageEyebrow').textContent = 'BÖLGE TRAFİK';
   document.title = 'İcraat';
 }
@@ -993,22 +1060,57 @@ async function requestDeleteEvk(id) {
   showToast('İcraat silindi.');
 }
 
-async function requestDeleteAllEvks() {
-  if (!state.evks.length) {
-    showToast('Silinecek icraat bulunmuyor.');
+async function requestDeleteSummary(id) {
+  const record = state.summaries.find(item => item.summaryId === id);
+  if (!record) return;
+  await deleteSummary(id);
+  await refreshEvks();
+  showToast('Alınan icraat silindi.');
+}
+
+async function requestDeleteAllSummaries() {
+  if (!state.summaries.length) {
+    showToast('Silinecek alınan icraat bulunmuyor.');
     return;
   }
   const confirmed = await askConfirm(
-    'Tüm icraatler silinsin mi?',
-    `Ekrandaki ${state.evks.length} icraat ve içlerindeki tüm ceza, kontrol ve kaza verileri kalıcı olarak silinecek.`,
+    'Alınan icraatlar silinsin mi?',
+    `Bağlantılarla alınmış ${state.summaries.length} icraat özeti bu cihazdan silinecek. Kişisel ekip kaydı etkilenmeyecek.`,
     'Tümünü Sil',
     true
   );
   if (!confirmed) return;
-  await deleteAllEvks();
-  showListView();
+  await deleteAllSummaries();
   await refreshEvks();
-  showToast('Tüm icraatler silindi.');
+  showToast('Alınan icraatlar silindi.');
+}
+
+function detailGroup(title, rows) {
+  return `<section class="summary-detail-group"><h3>${escapeHtml(title)}</h3>${rows.map(([label, value]) => `<div class="summary-detail-row"><span>${escapeHtml(label)}</span><b>${escapeHtml(value)}</b></div>`).join('')}</section>`;
+}
+
+function openSummaryDialog(id) {
+  const record = state.summaries.find(item => item.summaryId === id);
+  if (!record) return;
+  const summary = record.summary;
+  const teams = summary.teamCounts || {};
+  $('#summaryDialogTitle').textContent = summaryTitle(record);
+  $('#summaryDialogMeta').textContent = `${unitLabel(record.sourceUnit)} · ${displayDateTime(record.startEpochMillis)} – ${displayDateTime(record.endEpochMillis)}`;
+  $('#summaryDialogContent').innerHTML = [
+    detailGroup('Ekipler', [
+      ['12/36', Number(teams.GUNDUZ || 0) + Number(teams.GECE || 0)],
+      ['Ara ekip', teams.ARA_EKIP || 0], ['Radar', teams.RADAR || 0], ['Toplam', summary.teamTotal || 0]
+    ]),
+    detailGroup('Kontroller', [
+      ['K1', summary.controlCounts.K1_A], ['K2-A', summary.controlCounts.K2_A],
+      ['K2-B', summary.controlCounts.K2_B], ['K4', summary.controlCounts.K4_A],
+      ['K5', summary.controlCounts.K5], ['K6', summary.controlCounts.K6]
+    ]),
+    detailGroup('Kazalar', ACCIDENT_FIELDS.map(([key, label]) => [label.replace(' Sayısı', ''), summary.accidentCounts[key]])),
+    detailGroup('Ceza adetleri', [['Sürücü belgesine', summary.driverArticles], ['Tescil plakasına', summary.plateArticles]]),
+    detailGroup('Ceza türleri', [['Hız', summary.speed], ['Kemer', summary.belt], ['Alkol', summary.alcohol]])
+  ].join('');
+  $('#summaryDialog').showModal();
 }
 
 function askConfirm(title, message, okLabel = 'Onayla', danger = false) {
@@ -1033,20 +1135,6 @@ function askConfirm(title, message, okLabel = 'Onayla', danger = false) {
     $('#confirmCancel').addEventListener('click', onCancel);
     dialog.addEventListener('cancel', onDialogCancel);
   });
-}
-
-async function prepareEvksForExport(ids) {
-  const prepared = [];
-  for (const id of ids) {
-    const updated = await updateEvk(id, current => ({ ...current, revision: current.revision + 1, updatedAt: Date.now() }));
-    prepared.push(updated);
-  }
-  await refreshEvks();
-  return prepared;
-}
-
-function makeJsonFile(envelope, name) {
-  return new File([JSON.stringify(envelope, null, 2)], name, { type: 'application/json' });
 }
 
 function downloadFile(file) {
@@ -1074,6 +1162,91 @@ async function shareFile(file, title, text = 'İcraat kaydı', fallbackMessage =
   return false;
 }
 
+async function shareText(title, text) {
+  try {
+    if (navigator.share) {
+      await navigator.share({ title, text });
+      return true;
+    }
+    await navigator.clipboard.writeText(text);
+    showToast('Bağlantı panoya kopyalandı.');
+    return true;
+  } catch (error) {
+    if (error.name !== 'AbortError') showToast('Paylaşım açılamadı. Bağlantıyı yeniden deneyin.');
+    return false;
+  }
+}
+
+function transferUrl(record) {
+  const url = new URL(APP_SHARE_URL);
+  url.hash = `ozet=${encodeTransfer(record)}`;
+  return url.href;
+}
+
+async function shareTransfer(record) {
+  const title = record.packetKind === TRANSFER_KINDS.TEAM
+    ? `Ekip ${record.teamCode} İcraat Özeti`
+    : `${unitLabel(record.sourceUnit)} ${TRANSFER_KIND_LABELS[record.packetKind]}`;
+  const instruction = record.packetKind === TRANSFER_KINDS.TEAM
+    ? 'İcraat özetini 20 ekranına eklemek için bağlantıya dokunun:'
+    : record.packetKind === TRANSFER_KINDS.DAY
+      ? 'Gündüz toplamını gece 20 ekranına eklemek için bağlantıya dokunun:'
+      : 'Birim toplamını 5920 ekranına eklemek için bağlantıya dokunun:';
+  await shareText(title, `${title}\n${instruction}\n${transferUrl(record)}`);
+}
+
+async function shareTeamSummary(id) {
+  const evk = state.evks.find(item => item.evkId === id);
+  if (!evk) return;
+  try {
+    await shareTransfer(createTeamTransfer(evk));
+  } catch (error) {
+    showToast(error.message || 'İcraat özeti oluşturulamadı.');
+  }
+}
+
+async function handleTransferAction(action) {
+  if (action === 'PDF') {
+    await openReportDialog();
+    return;
+  }
+  if (![TRANSFER_KINDS.DAY, TRANSFER_KINDS.UNIT].includes(action)) {
+    showToast('Alınan kayıt türleri birlikte toplanamıyor. Gereksiz kayıtları silin.');
+    return;
+  }
+  try {
+    const records = sortedSummaries();
+    if (action === TRANSFER_KINDS.UNIT) {
+      const dayCount = records.filter(record => record.packetKind === TRANSFER_KINDS.DAY).length;
+      if (dayCount !== 1) throw new Error('Birim toplamı için tam bir gündüz toplamı bulunmalıdır.');
+    }
+    await shareTransfer(aggregateTransfers(records, action));
+  } catch (error) {
+    showToast(error.message || 'İcraatlar birleştirilemedi.', 4200);
+  }
+}
+
+async function importTransferFromHash() {
+  const match = location.hash.match(/^#ozet=(.+)$/);
+  if (!match) return false;
+  try {
+    const record = storedTransfer(decodeTransfer(decodeURIComponent(match[1])));
+    const duplicate = state.summaries.find(item => item.summaryId === record.summaryId && item.encoded === record.encoded);
+    if (duplicate) {
+      showToast('Bu icraat daha önce alınmış.');
+    } else {
+      await putSummary(record);
+      await refreshEvks();
+      showToast(`${summaryTitle(record)} alındı.`, 3600);
+    }
+  } catch (error) {
+    showToast(error.message || 'İcraat bağlantısı açılamadı.', 4800);
+  } finally {
+    history.replaceState({}, '', `${location.pathname}${location.search}`);
+  }
+  return true;
+}
+
 function clearReportOutput(message = '') {
   state.reportFile = null;
   $('#previewReport').disabled = true;
@@ -1085,7 +1258,7 @@ function clearReportOutput(message = '') {
 }
 
 function renderReportAccidentInputs(savedValues = {}) {
-  const incoming = summarizeDailyReport(state.evks).units;
+  const incoming = summarizeDailyReport(state.reportRecords).units;
   $('#reportAccidentSections').innerHTML = UNITS.map(unit => `<section class="report-unit-card">
     <h3>${escapeHtml(unit.label)}</h3>
     <section class="report-incoming" aria-label="${escapeHtml(unit.label)} ekiplerden gelen kaza özeti">
@@ -1148,16 +1321,33 @@ async function clearSavedReportInputs() {
 }
 
 async function openReportDialog() {
-  if (!state.evks.length) {
+  const unitSummaries = state.summaries.filter(record => record.packetKind === TRANSFER_KINDS.UNIT);
+  if (unitSummaries.length) {
+    const counts = new Map();
+    unitSummaries.forEach(record => counts.set(record.sourceUnit, (counts.get(record.sourceUnit) || 0) + 1));
+    const missing = UNITS.filter(unit => !counts.has(unit.code)).map(unit => unit.label);
+    const duplicates = UNITS.filter(unit => (counts.get(unit.code) || 0) > 1).map(unit => unit.label);
+    if (missing.length || duplicates.length) {
+      const parts = [];
+      if (missing.length) parts.push(`Eksik birim: ${missing.join(', ')}`);
+      if (duplicates.length) parts.push(`Birden fazla kayıt: ${duplicates.join(', ')}`);
+      showToast(`${parts.join('. ')}. PDF için her birimden bir kayıt bulunmalıdır.`, 5200);
+      return;
+    }
+    state.reportRecords = unitSummaries.map(toReportRecord);
+  } else {
+    state.reportRecords = state.evks.map(evk => structuredClone(evk));
+  }
+  if (!state.reportRecords.length) {
     showToast('PDF oluşturmak için en az bir icraat kaydı ekleyin.');
     return;
   }
   const savedValues = await getSetting(REPORT_INPUTS_SETTING, {});
   renderReportAccidentInputs(savedValues && typeof savedValues === 'object' ? savedValues : {});
   clearReportOutput('Tüm alanları doldurun. Veri yoksa sıfır giriniz. Girilen değerler bu cihazda saklanır.');
-  const earliest = Math.min(...state.evks.map(evk => Number(evk.startEpochMillis)));
-  const latest = Math.max(...state.evks.map(evk => Number(evk.endEpochMillis)));
-  $('#reportPeriod').textContent = `${state.evks.length} ekip kaydı · ${displayDateTime(earliest)} – ${displayDateTime(latest)}`;
+  const earliest = Math.min(...state.reportRecords.map(record => Number(record.startEpochMillis)));
+  const latest = Math.max(...state.reportRecords.map(record => Number(record.endEpochMillis)));
+  $('#reportPeriod').textContent = `${state.reportRecords.length} kaynak · ${displayDateTime(earliest)} – ${displayDateTime(latest)}`;
   $('#reportDialog').showModal();
 }
 
@@ -1201,7 +1391,7 @@ async function generateDailyReport(event) {
   status.classList.remove('error');
   status.textContent = 'Güncel icraat kayıtlarıyla PDF hazırlanıyor…';
   try {
-    const result = await createDailyReportPdf(state.evks.map(evk => structuredClone(evk)), accidents);
+    const result = await createDailyReportPdf(state.reportRecords.map(record => structuredClone(record)), accidents);
     state.reportFile = result.file;
     $('#previewReport').disabled = false;
     $('#downloadReport').disabled = false;
@@ -1238,95 +1428,6 @@ async function shareDailyReport() {
   );
 }
 
-async function shareSingleEvk(id) {
-  try {
-    const [evk] = await prepareEvksForExport([id]);
-    const envelope = buildEnvelope([evk], 'SINGLE_EVK');
-    const file = makeJsonFile(envelope, buildJsonFileName([evk]));
-    await shareFile(file, `Ekip ${evk.teamCode} İcraatı`);
-  } catch (error) {
-    showToast(error.message || 'İcraat paylaşılamadı.');
-  }
-}
-
-async function exportAll(share) {
-  if (!state.evks.length) {
-    showToast('Paylaşılacak icraat yok.');
-    return;
-  }
-  try {
-    const prepared = await prepareEvksForExport(state.evks.map(item => item.evkId));
-    const envelope = buildEnvelope(prepared, 'ALL_EVK');
-    const file = makeJsonFile(envelope, buildJsonFileName(prepared));
-    if (share) await shareFile(file, 'Tüm İcraat Kayıtları');
-    else {
-      downloadFile(file);
-      showToast('İcraat arşivi indirildi.');
-    }
-  } catch (error) {
-    showToast(error.message || 'Dışa aktarma tamamlanamadı.');
-  }
-}
-
-async function importJsonFile(file) {
-  try {
-    const envelope = JSON.parse(await file.text());
-    const incomingRecords = validateEnvelope(envelope);
-    const working = new Map(state.evks.map(record => [record.evkId, record]));
-    const accepted = [];
-    let skipped = 0;
-    let warnings = 0;
-
-    for (const incoming of incomingRecords) {
-      const local = working.get(incoming.evkId);
-      if (!local) {
-        const duplicate = [...working.values()].find(record => sameLogicalShift(record, incoming));
-        if (duplicate) {
-          warnings += 1;
-          const addAnyway = await askConfirm(
-            'Benzer ekip kaydı bulundu',
-            `Ekip ${incoming.teamCode} için aynı birim ve saatlere sahip farklı kimlikli bir kayıt var. Gelen kayıt yine de eklensin mi?`,
-            'Yine de Ekle'
-          );
-          if (!addAnyway) { skipped += 1; continue; }
-        }
-        accepted.push(incoming);
-        working.set(incoming.evkId, incoming);
-        continue;
-      }
-
-      const comparison = compareIncoming(local, incoming);
-      if (comparison === 'IDENTICAL') { skipped += 1; continue; }
-      let title = 'Bu ekip kaydı daha önce mevcut';
-      let message = 'Gelen kayıt ile telefondaki kayıt farklı.';
-      let okLabel = 'Gelenle Güncelle';
-      if (comparison === 'NEWER') message = 'Gelen kayıt daha yeni. Telefondaki kayıt güncellensin mi?';
-      if (comparison === 'OLDER') {
-        title = 'Gelen kayıt daha eski';
-        message = 'Telefonda daha güncel kayıt bulundu. Yine de gelen kayıt kullanılsın mı?';
-        okLabel = 'Yine de Değiştir';
-      }
-      if (comparison === 'SAME_REVISION_DIFFERENT_TIME') message = 'Revizyonlar aynı ancak son güncelleme zamanları farklı. Gelen kayıt kullanılsın mı?';
-      if (comparison === 'SAME_METADATA_DIFFERENT_CONTENT') message = 'Kayıt bilgileri aynı görünse de içerikler farklı. Gelen kayıt kullanılsın mı?';
-      warnings += 1;
-      const replace = await askConfirm(title, message, okLabel, comparison === 'OLDER');
-      if (replace) {
-        accepted.push(incoming);
-        working.set(incoming.evkId, incoming);
-      } else skipped += 1;
-    }
-
-    await putManyEvks(accepted);
-    await absorbDirectoriesFromEvks(accepted);
-    await refreshEvks();
-    showToast(`${accepted.length} kayıt alındı, ${skipped} kayıt atlandı${warnings ? `, ${warnings} uyarı gösterildi` : ''}.`, 4800);
-  } catch (error) {
-    showToast(error.message || 'JSON dosyası içe aktarılamadı.', 4500);
-  } finally {
-    $('#importInput').value = '';
-  }
-}
-
 async function loadPenaltyGuide() {
   try {
     const response = await fetch('./assets/ceza_rehberi.json');
@@ -1350,6 +1451,10 @@ function bindEvents() {
   $('#menuButton').addEventListener('click', () => toggleMenu());
   menuBackdrop.addEventListener('click', () => toggleMenu(false));
   $('#addTeamButton').addEventListener('click', () => openTeamDialog());
+  teamList.addEventListener('click', event => {
+    const button = event.target.closest('[data-transfer-action]');
+    if (button) handleTransferAction(button.dataset.transferAction);
+  });
   $('[data-close-team]').addEventListener('click', () => teamDialog.close());
   teamForm.addEventListener('submit', saveTeam);
   $('#backButton').addEventListener('click', () => history.back());
@@ -1496,7 +1601,7 @@ function bindEvents() {
     const id = state.cardActionId;
     cardMenuDialog.close();
     if (button.dataset.cardAction === 'edit') openTeamDialog(id);
-    if (button.dataset.cardAction === 'share') shareSingleEvk(id);
+    if (button.dataset.cardAction === 'share') shareTeamSummary(id);
     if (button.dataset.cardAction === 'delete') requestDeleteEvk(id);
   });
 
@@ -1551,9 +1656,7 @@ function bindEvents() {
     if (!button) return;
     toggleMenu(false);
     if (button.dataset.action === 'pdf') openReportDialog();
-    if (button.dataset.action === 'import') $('#importInput').click();
-    if (button.dataset.action === 'share') exportAll(true);
-    if (button.dataset.action === 'delete-all') requestDeleteAllEvks();
+    if (button.dataset.action === 'delete-imports') requestDeleteAllSummaries();
     if (button.dataset.action === 'about') $('#infoDialog').showModal();
   });
   $('[data-close-report]').addEventListener('click', async () => {
@@ -1576,14 +1679,14 @@ function bindEvents() {
   });
   $('#shareReport').addEventListener('click', shareDailyReport);
   $('[data-close-info]').addEventListener('click', () => $('#infoDialog').close());
-  $('#importInput').addEventListener('change', event => {
-    const [file] = event.target.files;
-    if (file) importJsonFile(file);
-  });
+  $('[data-close-summary]').addEventListener('click', () => $('#summaryDialog').close());
 
   window.addEventListener('popstate', event => {
     if (event.state?.evkId && state.evks.some(item => item.evkId === event.state.evkId)) openDetail(event.state.evkId, false);
     else showListView();
+  });
+  window.addEventListener('hashchange', () => {
+    if (location.hash.startsWith('#ozet=')) importTransferFromHash();
   });
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', () => {
@@ -1607,8 +1710,11 @@ async function init() {
   try {
     await openDatabase();
     await Promise.all([refreshEvks(), loadPenaltyGuide()]);
-    const match = location.hash.match(/^#evk=(.+)$/);
-    if (match) openDetail(decodeURIComponent(match[1]), false);
+    const imported = await importTransferFromHash();
+    if (!imported) {
+      const match = location.hash.match(/^#evk=(.+)$/);
+      if (match) openDetail(decodeURIComponent(match[1]), false);
+    }
   } catch (error) {
     showToast(error.message || 'Uygulama başlatılamadı.', 5000);
   }
@@ -1661,6 +1767,7 @@ async function registerWebMcp() {
     },
     annotations: { readOnlyHint: false, untrustedContentHint: false },
     async execute(input) {
+      if (state.evks.length) throw new Error('Bu cihazda zaten bir kişisel ekip bulunuyor.');
       if (!UNITS.some(unit => unit.code === input.sourceUnit)) throw new Error('Geçersiz birim.');
       if (!/^\d+$/.test(input.teamCode)) throw new Error('Ekip kodu yalnızca rakamlardan oluşmalıdır.');
       if (!['GUNDUZ', 'GECE', 'ARA_EKIP', 'RADAR'].includes(input.dutyType)) throw new Error('Geçersiz görev türü.');

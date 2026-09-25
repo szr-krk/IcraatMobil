@@ -2,3 +2,7 @@
 Thumbs.db
 *.log
 .sites-runtime/
+node_modules/
+cloud-worker/
+pnpm-lock.yaml
+output/

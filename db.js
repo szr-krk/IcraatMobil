@@ -1,7 +1,8 @@
 const DB_NAME = 'icraat-mobil';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const EVK_STORE = 'evks';
 const SETTINGS_STORE = 'settings';
+const SUMMARY_STORE = 'summaries';
 
 let databasePromise;
 
@@ -19,6 +20,12 @@ export function openDatabase() {
       }
       if (!database.objectStoreNames.contains(SETTINGS_STORE)) {
         database.createObjectStore(SETTINGS_STORE, { keyPath: 'key' });
+      }
+      if (!database.objectStoreNames.contains(SUMMARY_STORE)) {
+        const store = database.createObjectStore(SUMMARY_STORE, { keyPath: 'summaryId' });
+        store.createIndex('sourceUnit', 'sourceUnit', { unique: false });
+        store.createIndex('packetKind', 'packetKind', { unique: false });
+        store.createIndex('receivedAt', 'receivedAt', { unique: false });
       }
     };
     request.onsuccess = () => resolve(request.result);
@@ -130,4 +137,29 @@ export async function setSetting(key, value) {
 
 export async function evkIdExists(evkId) {
   return Boolean(await getEvk(evkId));
+}
+
+export async function getAllSummaries() {
+  const database = await openDatabase();
+  const transaction = database.transaction(SUMMARY_STORE, 'readonly');
+  return requestResult(transaction.objectStore(SUMMARY_STORE).getAll());
+}
+
+export async function putSummary(summary) {
+  const database = await openDatabase();
+  const transaction = database.transaction(SUMMARY_STORE, 'readwrite');
+  await requestResult(transaction.objectStore(SUMMARY_STORE).put(summary));
+  return summary;
+}
+
+export async function deleteSummary(summaryId) {
+  const database = await openDatabase();
+  const transaction = database.transaction(SUMMARY_STORE, 'readwrite');
+  await requestResult(transaction.objectStore(SUMMARY_STORE).delete(summaryId));
+}
+
+export async function deleteAllSummaries() {
+  const database = await openDatabase();
+  const transaction = database.transaction(SUMMARY_STORE, 'readwrite');
+  await requestResult(transaction.objectStore(SUMMARY_STORE).clear());
 }

@@ -1,7 +1,7 @@
 {
   "name": "İcraat Mobil",
   "short_name": "İcraat",
-  "description": "Çevrimdışı Ekip Vardiya Kaydı uygulaması",
+  "description": "Mobil icraat kaydı, özet aktarımı ve günlük PDF uygulaması",
   "lang": "tr",
   "start_url": "./",
   "scope": "./",

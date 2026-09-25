@@ -1,4 +1,4 @@
-const CACHE_NAME = 'icraat-mobil-v19';
+const CACHE_NAME = 'icraat-mobil-v20';
 const APP_SHELL = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const APP_SHELL = [
   './db.js',
   './domain.js',
   './report.js',
+  './transfer.js',
   './pdf-report.js',
   './manifest.webmanifest',
   './icons/favicon.svg',
@@ -39,7 +40,7 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
   const networkFirst = event.request.mode === 'navigate'
-    || /\/(index\.html|app\.js|db\.js|domain\.js|report\.js|pdf-report\.js|styles\.css|manifest\.webmanifest|ceza_rehberi\.json|reference_data\.json)$/.test(url.pathname);
+    || /\/(index\.html|app\.js|db\.js|domain\.js|report\.js|transfer\.js|pdf-report\.js|styles\.css|manifest\.webmanifest|ceza_rehberi\.json|reference_data\.json)$/.test(url.pathname);
   if (networkFirst) {
     event.respondWith(
       fetch(event.request)

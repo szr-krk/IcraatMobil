@@ -7,11 +7,18 @@
 - EVK verileri cihazdaki IndexedDB içinde saklanır.
 - Günlük İcraat PDF, cihazda kayıtlı tüm EVK’lerden tarayıcı içinde ve çevrimdışı üretilebilir.
 
+## Uygulama Durumu
+
+- Kişisel ekip kaydı isteğe bağlıdır ve yeni kurulumlarda en fazla bir adet oluşturulur.
+- Ekip → gündüz 20 → gece 20 → 5920 aktarımı kısa, tıklanabilir ve dosyasız özet bağlantılarıyla uygulanmıştır.
+- Alınan ekip, gündüz ve birim özetleri kişisel EVK’den ayrı IndexedDB deposunda ve ayrı ana ekran listesinde tutulur.
+- Merkez, Çorlu ve Malkara birim toplamları mevcut PDF veri giriş ekranını ve PDF üreticisini değiştirmeden besler.
+
 ## Birleştirilen özellikler
 
 - `Icraat_pdf`: Ekip türü, ekip kodu, tarih/saat, görevliler ve yollar.
 - `IcraatPdfYeni`: Birim seçimi, EVK kimlik/revizyon kuralları, birim odaklı kart listesi, ceza/kontrol/kaza payload yapısı ve JSON sözleşmesi.
-- Kart sağa kaydırılırsa güncelleme, sola kaydırılırsa onaylı silme açılır. Uzun basma aynı işlemleri menüyle sunar.
+- Kişisel ekip kartı sağa kaydırılırsa güncelleme, sola kaydırılırsa onaylı silme açılır. Uzun basma güncelleme, 20'ye özet gönderme ve silme işlemlerini sunar.
 - Ekip kartları birinci projedeki kalkan/yıldız ekip simgesini kullanır; kart üzerindeki ayrı paylaşım oku bulunmaz. Kullanıcıya görünen kayıt adı `İcraat`tır; EVK terimi yalnızca veri sözleşmesi ve teknik kimliklerde korunur.
 - Normal görevlerde kart ayrıntısında sabit sekmeler Ceza Ekle, Kontroller, Kazalar ve İcraat'tır. İcraat sekmesi birinci projenin ekip faaliyet metnini, ayrıca Hız/Kemer/Alkol adetlerini gösterir; EVK'ya bağlı not girişi ve sistem metin paylaşımı sunar.
 - Radar görevlerinde `Ekip · Yüzüne`, `Operatör · Plakaya` ve `İcraat` sekmeleri gösterilir; Kontroller, Kazalar ve standart ceza arama arayüzü gösterilmez.
@@ -26,7 +33,8 @@
 - Daha eski kayıt otomatik olarak daha yeni kaydın üzerine yazılmaz.
 - Bilinmeyen payload alanları korunur.
 - Görevli ve yol listeleri, birinci projenin modelleriyle uyumlu olarak `payload.personnel` ve `payload.roads` alanlarında taşınır.
-- Açılış özet satırı Merkez, Çorlu ve Malkara birimlerinin kayıtlı EVK sayılarını (kayıt yoksa `0`) sabit sırayla gösterir.
+- Ana ekrandaki eski Merkez/Çorlu/Malkara sayaç satırı kaldırılmıştır. Kişisel ekip varsa listenin üstünde **Benim İcraatım**, bağlantıyla alınan kayıtlar altta **Alınan İcraatlar** olarak gösterilir. Kişisel ekip yoksa yalnızca alınanlar listelenir.
+- Alınan özet kartına dokunulduğunda ekip, kontrol, kaza, ceza kaynağı ve ceza türü sayıları gösterilir. Kart sola kaydırılarak silinir; tüm alınan özetler menüden topluca temizlenebilir.
 - Görevli ve yol bilgileri ayrıca IndexedDB `settings` deposunda cihaz genelinde seçilebilir rehberler olarak tutulur. İlk kullanımda mevcut EVK payload kayıtları rehberlere alınır. Rehber kaydı güncellenebilir veya silinebilir; silme geçmiş EVK payload verilerini değiştirmez.
 - Mobil görevli ve yol rehberlerinde **Yeni** veya **Güncelle** seçildiğinde seçim penceresinden ayrı, tam ekran ve kaydırma gerektirmeyen bir kayıt ekranı açılır. Bu ekranda yalnızca ilgili alanlar ile geri/Kaydet işlemleri bulunur; seçim penceresinin **Tamam** düğmesi gösterilmez ve klavye kendiliğinden açılmaz. Görevli soyadı Türkçe büyük harfe çevrilir. Görevliler seçim listesinde, ekip kaydında ve icraat metninde sayısal sicil numarası küçükten büyüğe sıralanır; sicilsiz kayıtlar listenin sonunda yer alır.
 - Ceza ekleme çerçevesi Ceza Ekle sekmesinde ekranın altında sabittir ve sanal klavye açıldığında görünür alanın altına taşınır. Ceza listesi düşey kaydırılabilir; madde arama sonuçları sabit çerçevenin üstünde açılır.
@@ -41,12 +49,22 @@
 - Radar adet ekranı açıldığında hiçbir giriş alanı otomatik odaklanmaz; klavye yalnızca kullanıcının seçtiği alana dokunmasıyla açılır.
 - Radar İcraat sekmesi birinci projenin radar faaliyet metnini kullanır: K3 ve kontrol edilen araç sayısı radar ceza işlemlerinden hesaplanır; ceza maddeleri ekip/operatör ayrımı olmadan toplam adetle listelenir, ardından sürücüye/plakasına toplamları, toplam tutar, not ve `Arz ederim.` satırı gösterilir. Radar için Kontroller, Kazalar ve Hız/Kemer/Alkol ek özeti gösterilmez.
 - İcraat başlığı Merkez EVK'larında `Tekirdağ Bölge Trafik Denetleme Şube Müdürlüğü`, Çorlu ve Malkara EVK'larında `Malkara Bölge Trafik Denetleme İstasyon Amirliği` olarak gösterilir. Not `payload.note` alanında saklanır ve EVK JSON aktarımında korunur. Ekrandaki ayrıntılı icraat metni değişmez. Normal ekiplerde **Metin Olarak Paylaş**, birinci projedeki kısa WhatsApp metnini (işlem bazlı özet ve Hız/Kemer/Alkol satırları olmadan, madde başına toplam adetle); radar ekiplerinde birinci projedeki ayrıntılı radar metnini üretir. WhatsApp kalınlık işaretleri korunur. Web Share cihaz paylaşım ekranını açar; desteklenmiyorsa metni panoya kopyalar.
-- Tek icraat JSON dosyası `EkipKodu_GörevTürü_Gün_Ay.json` biçiminde adlandırılır. Toplu dosyada tek birim varsa `Birim_BaşlangıçGünü_BitişGünü_Ay.json`, birden fazla birim varsa `Toplu_icraat_BaşlangıçGünü_BitişGünü_Ay.json` biçimi kullanılır; ay/yıl geçişlerinde tarih parçaları açıkça yazılır.
-- Ana menüde tek toplu aktarım işlemi **Tüm İcraatleri Paylaş**tır; paylaşım desteklenmezse aynı JSON dosyası indirilir. **Tüm İcraatleri Sil** tüm EVK kayıtlarını açık onaydan sonra temizler. Kaydırılabilir **Kullanım Kılavuzu**, ekip personeli, 20 ve 5920 için veri giriş/aktarım adımlarını gösterir ve kullanıcıya görünen kayıtları “İcraat” olarak adlandırır.
+- Günlük kullanıcı akışında JSON dosyası indirme, içe aktarma ve toplu JSON paylaşma işlemleri kullanılmaz. Ana menü yalnızca **Günlük İcraat PDF**, **Alınan İcraatları Sil** ve **Kullanım Kılavuzu** işlemlerini gösterir.
+- **Kullanım Kılavuzu** ekip, gündüz 20, gece 20 ve 5920 arasındaki bağlantı akışını açıklar.
+
+## Dosyasız Özet Aktarımı
+
+- Özet bağlantısı URL fragmentinde taşınır; GitHub Pages sunucusuna veya başka bir bulut deposuna kaydedilmez.
+- Paket türleri `E` (tek ekip), `G` (gündüz toplamı) ve `B` (birim toplamı) olarak sürümlü, sabit sıralı ve Base36 kodlanır. Birim, başlangıç/bitiş zamanı, ekip kodu (yalnız `E`) ve sayısal özet değerleri bütünlük kontrol koduyla korunur.
+- Sayısal özet; dört ekip türü, K1/K2-A/K2-B/K4/K5/K6, dört kaza değeri, sürücü/plaka ceza adetleri ve hız/kemer/alkol adetlerinden oluşur. PTS ve KGYS, mevcut PDF öncesi ekranda elle girilmeye devam eder.
+- Bir ekip paketi ile yüz ekiplik toplam aynı alan yapısını kullanır; toplam bağlantısında kaynak kayıtlar tek tek taşınmaz, alanlar toplanır. Böylece bağlantı boyutu ekip sayısıyla büyümez.
+- Aynı bağlantının tekrar açılması özet kimliğiyle engellenir. Düzeltilmiş içerik yeni kayıt olarak gelir; kullanıcı kendisine bildirilen eski kartı elle siler. Revizyon bilgisi taşınmaz.
+- Yalnız `E` kayıtları bulunan cihaz **Gündüz Toplamını Paylaş**, bir `G` kaydı ile gece ekip kayıtları bulunan cihaz **Birim Toplamını Paylaş** işlemini görür. Yalnız `B` kayıtları bulunan cihaz PDF işlemine yönlendirilir.
+- 5920 cihazında PDF açılabilmesi için Merkez, Çorlu ve Malkara birimlerinin her birinden tam bir `B` kaydı bulunmalıdır; eksik veya mükerrer birim açık uyarıyla engellenir.
 
 ## Günlük İcraat PDF
 
-- Ana menüdeki **Günlük İcraat PDF** işlemi cihazda kayıtlı bütün EVK’leri rapora alır; PDF oluşturmak EVK kimlik, revision veya updatedAt değerlerini değiştirmez.
+- Ana menüdeki **Günlük İcraat PDF** işlemi üç birim toplamı alınmışsa bu `B` özetlerini, aksi durumda cihazdaki kişisel EVK kayıtlarını rapora alır. PDF oluşturmak EVK veya özet kayıtlarını değiştirmez.
 - Rapor aralığı EVK’lerin en erken başlangıcı ile en geç bitişidir. `12/36`, Gündüz ve Gece ekiplerinin toplamıdır; Ara Ekip ve Radar ayrı satırlardır.
 - PDF öncesinde her birim kartında, ekrandaki icraatların `payload.accidents` alanlarından toplanan son 24 saatlik Ölümlü Kaza, Ölü, Yaralanmalı Kaza ve Yaralı değerleri salt okunur bilgi olarak gösterilir. Kullanıcı bunları önceki günün PDF'indeki birikimli değerlere ekleyerek yıllık toplam alanlarını doldurur.
 - Merkez, Çorlu ve Malkara için Ölümlü Kaza, Ölü, Yaralanmalı Kaza, Yaralı, KGYS ve PTS alanlarının tamamı elle ve zorunlu olarak girilir; alanlarda yanıltıcı `0` ipucu gösterilmez. Veri yoksa kullanıcı açıkça `0` girmelidir; boş alanlarda **Veri yoksa sıfır giriniz.** uyarısı gösterilir. Bu 18 değer cihazdaki IndexedDB `settings` deposunda yalnızca PDF form tercihi olarak saklanır, ekran yeniden açıldığında geri yüklenir ve **Kayıtlı Verileri Temizle** işlemiyle topluca silinebilir. EVK payload’ına ve JSON aktarımına eklenmez. PTS ve KGYS adetleri ilgili birimin Sürücüye, Plakaya, PTS ve KGYS toplamına katılarak PDF yüzdeleri hesaplanır.
@@ -56,10 +74,6 @@
 - PDF'nin kurumsal görsel dili lacivert başlıklar, ölçülü açık yeşil bölüm başlıkları ve mavi-gri `TOPLAM` alanlarından oluşur. Hedef karşılaştırmalarında başarı/eksik durumları yalnızca renkle değil sırasıyla `✓`/`✕`, gerçekleşme çubuğu ve yön oku ile de belirtilir. Böylece renkli ekranda hızlı okunur, siyah-beyaz yazıcı çıktısında anlamını ve tablo hiyerarşisini korur.
 - PDF şablonundaki bütün mevcut tablo ve hücre kenarlıkları, kaynak şablondaki renk ve kalınlık farklarından bağımsız olarak ince (`1 px`) siyah çizgiyle oluşturulur. Hedef/gerçekleşme çubuklarının dış çerçevesi de aynı stili kullanır.
 - `reference_data.json` Service Worker tarafından ağ öncelikli okunur; ağ yoksa son geçerli çevrimdışı kopya kullanılır. Yeni ay hedefleri eklenirken uygulama kodu değişmez.
-
-## Web uzantısı
-
-Tüm birimlerdeki EVK kayıtlarının tek dosyada taşınabilmesi için web sürümü `exportType = ALL_EVK` ve karışık paketlerde `sourceUnit = MIXED` kullanır. Kayıtların içindeki `sourceUnit` değerleri değişmez. Import motoru mevcut `SINGLE_EVK` ve `UNIT_PACKAGE` zarflarını da kayıt bazında kabul eder.
 
 ## Açık TODO
 

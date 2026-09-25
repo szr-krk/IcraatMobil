@@ -39,19 +39,14 @@ button { touch-action: manipulation; }
 .icon-button:active { background: rgb(255 255 255 / 12%); }
 .screen { padding: 14px 12px calc(96px + env(safe-area-inset-bottom)); outline: none; }
 
-.summary-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; overflow: hidden; margin-bottom: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--line); }
-.summary-strip div { min-width: 0; padding: 11px 8px; text-align: center; background: white; }
-.summary-strip strong, .summary-strip span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.summary-strip strong { color: var(--navy-800); font-size: .84rem; }
-.summary-strip span { margin-top: 3px; color: var(--text); font-size: 1.08rem; font-weight: 900; }
-
 .team-list { display: grid; gap: 14px; }
-.unit-section { display: grid; gap: 7px; }
-.unit-heading { display: flex; align-items: center; gap: 8px; padding: 0 4px; }
-.unit-heading h2 { margin: 0; color: var(--navy-800); font-size: .83rem; letter-spacing: .06em; text-transform: uppercase; }
-.unit-heading span { min-width: 25px; padding: 2px 7px; border-radius: 99px; color: white; background: var(--navy-800); text-align: center; font-size: .72rem; font-weight: 800; }
+.home-section { display: grid; gap: 8px; }
+.home-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 4px; }
+.home-heading h2 { margin: 0; color: var(--navy-800); font-size: .83rem; letter-spacing: .06em; text-transform: uppercase; }
+.home-heading span { min-width: 25px; padding: 2px 7px; border-radius: 99px; color: white; background: var(--navy-800); text-align: center; font-size: .72rem; font-weight: 800; }
 .card-stack { display: grid; gap: 7px; }
 .swipe-shell { position: relative; overflow: hidden; border-radius: 13px; background: linear-gradient(90deg, #1769aa 0 50%, #c9343c 50%); }
+.swipe-shell.summary-swipe { background: var(--red-600); }
 .swipe-label { position: absolute; inset-block: 0; display: flex; align-items: center; color: white; font-size: .78rem; font-weight: 900; letter-spacing: .05em; }
 .swipe-label.edit { left: 16px; }
 .swipe-label.delete { right: 16px; }
@@ -66,6 +61,12 @@ button { touch-action: manipulation; }
 .team-meta { min-width: 0; }
 .team-meta strong { color: var(--navy-800); font-size: .77rem; }
 .team-meta span { margin-top: 3px; color: var(--muted); font-size: .74rem; }
+.summary-card { grid-template-columns: 43px minmax(0, 1fr) auto; }
+.summary-card .team-icon { font-size: .69rem; letter-spacing: .02em; }
+.summary-card .team-meta { text-align: right; }
+.summary-card .team-meta strong { font-size: .73rem; }
+.incoming-empty { padding: 22px 16px; border: 1px dashed #aab8c7; border-radius: 13px; color: var(--muted); background: rgb(255 255 255 / 55%); text-align: center; font-size: .84rem; line-height: 1.45; }
+.transfer-action { position: sticky; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 8; width: 100%; min-height: 52px; border: 0; border-radius: 13px; padding: 10px 14px; color: white; background: var(--navy-800); box-shadow: 0 8px 22px rgb(8 24 44 / 20%); font-size: .82rem; font-weight: 900; letter-spacing: .035em; }
 .empty-state { min-height: 48dvh; display: grid; place-content: center; justify-items: center; padding: 32px 24px; text-align: center; color: var(--muted); }
 .empty-state h2 { margin: 18px 0 5px; color: var(--text); font-size: 1.12rem; }
 .empty-state p { max-width: 300px; margin: 0; line-height: 1.5; }
@@ -161,6 +162,13 @@ button { touch-action: manipulation; }
 .guide-content { display: grid; gap: 13px; padding-right: 5px; overflow-y: auto; overscroll-behavior: contain; }
 .guide-content p { color: var(--text); font-size: .85rem; line-height: 1.55; }
 .guide-content p:first-child { padding: 10px; border: 1px solid #c4d2df; border-radius: 10px; color: var(--muted); background: #f4f7fa; font-size: .8rem; }
+.summary-detail-card { max-height: min(88dvh, 720px); grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; }
+.summary-detail-card > div:first-child p { margin-top: 5px; font-size: .78rem; }
+.summary-detail-content { display: grid; gap: 12px; padding-right: 4px; overflow-y: auto; }
+.summary-detail-group { overflow: hidden; border: 1px solid var(--line); border-radius: 11px; }
+.summary-detail-group h3 { margin: 0; padding: 8px 10px; color: var(--navy-800); background: #edf3f8; font-size: .77rem; letter-spacing: .03em; }
+.summary-detail-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 10px; border-top: 1px solid var(--line); font-size: .8rem; }
+.summary-detail-row b { color: var(--navy-800); }
 
 .directory-card { width: 100%; max-height: min(88dvh, 720px); grid-template-rows: auto minmax(80px, 1fr) auto; overflow: hidden; }
 .directory-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }

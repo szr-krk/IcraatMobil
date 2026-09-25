@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="İcraat">
-  <meta name="description" content="Mobil, çevrimdışı Ekip Vardiya Kaydı uygulaması">
+  <meta name="description" content="Mobil icraat kaydı, özet aktarımı ve günlük PDF uygulaması">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
@@ -20,17 +20,12 @@
       <button class="icon-button back-button" id="backButton" aria-label="Ekip listesine dön" hidden>‹</button>
       <div class="title-block">
         <p class="eyebrow" id="pageEyebrow">BÖLGE TRAFİK</p>
-        <h1 id="pageTitle">Ekipler</h1>
+        <h1 id="pageTitle">İcraatlar</h1>
       </div>
       <button class="icon-button" id="menuButton" aria-label="Menüyü aç" aria-expanded="false">⋮</button>
     </header>
 
     <main id="listScreen" class="screen" tabindex="-1">
-      <section class="summary-strip" aria-label="Kayıt özeti">
-        <div><strong>Merkez</strong><span id="merkezCount">0</span></div>
-        <div><strong>Çorlu</strong><span id="corluCount">0</span></div>
-        <div><strong>Malkara</strong><span id="malkaraCount">0</span></div>
-      </section>
       <section id="teamList" class="team-list" aria-live="polite"></section>
     </main>
 
@@ -108,9 +103,7 @@
   <div class="backdrop" id="menuBackdrop" hidden></div>
   <nav class="overflow-menu" id="overflowMenu" aria-label="Uygulama menüsü" hidden>
     <button type="button" data-action="pdf">Günlük İcraat PDF</button>
-    <button type="button" data-action="import">JSON İçe Aktar</button>
-    <button type="button" data-action="share">Tüm İcraatleri Paylaş</button>
-    <button type="button" class="danger-text" data-action="delete-all">Tüm İcraatleri Sil</button>
+    <button type="button" class="danger-text" data-action="delete-imports">Alınan İcraatları Sil</button>
     <button type="button" data-action="about">Kullanım Kılavuzu</button>
   </nav>
 
@@ -231,9 +224,17 @@
     <div class="action-card">
       <h2 id="cardMenuTitle">Ekip işlemleri</h2>
       <button type="button" data-card-action="edit">Ekibi Güncelle</button>
-      <button type="button" data-card-action="share">İcraatı Paylaş</button>
+      <button type="button" data-card-action="share">20'ye Özet Gönder</button>
       <button type="button" class="danger-text" data-card-action="delete">İcraatı Sil</button>
       <button type="button" data-card-action="cancel">Vazgeç</button>
+    </div>
+  </dialog>
+
+  <dialog id="summaryDialog" class="mini-dialog summary-dialog">
+    <div class="dialog-card summary-detail-card">
+      <div><h2 id="summaryDialogTitle">İcraat Özeti</h2><p id="summaryDialogMeta"></p></div>
+      <div id="summaryDialogContent" class="summary-detail-content"></div>
+      <div class="dialog-actions"><button type="button" class="primary-button" data-close-summary>Tamam</button></div>
     </div>
   </dialog>
 
@@ -257,22 +258,20 @@
     <div class="dialog-card guide-card">
       <h2>Kullanım Kılavuzu</h2>
       <div class="guide-content">
-        <p>İcraat verileri bu cihazın tarayıcı hafızasında saklanır. Uygulama ana ekrana eklendikten sonra çevrimdışı kullanılabilir.</p>
+        <p>İcraat verileri ve alınan özetler yalnızca bu cihazın tarayıcı hafızasında saklanır.</p>
         <p>Ekip personeli kendi ekibini eklerken tüm verileri muhakkak eksiksiz ve doğru bir şekilde girmelidir; aksi takdirde oluşturulan icraat metni ve PDF hatalı olacaktır.</p>
         <p>Ceza ekleme işlemi sırasında, örneğin bir sürücüye birden fazla maddeden ceza yazdıysanız, tüm maddeleri eklemeden <strong>KAYDET</strong> butonuna basmayınız.</p>
         <p>Kaza verilerini ve kontrol sayılarını da muhakkak giriniz. Veri yoksa boş bırakabilirsiniz.</p>
         <p>Görev sonunda <strong>İcraat</strong> sekmesine tıklayarak varsa notunuzu ekleyip <strong>Metin Olarak Paylaş</strong> seçeneği ile Yıldız uygulaması üzerinden paylaşınız.</p>
-        <p>Görev sonunda ekip kaydına uzun basarak <strong>İcraatı Paylaş</strong> seçeneği ile icraatınızı telefonunuza indiriniz. Daha sonra telefonunuzun İndirilenler klasöründeki dosyayı WhatsApp ya da Yıldız uygulaması ile bağlı bulunduğunuz 20'deki personele gönderiniz.</p>
-        <p>24 saatin sonunda 20'deki personelin telefonunda tüm ekiplerin kayıtları toplanmış olmalıdır.</p>
-        <p>20'deki personel menüden <strong>Tüm İcraatleri Paylaş</strong> seçeneği ile ekranında gördüğü tüm kayıtları telefonuna tek dosya olarak indirir ve İndirilenler klasöründeki dosyayı 5920'ye gönderir.</p>
-        <p>5920 personeli kendisine toplu olarak gelen verileri sağ üst menüden <strong>JSON İçe Aktar</strong> seçeneği ile İndirilenler klasöründen seçerek kendi ekranına aktarır. Bu işlemi yapmadan önce ekranda başka günlere ait herhangi bir kayıt olmamalıdır; aksi takdirde yanlış veriler içeren PDF üretilmesine sebep olur.</p>
-        <p>5920 personeli tüm ekip ve istasyonlardan verileri aldığına emin olduktan sonra sağ üst menüden <strong>Günlük İcraat PDF</strong> seçeneğine dokunur. Ekranda istenen verileri doldurup <strong>PDF Oluştur</strong> seçeneği ile raporu oluşturabilir ve ilgili yerlerle paylaşabilir.</p>
+        <p>Ekip kartına uzun basıp <strong>20'ye Özet Gönder</strong> seçeneğiyle oluşturulan bağlantıyı kendi 20'nize gönderiniz. Bağlantıya dokunulduğunda icraat özeti karşı cihazdaki <strong>Alınan İcraatlar</strong> listesine eklenir.</p>
+        <p>Gündüz 20, ekiplerden gelen kayıtları topladıktan sonra <strong>Gündüz Toplamını Paylaş</strong> seçeneğiyle gece 20'ye gönderir. Gece 20, gündüz toplamı ile gece ekiplerini birleştirip <strong>Birim Toplamını Paylaş</strong> seçeneğiyle 5920'ye gönderir.</p>
+        <p>5920 personeli Merkez, Çorlu ve Malkara bağlantılarını açtıktan sonra <strong>Günlük İcraat PDF</strong> seçeneğine dokunur. Mevcut PDF veri giriş ekranını doldurup raporu oluşturabilir.</p>
+        <p>Düzeltilmiş bir icraat yeniden gönderilecekse önce eski kartı kaydırarak siliniz. Aynı bağlantı yanlışlıkla tekrar açılırsa ikinci kez eklenmez.</p>
       </div>
       <div class="dialog-actions"><button type="button" class="primary-button" data-close-info>Tamam</button></div>
     </div>
   </dialog>
 
-  <input id="importInput" type="file" accept="application/json,.json" hidden>
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
   <script type="module" src="app.js"></script>
 </body>

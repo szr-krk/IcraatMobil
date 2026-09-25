@@ -107,7 +107,6 @@ export function summarizeDailyReport(evks) {
   for (const evk of evks) {
     const teamLabel = `Ekip ${evk?.teamCode || '?'}`;
     if (!Object.hasOwn(units, evk?.sourceUnit)) throw new Error(`${teamLabel}: bilinmeyen birim.`);
-    if (!REPORT_DUTIES.includes(evk?.dutyType)) throw new Error(`${teamLabel}: bilinmeyen görev türü.`);
     const start = Number(evk.startEpochMillis ?? Date.parse(evk.startDateTime));
     const end = Number(evk.endEpochMillis ?? Date.parse(evk.endDateTime));
     if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) {
@@ -117,6 +116,22 @@ export function summarizeDailyReport(evks) {
     latest = Math.max(latest, end);
 
     const unit = units[evk.sourceUnit];
+    if (evk.recordType === 'ICRAAT_SUMMARY') {
+      REPORT_DUTIES.forEach(key => {
+        unit.teamCounts[key] = safeAdd(unit.teamCounts[key], integerValue(evk.summary?.teamCounts?.[key] ?? 0, `${teamLabel} ${key}`));
+      });
+      REPORT_CONTROL_KEYS.forEach(key => {
+        unit.controlCounts[key] = safeAdd(unit.controlCounts[key], integerValue(evk.summary?.controlCounts?.[key] ?? 0, `${teamLabel} ${key}`));
+      });
+      REPORT_ACCIDENT_KEYS.forEach(key => {
+        unit.accidentCounts[key] = safeAdd(unit.accidentCounts[key], integerValue(evk.summary?.accidentCounts?.[key] ?? 0, `${teamLabel} ${key}`));
+      });
+      ['driverArticles', 'plateArticles', 'speed', 'belt', 'alcohol'].forEach(key => {
+        unit[key] = safeAdd(unit[key], integerValue(evk.summary?.[key] ?? 0, `${teamLabel} ${key}`));
+      });
+      continue;
+    }
+    if (!REPORT_DUTIES.includes(evk?.dutyType)) throw new Error(`${teamLabel}: bilinmeyen görev türü.`);
     unit.teamCounts[evk.dutyType] = safeAdd(unit.teamCounts[evk.dutyType], 1);
     const payload = ensurePayload(evk);
     REPORT_CONTROL_KEYS.forEach((key, index) => {
