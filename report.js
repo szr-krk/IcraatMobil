@@ -164,17 +164,20 @@ export function summarizeDailyReport(evks) {
   return { units, earliest, latest };
 }
 
-function validateReference(reference, month) {
-  if (!reference || reference.app !== 'ICRAAT_REFERENCE' || reference.schemaVersion !== 1) {
-    throw new Error('Geçersiz aylık hedef dosyası.');
+export function validateReferenceData(reference) {
+  if (!reference || reference.app !== 'ICRAAT_REFERENCE' || reference.schemaVersion !== 2) {
+    throw new Error('Geçersiz kontrol hedef dosyası.');
   }
-  const targets = reference.monthlyTargets?.[month];
-  if (!targets) throw new Error(`${month} ayına ait hedefler bulunamadı. Hedef dosyasını güncelleyin.`);
+  const updatedAt = String(reference.updatedAt || '').trim();
+  const updatedAtEpochMillis = Date.parse(updatedAt);
+  if (!updatedAt || !Number.isFinite(updatedAtEpochMillis)) throw new Error('Hedef dosyasının son güncelleme tarihi geçersiz.');
+  const targets = reference.targets;
+  if (!targets || typeof targets !== 'object' || Array.isArray(targets)) throw new Error('Kontrol hedefleri bulunamadı.');
   REPORT_UNITS.forEach(unit => {
     if (!targets[unit]) throw new Error(`${unit} hedefleri bulunamadı.`);
     REPORT_CONTROL_KEYS.forEach(key => integerValue(targets[unit][key], `${unit} ${key} hedefi`));
   });
-  return targets;
+  return { targets, updatedAt, updatedAtEpochMillis };
 }
 
 export function validateAccidentCounts(accidents) {
@@ -251,8 +254,7 @@ export function buildDailyReportData(evks, accidentInput, reference) {
   const startDate = dateParts(summary.earliest);
   const endDate = dateParts(summary.latest);
   const periodLabel = reportPeriodLabel(startDate, endDate);
-  const month = `${endDate.year}-${String(endDate.month).padStart(2, '0')}`;
-  const monthlyTargets = validateReference(reference, month);
+  const { targets: currentTargets } = validateReferenceData(reference);
   const cells = {
     F9: periodLabel,
     F11: `(${formattedTime(summary.earliest)}-${formattedTime(summary.latest)})`
@@ -276,7 +278,7 @@ export function buildDailyReportData(evks, accidentInput, reference) {
       cells[`${TARGET_COLUMNS[unitIndex]}${row}`] = teams[index];
       totalTeams[index] = safeAdd(totalTeams[index], teams[index]);
     });
-    const targets = REPORT_CONTROL_KEYS.map(key => integerValue(monthlyTargets[unitCode][key], `${unitCode} ${key} hedefi`));
+    const targets = REPORT_CONTROL_KEYS.map(key => integerValue(currentTargets[unitCode][key], `${unitCode} ${key} hedefi`));
     const actuals = REPORT_CONTROL_KEYS.map(key => unit.controlCounts[key]);
     targets.forEach((value, index) => { totalTargets[index] = safeAdd(totalTargets[index], value); });
     actuals.forEach((value, index) => { totalActuals[index] = safeAdd(totalActuals[index], value); });

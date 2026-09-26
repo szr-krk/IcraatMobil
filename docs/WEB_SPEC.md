@@ -72,16 +72,15 @@
 - Rapor aralığı EVK’lerin en erken başlangıcı ile en geç bitişidir. `12/36`, Gündüz ve Gece ekiplerinin toplamıdır; Ara Ekip ve Radar ayrı satırlardır.
 - PDF öncesinde her birim kartında, ekrandaki icraatların `payload.accidents` alanlarından toplanan son 24 saatlik Ölümlü Kaza, Ölü, Yaralanmalı Kaza ve Yaralı değerleri salt okunur bilgi olarak gösterilir. Kullanıcı bunları önceki günün PDF'indeki birikimli değerlere ekleyerek yıllık toplam alanlarını doldurur.
 - Merkez, Çorlu ve Malkara için Ölümlü Kaza, Ölü, Yaralanmalı Kaza, Yaralı, KGYS ve PTS alanlarının tamamı elle ve zorunlu olarak girilir; alanlarda yanıltıcı `0` ipucu gösterilmez. Veri yoksa kullanıcı açıkça `0` girmelidir; boş alanlarda **Veri yoksa sıfır giriniz.** uyarısı gösterilir. Bu 18 değer cihazdaki IndexedDB `settings` deposunda yalnızca PDF form tercihi olarak saklanır, ekran yeniden açıldığında geri yüklenir ve **Kayıtlı Verileri Temizle** işlemiyle topluca silinebilir. EVK payload’ına ve JSON aktarımına eklenmez. PTS ve KGYS adetleri ilgili birimin Sürücüye, Plakaya, PTS ve KGYS toplamına katılarak PDF yüzdeleri hesaplanır.
-- Birim bazlı K1/A, K2/A, K2/B, K4/A, K5 ve K6 gerçekleşenleri EVK kontrollerinden; hedefleri `assets/reference_data.json` içindeki rapor bitiş ayından gelir.
+- Birim bazlı K1/A, K2/A, K2/B, K4/A, K5 ve K6 gerçekleşenleri EVK kontrollerinden; hedefleri `assets/reference_data.json` içindeki zamandan bağımsız tek güncel hedef tablosundan gelir. Ay veya yıl değişimi hedef seçimini değiştirmez; yeni hedef yayımlanana kadar mevcut tablo kullanılmaya devam eder.
 - Ceza adetleri madde çarpanlarıyla hesaplanır. Radar EVK’de mükerrer ekip/yüzüne değerleri dışlanır; yalnızca `RADAR_OPERATOR` + `PLATE` kayıtları toplu rapora eklenir.
 - Şablon `assets/daily_report/template.json` ve iki resmi logodan tarayıcı Canvas’ına çizilir; tek sayfalık A4 PDF cihaz içinde oluşturulur. Kullanıcı önizleyebilir, indirebilir veya desteklenen cihazlarda sistem paylaşım ekranıyla gönderebilir.
 - PDF'nin kurumsal görsel dili lacivert başlıklar, ölçülü açık yeşil bölüm başlıkları ve mavi-gri `TOPLAM` alanlarından oluşur. Hedef karşılaştırmalarında başarı/eksik durumları yalnızca renkle değil sırasıyla `✓`/`✕`, gerçekleşme çubuğu ve yön oku ile de belirtilir. Böylece renkli ekranda hızlı okunur, siyah-beyaz yazıcı çıktısında anlamını ve tablo hiyerarşisini korur.
 - PDF şablonundaki bütün mevcut tablo ve hücre kenarlıkları, kaynak şablondaki renk ve kalınlık farklarından bağımsız olarak ince (`1 px`) siyah çizgiyle oluşturulur. Hedef/gerçekleşme çubuklarının dış çerçevesi de aynı stili kullanır.
-- `reference_data.json` Service Worker tarafından ağ öncelikli okunur; ağ yoksa son geçerli çevrimdışı kopya kullanılır. Yeni ay hedefleri eklenirken uygulama kodu değişmez.
+- `reference_data.json` Service Worker tarafından ağ öncelikli okunur; ağ yoksa son geçerli çevrimdışı kopya kullanılır. Hedefler değiştiğinde yalnız `targets`, `updatedAt` ve tercihen `dataVersion` güncellenir; uygulama kodu değişmez. PDF öncesi ekranda dosyanın `updatedAt` değeri gösterilir.
 
 ## Açık TODO
 
 - BIRIM_BILGI alanları tanımlanınca IndexedDB store ve form eklenecek.
-- Uzak aylık hedef kaynağının nihai adresi belirlendiğinde yerel `reference_data.json` için sürümlü güncelleme mekanizması eklenecek.
 - Public kaynak deposu: `https://github.com/szr-krk/IcraatMobil`
 - GitHub Pages yayını: `https://szr-krk.github.io/IcraatMobil/`

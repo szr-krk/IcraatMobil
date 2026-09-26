@@ -16,17 +16,16 @@ function evk(unit = 'MERKEZ', duty = 'GUNDUZ', start = '2026-09-21T08:00:00+03:0
   };
 }
 
-function reference(month = '2026-09', base = 100) {
+function reference(base = 100) {
   const controls = ['K1_A', 'K2_A', 'K2_B', 'K4_A', 'K5', 'K6'];
   const units = ['MERKEZ', 'CORLU', 'MALKARA'];
   return {
     app: 'ICRAAT_REFERENCE',
-    schemaVersion: 1,
-    monthlyTargets: {
-      [month]: Object.fromEntries(units.map((unit, unitIndex) => [unit,
-        Object.fromEntries(controls.map((key, keyIndex) => [key, (unitIndex + 1) * base + keyIndex]))
-      ]))
-    }
+    schemaVersion: 2,
+    updatedAt: '2026-09-26T11:48:43+03:00',
+    targets: Object.fromEntries(units.map((unit, unitIndex) => [unit,
+      Object.fromEntries(controls.map((key, keyIndex) => [key, (unitIndex + 1) * base + keyIndex]))
+    ]))
   };
 }
 
@@ -132,8 +131,18 @@ test('PDF öncesinde girilen PTS ve KGYS adetleri ceza toplamı ve yüzdelerine 
   assert.equal(report.cells.F90, 4 / 147);
 });
 
-test('eksik hedef ayı, eksik kaza alanı ve geçersiz EVK raporu engeller', () => {
-  assert.throws(() => buildDailyReportData([evk()], accidents(), reference('2026-08')), /2026-09/);
+test('tek hedef tablosu ay değişiminden etkilenmez', () => {
+  const october = evk('MERKEZ', 'GUNDUZ', '2026-10-01T08:00:00+03:00', '2026-10-01T20:00:00+03:00');
+  const january = evk('MERKEZ', 'GUNDUZ', '2027-01-01T08:00:00+03:00', '2027-01-01T20:00:00+03:00');
+  assert.equal(buildDailyReportData([october], accidents(), reference()).cells.C45, 100);
+  assert.equal(buildDailyReportData([january], accidents(), reference()).cells.C45, 100);
+});
+
+test('eksik hedef, geçersiz güncelleme tarihi, eksik kaza alanı ve geçersiz EVK raporu engeller', () => {
+  const missingTarget = reference();
+  delete missingTarget.targets.CORLU;
+  assert.throws(() => buildDailyReportData([evk()], accidents(), missingTarget), /CORLU/);
+  assert.throws(() => buildDailyReportData([evk()], accidents(), { ...reference(), updatedAt: 'hatalı' }), /güncelleme tarihi/);
   const missing = accidents();
   delete missing.CORLU;
   assert.throws(() => buildDailyReportData([evk()], missing, reference()), /CORLU/);

@@ -8,7 +8,7 @@ import {
   mergeDirectoryItems, mergePenaltyRecord, penaltySummary, receivedSummaryGroups, sortPersonnelByRegistry,
   toIstanbulIso, unitLabel
 } from './domain.js';
-import { createDailyReportPdf } from './pdf-report.js';
+import { createDailyReportPdf, loadDailyReportReference } from './pdf-report.js';
 import { summarizeDailyReport } from './report.js';
 import {
   TRANSFER_KINDS, TRANSFER_KIND_LABELS, aggregateTransfers, combineTransferSummaries, createTeamTransfer, decodeTransfer,
@@ -34,6 +34,7 @@ const state = {
   guide: [],
   reportFile: null,
   reportRecords: [],
+  reportReference: null,
   summaryShare: null,
   saveTimers: new Map(),
   pendingDetailInputs: new Set()
@@ -1341,7 +1342,18 @@ async function openReportDialog() {
   const earliest = Math.min(...state.reportRecords.map(record => Number(record.startEpochMillis)));
   const latest = Math.max(...state.reportRecords.map(record => Number(record.endEpochMillis)));
   $('#reportPeriod').textContent = `${state.reportRecords.length} kaynak · ${displayDateTime(earliest)} – ${displayDateTime(latest)}`;
+  state.reportReference = null;
+  const targetUpdate = $('#reportTargetUpdate');
+  targetUpdate.textContent = 'Kontrol hedefleri kontrol ediliyor…';
+  targetUpdate.classList.remove('error');
   $('#reportDialog').showModal();
+  try {
+    state.reportReference = await loadDailyReportReference();
+    targetUpdate.textContent = `Kontrol hedefleri son güncelleme: ${displayDateTime(Date.parse(state.reportReference.updatedAt))}`;
+  } catch (error) {
+    targetUpdate.textContent = error.message || 'Kontrol hedefleri okunamadı.';
+    targetUpdate.classList.add('error');
+  }
 }
 
 function readReportAccidents() {
@@ -1384,7 +1396,11 @@ async function generateDailyReport(event) {
   status.classList.remove('error');
   status.textContent = 'Güncel icraat kayıtlarıyla PDF hazırlanıyor…';
   try {
-    const result = await createDailyReportPdf(state.reportRecords.map(record => structuredClone(record)), accidents);
+    const result = await createDailyReportPdf(
+      state.reportRecords.map(record => structuredClone(record)),
+      accidents,
+      state.reportReference
+    );
     state.reportFile = result.file;
     $('#previewReport').disabled = false;
     $('#downloadReport').disabled = false;

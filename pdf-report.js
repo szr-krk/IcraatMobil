@@ -1,4 +1,4 @@
-import { buildDailyReportData } from './report.js';
+import { buildDailyReportData, validateReferenceData } from './report.js';
 
 const PAGE_WIDTH = 595;
 const PAGE_HEIGHT = 842;
@@ -383,14 +383,22 @@ function reportFileName(periodLabel) {
   return `Gunluk_Icraat_${safePeriod}.pdf`;
 }
 
-export async function createDailyReportPdf(evks, accidents) {
-  const [templateResponse, referenceResponse] = await Promise.all([
+export async function loadDailyReportReference() {
+  const response = await fetch('./assets/reference_data.json', { cache: 'no-cache' });
+  if (!response.ok) throw new Error('Kontrol hedef dosyası okunamadı.');
+  const reference = await response.json();
+  validateReferenceData(reference);
+  return reference;
+}
+
+export async function createDailyReportPdf(evks, accidents, suppliedReference = null) {
+  const [templateResponse, reference] = await Promise.all([
     fetch('./assets/daily_report/template.json'),
-    fetch('./assets/reference_data.json', { cache: 'no-cache' })
+    suppliedReference ? Promise.resolve(suppliedReference) : loadDailyReportReference()
   ]);
   if (!templateResponse.ok) throw new Error('PDF şablonu okunamadı.');
-  if (!referenceResponse.ok) throw new Error('Aylık hedef dosyası okunamadı.');
-  const [template, reference] = await Promise.all([templateResponse.json(), referenceResponse.json()]);
+  validateReferenceData(reference);
+  const template = await templateResponse.json();
   const placement = {
     left: Number(template.left),
     top: Number(template.top),
