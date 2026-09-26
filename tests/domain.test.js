@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   buildEnvelope, buildJsonFileName, buildPerformanceReport, buildSharePerformanceText, calculateKeyboardInset, compareIncoming, ensurePayload, exportRecord, normalizeEvk,
-  mergeDirectoryItems, penaltySummary, sameLogicalShift, sortPersonnelByRegistry, toIstanbulIso, validateEnvelope
+  mergeDirectoryItems, mergePenaltyRecord, penaltySummary, sameLogicalShift, sortPersonnelByRegistry, toIstanbulIso, validateEnvelope
 } from '../domain.js';
 
 function record(overrides = {}) {
@@ -112,6 +112,44 @@ test('ceza kartı düz cümle özetini toplam tutar ve ek işlemlerle oluşturur
     vehicleBan: true, licenseCancel: true, parking: true
   });
   assert.equal(summary, 'Sürücüye: 78/1-a, 34/a → 3.000 ₺. Araç Men. Belge İptal. Otoparka (3 Adet)');
+});
+
+test('aynı ceza işlemi yeni satır açmadan mevcut adedi artırır', () => {
+  const existing = {
+    penaltyId: 'penalty-existing', type: 'DRIVER', origin: 'NORMAL', count: 1,
+    articles: [{ code: '78/1-a', amount: 500 }, { code: '34/a', amount: 250 }],
+    vehicleBan: false, parking: false, licenseCancel: false, parkingOnly: false
+  };
+  const incoming = {
+    penaltyId: 'penalty-new', type: 'DRIVER', origin: 'NORMAL', count: 2,
+    articles: [{ code: '34/a', amount: 250 }, { code: '78/1-a', amount: 500 }],
+    vehicleBan: false, parking: false, licenseCancel: false, parkingOnly: false
+  };
+  const result = mergePenaltyRecord([existing], incoming);
+  assert.equal(result.merged, true);
+  assert.equal(result.count, 3);
+  assert.equal(result.records.length, 1);
+  assert.equal(result.records[0].penaltyId, 'penalty-existing');
+  assert.equal(result.records[0].count, 3);
+});
+
+test('ceza türü veya ek işlemi farklıysa ayrı satır korunur', () => {
+  const existing = {
+    penaltyId: 'penalty-existing', type: 'DRIVER', count: 1,
+    articles: [{ code: '78/1-a', amount: 500 }], parking: false
+  };
+  const differentType = mergePenaltyRecord([existing], {
+    penaltyId: 'penalty-plate', type: 'PLATE', count: 1,
+    articles: [{ code: '78/1-a', amount: 500 }], parking: false
+  });
+  const differentAction = mergePenaltyRecord([existing], {
+    penaltyId: 'penalty-parking', type: 'DRIVER', count: 1,
+    articles: [{ code: '78/1-a', amount: 500 }], parking: true
+  });
+  assert.equal(differentType.merged, false);
+  assert.equal(differentAction.merged, false);
+  assert.equal(differentType.records.length, 2);
+  assert.equal(differentAction.records.length, 2);
 });
 
 test('icraat özeti kurum başlığı ile hız, kemer, alkol ve not satırlarını üretir', () => {

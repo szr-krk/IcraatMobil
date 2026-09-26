@@ -182,6 +182,43 @@ export function calculateKeyboardInset(layoutHeight, visualHeight, offsetTop = 0
   return Math.max(0, Math.round(values[0] - values[1] - values[2]));
 }
 
+function positivePenaltyCount(value) {
+  const count = Number.parseInt(value, 10);
+  return Number.isInteger(count) && count > 0 ? count : 1;
+}
+
+function penaltyOperationKey(record) {
+  const articles = (Array.isArray(record?.articles) ? record.articles : []).map(article => {
+    const code = String(article?.code || '').trim().toLocaleLowerCase('tr-TR');
+    const amount = Number(article?.amount);
+    return `${code}:${Number.isFinite(amount) ? amount : ''}`;
+  }).sort((left, right) => left.localeCompare(right, 'tr-TR', { numeric: true }));
+  return JSON.stringify({
+    origin: String(record?.origin || 'NORMAL').trim().toLocaleUpperCase('tr-TR'),
+    type: record?.type == null ? null : String(record.type).trim().toLocaleUpperCase('tr-TR'),
+    articles,
+    vehicleBan: Boolean(record?.vehicleBan),
+    parking: Boolean(record?.parking),
+    licenseCancel: Boolean(record?.licenseCancel),
+    parkingOnly: Boolean(record?.parkingOnly)
+  });
+}
+
+export function mergePenaltyRecord(records, incoming) {
+  const current = Array.isArray(records) ? records : [];
+  const operationKey = penaltyOperationKey(incoming);
+  const matchIndex = current.findIndex(record => penaltyOperationKey(record) === operationKey);
+  if (matchIndex < 0) {
+    return { records: [incoming, ...current], merged: false, count: positivePenaltyCount(incoming?.count) };
+  }
+  const count = positivePenaltyCount(current[matchIndex]?.count) + positivePenaltyCount(incoming?.count);
+  return {
+    records: current.map((record, index) => index === matchIndex ? { ...record, count } : record),
+    merged: true,
+    count
+  };
+}
+
 export function penaltySummary(record) {
   const count = Number.isInteger(Number(record?.count)) && Number(record.count) > 0 ? Number(record.count) : 1;
   const articles = Array.isArray(record?.articles) ? record.articles : [];

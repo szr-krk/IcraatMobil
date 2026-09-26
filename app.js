@@ -5,7 +5,7 @@ import {
 import {
   ACCIDENT_FIELDS, CONTROLS, UNITS, buildPerformanceReport, buildSharePerformanceText, calculateKeyboardInset,
   directoryItemKey, displayDateTime, dutyLabel, ensurePayload, makeChildId, makeRandomId,
-  mergeDirectoryItems, penaltySummary, sortPersonnelByRegistry,
+  mergeDirectoryItems, mergePenaltyRecord, penaltySummary, sortPersonnelByRegistry,
   toIstanbulIso, unitLabel
 } from './domain.js';
 import { createDailyReportPdf } from './pdf-report.js';
@@ -730,14 +730,16 @@ async function savePenalty(event) {
     parkingOnly,
     origin
   };
+  let mergeResult = null;
   await updateEvk(evk.evkId, current => {
     const payload = ensurePayload(current);
-    payload.penalties.unshift(record);
+    mergeResult = mergePenaltyRecord(payload.penalties, record);
+    payload.penalties = mergeResult.records;
     return { ...current, payload, updatedAt: Date.now() };
   });
   resetPenaltyForm();
   await refreshEvks();
-  showToast('Ceza kaydedildi.');
+  showToast(mergeResult?.merged ? `Aynı işlemle birleştirildi. Adet ${mergeResult.count} oldu.` : 'Ceza kaydedildi.');
 }
 
 function resetPenaltyForm() {
