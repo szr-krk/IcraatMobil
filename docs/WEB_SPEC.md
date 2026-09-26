@@ -10,7 +10,7 @@
 ## Uygulama Durumu
 
 - Kişisel ekip kaydı isteğe bağlıdır ve yeni kurulumlarda en fazla bir adet oluşturulur.
-- Ekip ekleme ekranındaki başlangıç/bitiş tarih ve saat alanları iki sütunlu mobil düzende kendi hücre sınırları içinde küçülebilir; iPhone Safari'nin yerel tarih/saat girişleri yan sütunun üzerine taşmaz. Android görünümü ve yerel tarih/saat seçicileri korunur.
+- Ekip ekleme ekranındaki başlangıç/bitiş tarih ve saat alanları iki sütunlu mobil düzende kendi hücre sınırları içinde küçülebilir. iPhone Safari'de yerel kontrolün zorladığı iç genişlik kaldırılır; iki kutunun kenarlıkları üst üste binmez ve saat kutusu ekran dışına taşmaz. Android görünümü ile iOS/Android yerel tarih ve saat seçicileri korunur.
 - Ekip → gündüz 20 → gece 20 → 5920 aktarımı kısa, tıklanabilir ve dosyasız özet bağlantılarıyla uygulanmıştır.
 - Alınan ekip, gündüz ve birim özetleri kişisel EVK’den ayrı IndexedDB deposunda ve ayrı ana ekran listesinde tutulur.
 - PDF yalnızca **Alınan İcraatlar** listesindeki özetlerden beslenir; kişisel ekip kartı PDF hesabına doğrudan katılmaz. Mevcut PDF veri giriş ekranı ve PDF üreticisi değişmez.

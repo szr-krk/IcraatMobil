@@ -144,6 +144,22 @@ button { touch-action: manipulation; }
   min-inline-size: 0;
   overflow: hidden;
 }
+@supports (-webkit-touch-callout: none) {
+  .date-grid input[type="date"],
+  .date-grid input[type="time"] {
+    -webkit-appearance: none;
+    appearance: none;
+    padding-inline: 8px;
+    text-align: center;
+  }
+  .date-grid input[type="date"]::-webkit-date-and-time-value,
+  .date-grid input[type="time"]::-webkit-date-and-time-value {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    text-align: center;
+  }
+}
 .form-section { padding-top: 14px; border-top: 1px solid var(--line); }
 .form-section > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .form-section h3 { margin: 0; font-size: 1rem; }
