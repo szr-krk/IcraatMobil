@@ -154,11 +154,13 @@ test('ceza türü veya ek işlemi farklıysa ayrı satır korunur', () => {
 
 test('birleşik alınan icraat özeti ekrandaki bütün grupları metne dönüştürür', () => {
   const text = buildReceivedSummaryText('Tüm İcraatlar', 'Malkara · 24.09.2026', {
+    teamCounts: { GUNDUZ: 2, GECE: 3, ARA_EKIP: 4, RADAR: 5 },
     controlCounts: { K1_A: 1, K2_A: 2, K2_B: 3, K4_A: 4, K5: 5, K6: 6 },
     accidentCounts: { fatalAccidentCount: 7, deathCount: 8, injuryAccidentCount: 9, injuredCount: 10 },
     driverArticles: 11, plateArticles: 12, speed: 13, belt: 14, alcohol: 15
   });
   assert.match(text, /^\*Tüm İcraatlar\*\nMalkara/);
+  assert.match(text, /\*Ekip sayıları\*\n12\/36 Ekip Sayısı: 5\nAra Ekip Sayısı: 4\nRadar Sayısı: 5/);
   assert.match(text, /\*Kontroller\*\nK1: 1[\s\S]*K6: 6/);
   assert.match(text, /\*Kazalar\*[\s\S]*Yaralı: 10/);
   assert.match(text, /\*Ceza adetleri\*[\s\S]*Tescil plakasına: 12/);

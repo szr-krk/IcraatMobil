@@ -1087,11 +1087,11 @@ function detailGroup(title, rows) {
   return `<section class="summary-detail-group"><h3>${escapeHtml(title)}</h3>${cells}${filler}</section>`;
 }
 
-function showSummaryDialog(title, meta, summary, share = null) {
+function showSummaryDialog(title, meta, summary, share = null, includeTeamCounts = false) {
   state.summaryShare = share;
   $('#summaryDialogTitle').textContent = title;
   $('#summaryDialogMeta').textContent = meta;
-  $('#summaryDialogContent').innerHTML = receivedSummaryGroups(summary)
+  $('#summaryDialogContent').innerHTML = receivedSummaryGroups(summary, includeTeamCounts)
     .map(group => detailGroup(group.title, group.rows)).join('');
   $('#shareSummaryText').hidden = !share;
   $('#summaryDialog').showModal();
@@ -1116,7 +1116,7 @@ function openAllSummariesDialog() {
     showSummaryDialog(title, meta, combined.summary, {
       title,
       text: buildReceivedSummaryText(title, meta, combined.summary)
-    });
+    }, true);
   } catch (error) {
     showToast(error.message || 'İcraatlar görüntülenemedi.', 4200);
   }

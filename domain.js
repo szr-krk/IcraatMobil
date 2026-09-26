@@ -240,10 +240,10 @@ export function penaltySummary(record) {
   return `${type}: ${codes} → ${totalAmount} ₺.${flags.length ? ` ${flags.join('. ')} ` : ' '}(${count} Adet)`;
 }
 
-export function receivedSummaryGroups(summary) {
+export function receivedSummaryGroups(summary, includeTeamCounts = false) {
   const value = summary || {};
   const number = input => Number.isSafeInteger(Number(input)) && Number(input) >= 0 ? Number(input) : 0;
-  return [
+  const groups = [
     {
       title: 'Kontroller',
       rows: [
@@ -265,12 +265,23 @@ export function receivedSummaryGroups(summary) {
       rows: [['Hız', number(value.speed)], ['Kemer', number(value.belt)], ['Alkol', number(value.alcohol)]]
     }
   ];
+  if (includeTeamCounts) {
+    groups.unshift({
+      title: 'Ekip sayıları',
+      rows: [
+        ['12/36 Ekip Sayısı', number(value.teamCounts?.GUNDUZ) + number(value.teamCounts?.GECE)],
+        ['Ara Ekip Sayısı', number(value.teamCounts?.ARA_EKIP)],
+        ['Radar Sayısı', number(value.teamCounts?.RADAR)]
+      ]
+    });
+  }
+  return groups;
 }
 
 export function buildReceivedSummaryText(title, meta, summary) {
   const lines = [`*${String(title || 'İcraat Özeti').trim()}*`];
   if (String(meta || '').trim()) lines.push(String(meta).trim());
-  receivedSummaryGroups(summary).forEach(group => {
+  receivedSummaryGroups(summary, true).forEach(group => {
     lines.push('', `*${group.title}*`, ...group.rows.map(([label, value]) => `${label}: ${value}`));
   });
   return lines.join('\n');
