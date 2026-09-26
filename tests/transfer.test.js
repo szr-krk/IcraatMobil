@@ -39,7 +39,7 @@ test('ekip, gündüz ve birim paketleri aynı sayısal yapıyla kademeli toplan�
   assert.equal(day.summary.teamCounts.GUNDUZ, 1);
   assert.equal(day.summary.teamCounts.RADAR, 1);
   assert.equal(unit.summary.teamCounts.GECE, 1);
-  assert.equal(unit.summary.controlCounts.K1_A, 14);
+  assert.equal(unit.summary.controlCounts.K1_A, 9);
   assert.equal(transferAction([first, second]), TRANSFER_KINDS.DAY);
   assert.equal(transferAction([day, night]), TRANSFER_KINDS.UNIT);
   assert.equal(transferAction([unit]), 'PDF');
@@ -59,4 +59,17 @@ test('bozulmuş bağlantı özeti kabul edilmez', () => {
   const encoded = encodeTransfer(createTeamTransfer(evk('59635', 'GUNDUZ')));
   const changed = `${encoded.slice(0, -1)}${encoded.endsWith('a') ? 'b' : 'a'}`;
   assert.throws(() => decodeTransfer(changed), /bozulmuş/);
+});
+
+test('radar ekip bağlantısı yalnız operatörün plakaya yazdığı cezaları taşır', () => {
+  const radar = evk('59640', 'RADAR', { K1_A: 9 }, { injuryAccidentCount: 2 }, [
+    { penaltyId: 'team', type: 'DRIVER', origin: 'RADAR_TEAM', count: 7, articles: [{ code: '51/2-b-2', amount: 100 }] },
+    { penaltyId: 'operator', type: 'PLATE', origin: 'RADAR_OPERATOR', count: 3, articles: [{ code: '51/2-b-4', amount: 100 }] }
+  ]);
+  const decoded = decodeTransfer(encodeTransfer(createTeamTransfer(radar)));
+  assert.equal(decoded.summary.driverArticles, 0);
+  assert.equal(decoded.summary.plateArticles, 3);
+  assert.equal(decoded.summary.speed, 3);
+  assert.equal(decoded.summary.controlCounts.K1_A, 0);
+  assert.equal(decoded.summary.accidentCounts.injuryAccidentCount, 0);
 });

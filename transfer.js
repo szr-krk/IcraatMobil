@@ -1,4 +1,5 @@
 import { summarizeDailyReport } from './report.js';
+import { ensurePayload } from './domain.js';
 
 export const TRANSFER_KINDS = Object.freeze({ TEAM: 'E', DAY: 'G', UNIT: 'B' });
 export const TRANSFER_KIND_LABELS = Object.freeze({ E: 'Ekip', G: 'Gündüz toplamı', B: 'Birim toplamı' });
@@ -99,7 +100,20 @@ function base36Integer(value, label) {
 }
 
 export function createTeamTransfer(evk) {
-  const report = summarizeDailyReport([evk]);
+  let source = evk;
+  if (evk?.dutyType === 'RADAR') {
+    const payload = ensurePayload(evk);
+    source = {
+      ...evk,
+      payload: {
+        ...payload,
+        controls: {},
+        accidents: {},
+        penalties: payload.penalties.filter(record => record?.origin === 'RADAR_OPERATOR' && record?.type === 'PLATE')
+      }
+    };
+  }
+  const report = summarizeDailyReport([source]);
   return normalizeTransfer({
     packetKind: TRANSFER_KINDS.TEAM,
     sourceUnit: evk.sourceUnit,
