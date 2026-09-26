@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  TRANSFER_KINDS, aggregateTransfers, createTeamTransfer, decodeTransfer, encodeTransfer, transferAction
+  TRANSFER_KINDS, aggregateTransfers, combineTransferSummaries, createTeamTransfer, decodeTransfer, encodeTransfer, transferAction
 } from '../transfer.js';
 import { summarizeDailyReport } from '../report.js';
 
@@ -53,6 +53,25 @@ test('birim özeti mevcut PDF rapor özetleyicisi tarafından doğrudan kullanı
   assert.equal(report.units.MALKARA.teamTotal, 2);
   assert.equal(report.units.MALKARA.controlCounts.K2_B, 10);
   assert.equal(report.units.MALKARA.accidentCounts.fatalAccidentCount, 3);
+});
+
+test('görüntüleme toplamı farklı birimlerdeki alınan icraatları birlikte toplar', () => {
+  const malkara = createTeamTransfer(evk('59635', 'GUNDUZ', { K1_A: 4 }, {}, [{
+    type: 'DRIVER', count: 2, articles: [{ code: '78/1-a', amount: 100 }]
+  }]));
+  const corlu = createTeamTransfer({
+    ...evk('59636', 'GECE', { K1_A: 6 }, {}, [{
+      type: 'PLATE', count: 3, articles: [{ code: '48/5', amount: 100 }]
+    }]),
+    sourceUnit: 'CORLU'
+  });
+  const combined = combineTransferSummaries([corlu, malkara]);
+  assert.deepEqual(combined.sourceUnits, ['CORLU', 'MALKARA']);
+  assert.equal(combined.summary.controlCounts.K1_A, 10);
+  assert.equal(combined.summary.driverArticles, 2);
+  assert.equal(combined.summary.plateArticles, 3);
+  assert.equal(combined.summary.belt, 2);
+  assert.equal(combined.summary.alcohol, 3);
 });
 
 test('bozulmuş bağlantı özeti kabul edilmez', () => {

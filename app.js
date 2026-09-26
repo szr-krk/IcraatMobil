@@ -3,15 +3,15 @@ import {
   putEvk, putSummary, setSetting, updateEvk
 } from './db.js';
 import {
-  ACCIDENT_FIELDS, CONTROLS, UNITS, buildPerformanceReport, buildSharePerformanceText, calculateKeyboardInset,
+  ACCIDENT_FIELDS, CONTROLS, UNITS, buildPerformanceReport, buildReceivedSummaryText, buildSharePerformanceText, calculateKeyboardInset,
   directoryItemKey, displayDateTime, dutyLabel, ensurePayload, makeChildId, makeRandomId,
-  mergeDirectoryItems, mergePenaltyRecord, penaltySummary, sortPersonnelByRegistry,
+  mergeDirectoryItems, mergePenaltyRecord, penaltySummary, receivedSummaryGroups, sortPersonnelByRegistry,
   toIstanbulIso, unitLabel
 } from './domain.js';
 import { createDailyReportPdf } from './pdf-report.js';
 import { summarizeDailyReport } from './report.js';
 import {
-  TRANSFER_KINDS, TRANSFER_KIND_LABELS, aggregateTransfers, createTeamTransfer, decodeTransfer,
+  TRANSFER_KINDS, TRANSFER_KIND_LABELS, aggregateTransfers, combineTransferSummaries, createTeamTransfer, decodeTransfer,
   encodeTransfer, storedTransfer, toReportRecord, transferAction
 } from './transfer.js';
 
@@ -34,6 +34,7 @@ const state = {
   guide: [],
   reportFile: null,
   reportRecords: [],
+  summaryShare: null,
   saveTimers: new Map(),
   pendingDetailInputs: new Set()
 };
@@ -135,6 +136,7 @@ function renderTeamList() {
   const received = `<section class="home-section">
     <div class="home-heading"><h2>Alınan İcraatlar</h2><span>${incoming.length}</span></div>
     ${incoming.length ? `<div class="card-stack">${incoming.map(summaryCardHtml).join('')}</div>` : '<div class="incoming-empty">Henüz bağlantı ile alınmış icraat bulunmuyor.</div>'}
+    ${incoming.length ? '<button type="button" class="summary-preview-action" data-preview-all-summaries>TÜM İCRAATLERİ GÖRÜNTÜLE</button>' : ''}
     ${actionLabel ? `<button type="button" class="transfer-action" data-transfer-action="${escapeHtml(action)}">${actionLabel}</button>` : ''}
   </section>`;
   teamList.innerHTML = personal + received;
@@ -1085,23 +1087,39 @@ function detailGroup(title, rows) {
   return `<section class="summary-detail-group"><h3>${escapeHtml(title)}</h3>${cells}${filler}</section>`;
 }
 
+function showSummaryDialog(title, meta, summary, share = null) {
+  state.summaryShare = share;
+  $('#summaryDialogTitle').textContent = title;
+  $('#summaryDialogMeta').textContent = meta;
+  $('#summaryDialogContent').innerHTML = receivedSummaryGroups(summary)
+    .map(group => detailGroup(group.title, group.rows)).join('');
+  $('#shareSummaryText').hidden = !share;
+  $('#summaryDialog').showModal();
+}
+
 function openSummaryDialog(id) {
   const record = state.summaries.find(item => item.summaryId === id);
   if (!record) return;
-  const summary = record.summary;
-  $('#summaryDialogTitle').textContent = summaryTitle(record);
-  $('#summaryDialogMeta').textContent = `${unitLabel(record.sourceUnit)} · ${displayDateTime(record.startEpochMillis)} – ${displayDateTime(record.endEpochMillis)}`;
-  $('#summaryDialogContent').innerHTML = [
-    detailGroup('Kontroller', [
-      ['K1', summary.controlCounts.K1_A], ['K2-A', summary.controlCounts.K2_A],
-      ['K2-B', summary.controlCounts.K2_B], ['K4', summary.controlCounts.K4_A],
-      ['K5', summary.controlCounts.K5], ['K6', summary.controlCounts.K6]
-    ]),
-    detailGroup('Kazalar', ACCIDENT_FIELDS.map(([key, label]) => [label.replace(' Sayısı', ''), summary.accidentCounts[key]])),
-    detailGroup('Ceza adetleri', [['Sürücü belgesine', summary.driverArticles], ['Tescil plakasına', summary.plateArticles]]),
-    detailGroup('Ceza türleri', [['Hız', summary.speed], ['Kemer', summary.belt], ['Alkol', summary.alcohol]])
-  ].join('');
-  $('#summaryDialog').showModal();
+  showSummaryDialog(
+    summaryTitle(record),
+    `${unitLabel(record.sourceUnit)} · ${displayDateTime(record.startEpochMillis)} – ${displayDateTime(record.endEpochMillis)}`,
+    record.summary
+  );
+}
+
+function openAllSummariesDialog() {
+  try {
+    const combined = combineTransferSummaries(sortedSummaries());
+    const title = 'Tüm İcraatlar';
+    const unitNames = combined.sourceUnits.map(unitLabel).join(' · ');
+    const meta = `${unitNames} · ${displayDateTime(combined.startEpochMillis)} – ${displayDateTime(combined.endEpochMillis)}`;
+    showSummaryDialog(title, meta, combined.summary, {
+      title,
+      text: buildReceivedSummaryText(title, meta, combined.summary)
+    });
+  } catch (error) {
+    showToast(error.message || 'İcraatlar görüntülenemedi.', 4200);
+  }
 }
 
 function askConfirm(title, message, okLabel = 'Onayla', danger = false) {
@@ -1153,17 +1171,17 @@ async function shareFile(file, title, text = 'İcraat kaydı', fallbackMessage =
   return false;
 }
 
-async function shareText(title, text) {
+async function shareText(title, text, copiedMessage = 'Metin panoya kopyalandı.') {
   try {
     if (navigator.share) {
       await navigator.share({ title, text });
       return true;
     }
     await navigator.clipboard.writeText(text);
-    showToast('Bağlantı panoya kopyalandı.');
+    showToast(copiedMessage);
     return true;
   } catch (error) {
-    if (error.name !== 'AbortError') showToast('Paylaşım açılamadı. Bağlantıyı yeniden deneyin.');
+    if (error.name !== 'AbortError') showToast('Paylaşım açılamadı. Lütfen yeniden deneyin.');
     return false;
   }
 }
@@ -1183,7 +1201,7 @@ async function shareTransfer(record) {
     : record.packetKind === TRANSFER_KINDS.DAY
       ? 'Gündüz toplamını gece 20 ekranına eklemek için bağlantıya dokunun:'
       : 'Birim toplamını 5920 ekranına eklemek için bağlantıya dokunun:';
-  await shareText(title, `${title}\n${instruction}\n${transferUrl(record)}`);
+  await shareText(title, `${title}\n${instruction}\n${transferUrl(record)}`, 'Bağlantı panoya kopyalandı.');
 }
 
 async function shareTeamSummary(id) {
@@ -1427,6 +1445,11 @@ function bindEvents() {
   menuBackdrop.addEventListener('click', () => toggleMenu(false));
   $('#addTeamButton').addEventListener('click', () => openTeamDialog());
   teamList.addEventListener('click', event => {
+    const preview = event.target.closest('[data-preview-all-summaries]');
+    if (preview) {
+      openAllSummariesDialog();
+      return;
+    }
     const button = event.target.closest('[data-transfer-action]');
     if (button) handleTransferAction(button.dataset.transferAction);
   });
@@ -1645,6 +1668,9 @@ function bindEvents() {
   $('#shareReport').addEventListener('click', shareDailyReport);
   $('[data-close-info]').addEventListener('click', () => $('#infoDialog').close());
   $('[data-close-summary]').addEventListener('click', () => $('#summaryDialog').close());
+  $('#shareSummaryText').addEventListener('click', () => {
+    if (state.summaryShare) shareText(state.summaryShare.title, state.summaryShare.text);
+  });
 
   window.addEventListener('popstate', event => {
     if (event.state?.evkId && state.evks.some(item => item.evkId === event.state.evkId)) openDetail(event.state.evkId, false);

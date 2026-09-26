@@ -126,10 +126,21 @@ export function createTeamTransfer(evk) {
 
 export function aggregateTransfers(records, packetKind) {
   if (![TRANSFER_KINDS.DAY, TRANSFER_KINDS.UNIT].includes(packetKind)) throw new Error('Toplam türü geçersiz.');
+  const combined = combineTransferSummaries(records);
+  if (combined.sourceUnits.length !== 1) throw new Error('Farklı birimlerin icraatları aynı birim toplamına eklenemez.');
+  return normalizeTransfer({
+    packetKind,
+    sourceUnit: combined.sourceUnits[0],
+    teamCode: '',
+    startEpochMillis: combined.startEpochMillis,
+    endEpochMillis: combined.endEpochMillis,
+    summary: combined.summary
+  });
+}
+
+export function combineTransferSummaries(records) {
   if (!Array.isArray(records) || !records.length) throw new Error('Toplanacak icraat bulunamadı.');
   const normalized = records.map(normalizeTransfer);
-  const units = new Set(normalized.map(record => record.sourceUnit));
-  if (units.size !== 1) throw new Error('Farklı birimlerin icraatları aynı birim toplamına eklenemez.');
   const result = emptySummary();
   for (const record of normalized) {
     const value = record.summary;
@@ -138,14 +149,12 @@ export function aggregateTransfers(records, packetKind) {
     ACCIDENTS.forEach(key => { result.accidentCounts[key] = add(result.accidentCounts[key], value.accidentCounts[key]); });
     ['driverArticles', 'plateArticles', 'speed', 'belt', 'alcohol'].forEach(key => { result[key] = add(result[key], value[key]); });
   }
-  return normalizeTransfer({
-    packetKind,
-    sourceUnit: normalized[0].sourceUnit,
-    teamCode: '',
+  return {
+    sourceUnits: UNIT_CODES.filter(unit => normalized.some(record => record.sourceUnit === unit)),
     startEpochMillis: Math.min(...normalized.map(record => record.startEpochMillis)),
     endEpochMillis: Math.max(...normalized.map(record => record.endEpochMillis)),
-    summary: result
-  });
+    summary: normalizedSummary(result)
+  };
 }
 
 export function normalizeTransfer(record) {

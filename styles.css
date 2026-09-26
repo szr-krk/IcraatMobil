@@ -69,6 +69,7 @@ button { touch-action: manipulation; }
 .summary-card .team-meta { text-align: right; }
 .summary-card .team-meta strong { font-size: .73rem; }
 .incoming-empty { padding: 22px 16px; border: 1px dashed #aab8c7; border-radius: 13px; color: var(--muted); background: rgb(255 255 255 / 55%); text-align: center; font-size: .84rem; line-height: 1.45; }
+.summary-preview-action { width: 100%; min-height: 48px; border: 1px solid #9fb0c1; border-radius: 13px; padding: 9px 12px; color: var(--navy-800); background: white; font-size: .8rem; font-weight: 900; letter-spacing: .03em; }
 .transfer-action { position: sticky; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 8; width: 100%; min-height: 52px; border: 0; border-radius: 13px; padding: 10px 14px; color: white; background: var(--navy-800); box-shadow: 0 8px 22px rgb(8 24 44 / 20%); font-size: .82rem; font-weight: 900; letter-spacing: .035em; }
 .empty-state { min-height: 48dvh; display: grid; place-content: center; justify-items: center; padding: 32px 24px; text-align: center; color: var(--muted); }
 .empty-state h2 { margin: 18px 0 5px; color: var(--text); font-size: 1.12rem; }
@@ -197,6 +198,7 @@ button { touch-action: manipulation; }
 .summary-detail-row span { min-width: 0; line-height: 1.2; }
 .summary-detail-row b { color: var(--navy-800); }
 .summary-detail-filler { min-height: 32px; background: white; }
+.summary-share-button { flex: 1; padding-inline: 10px; font-size: .76rem; }
 
 .directory-card { width: 100%; max-height: min(88dvh, 720px); grid-template-rows: auto minmax(80px, 1fr) auto; overflow: hidden; }
 .directory-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }

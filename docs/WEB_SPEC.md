@@ -13,6 +13,7 @@
 - Ekip ekleme ekranındaki başlangıç/bitiş tarih ve saat alanları iki sütunlu mobil düzende kendi hücre sınırları içinde küçülebilir. iPhone Safari'de yerel kontrolün zorladığı iç genişlik kaldırılır; iki kutunun kenarlıkları üst üste binmez ve saat kutusu ekran dışına taşmaz. Android görünümü ile iOS/Android yerel tarih ve saat seçicileri korunur.
 - Ekip → gündüz 20 → gece 20 → 5920 aktarımı kısa, tıklanabilir ve dosyasız özet bağlantılarıyla uygulanmıştır.
 - Alınan ekip, gündüz ve birim özetleri kişisel EVK’den ayrı IndexedDB deposunda ve ayrı ana ekran listesinde tutulur.
+- **Tüm İcraatleri Görüntüle**, Alınan İcraatlar listesindeki kayıtların tamamını birim ayrımı gözetmeden toplayıp tek kayıt önizlemesiyle aynı Kontroller, Kazalar, Ceza adetleri ve Ceza türleri düzeninde gösterir. Bu ekrandaki **Metin Olarak Paylaş**, uygulama bağlantısı içermeyen ve ekranda görünen bütün birleşik değerleri taşıyan düz metni sistem paylaşım ekranına gönderir; mevcut bağlantılı toplam paylaşımı ayrıca korunur.
 - PDF yalnızca **Alınan İcraatlar** listesindeki özetlerden beslenir; kişisel ekip kartı PDF hesabına doğrudan katılmaz. Mevcut PDF veri giriş ekranı ve PDF üreticisi değişmez.
 
 ## Birleştirilen özellikler

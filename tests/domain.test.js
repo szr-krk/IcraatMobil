@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  buildEnvelope, buildJsonFileName, buildPerformanceReport, buildSharePerformanceText, calculateKeyboardInset, compareIncoming, ensurePayload, exportRecord, normalizeEvk,
+  buildEnvelope, buildJsonFileName, buildPerformanceReport, buildReceivedSummaryText, buildSharePerformanceText, calculateKeyboardInset, compareIncoming, ensurePayload, exportRecord, normalizeEvk,
   mergeDirectoryItems, mergePenaltyRecord, penaltySummary, sameLogicalShift, sortPersonnelByRegistry, toIstanbulIso, validateEnvelope
 } from '../domain.js';
 
@@ -150,6 +150,19 @@ test('ceza türü veya ek işlemi farklıysa ayrı satır korunur', () => {
   assert.equal(differentAction.merged, false);
   assert.equal(differentType.records.length, 2);
   assert.equal(differentAction.records.length, 2);
+});
+
+test('birleşik alınan icraat özeti ekrandaki bütün grupları metne dönüştürür', () => {
+  const text = buildReceivedSummaryText('Tüm İcraatlar', 'Malkara · 24.09.2026', {
+    controlCounts: { K1_A: 1, K2_A: 2, K2_B: 3, K4_A: 4, K5: 5, K6: 6 },
+    accidentCounts: { fatalAccidentCount: 7, deathCount: 8, injuryAccidentCount: 9, injuredCount: 10 },
+    driverArticles: 11, plateArticles: 12, speed: 13, belt: 14, alcohol: 15
+  });
+  assert.match(text, /^\*Tüm İcraatlar\*\nMalkara/);
+  assert.match(text, /\*Kontroller\*\nK1: 1[\s\S]*K6: 6/);
+  assert.match(text, /\*Kazalar\*[\s\S]*Yaralı: 10/);
+  assert.match(text, /\*Ceza adetleri\*[\s\S]*Tescil plakasına: 12/);
+  assert.match(text, /\*Ceza türleri\*[\s\S]*Alkol: 15$/);
 });
 
 test('icraat özeti kurum başlığı ile hız, kemer, alkol ve not satırlarını üretir', () => {

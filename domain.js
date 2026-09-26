@@ -240,6 +240,42 @@ export function penaltySummary(record) {
   return `${type}: ${codes} → ${totalAmount} ₺.${flags.length ? ` ${flags.join('. ')} ` : ' '}(${count} Adet)`;
 }
 
+export function receivedSummaryGroups(summary) {
+  const value = summary || {};
+  const number = input => Number.isSafeInteger(Number(input)) && Number(input) >= 0 ? Number(input) : 0;
+  return [
+    {
+      title: 'Kontroller',
+      rows: [
+        ['K1', number(value.controlCounts?.K1_A)], ['K2-A', number(value.controlCounts?.K2_A)],
+        ['K2-B', number(value.controlCounts?.K2_B)], ['K4', number(value.controlCounts?.K4_A)],
+        ['K5', number(value.controlCounts?.K5)], ['K6', number(value.controlCounts?.K6)]
+      ]
+    },
+    {
+      title: 'Kazalar',
+      rows: ACCIDENT_FIELDS.map(([key, label]) => [label.replace(' Sayısı', ''), number(value.accidentCounts?.[key])])
+    },
+    {
+      title: 'Ceza adetleri',
+      rows: [['Sürücü belgesine', number(value.driverArticles)], ['Tescil plakasına', number(value.plateArticles)]]
+    },
+    {
+      title: 'Ceza türleri',
+      rows: [['Hız', number(value.speed)], ['Kemer', number(value.belt)], ['Alkol', number(value.alcohol)]]
+    }
+  ];
+}
+
+export function buildReceivedSummaryText(title, meta, summary) {
+  const lines = [`*${String(title || 'İcraat Özeti').trim()}*`];
+  if (String(meta || '').trim()) lines.push(String(meta).trim());
+  receivedSummaryGroups(summary).forEach(group => {
+    lines.push('', `*${group.title}*`, ...group.rows.map(([label, value]) => `${label}: ${value}`));
+  });
+  return lines.join('\n');
+}
+
 const reportDateFormatter = new Intl.DateTimeFormat('tr-TR', {
   timeZone: 'Europe/Istanbul', day: '2-digit', month: '2-digit', year: 'numeric'
 });
