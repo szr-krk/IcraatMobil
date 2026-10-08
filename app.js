@@ -297,12 +297,16 @@ function summaryDuty(record) {
 }
 
 function summaryCardHtml(record) {
-  const total = Number(record.summary?.teamTotal) || Object.values(record.summary?.teamCounts || {}).reduce((sum, value) => sum + Number(value || 0), 0);
+  const fallbackCount = Number(record.summary?.teamTotal)
+    || Object.values(record.summary?.teamCounts || {}).reduce((sum, value) => sum + Number(value || 0), 0);
+  const sourceRecordCount = Number.isSafeInteger(Number(record.sourceRecordCount)) && Number(record.sourceRecordCount) > 0
+    ? Number(record.sourceRecordCount)
+    : fallbackCount;
   return `<div class="swipe-shell summary-swipe">
     <span class="swipe-label delete">SİL</span>
     <article class="team-card summary-card" data-summary-id="${escapeHtml(record.summaryId)}" tabindex="0" aria-label="${escapeHtml(summaryTitle(record))}">
       <div class="team-icon" aria-hidden="true">${escapeHtml(record.packetKind)}</div>
-      <div class="team-code"><strong>${escapeHtml(summaryTitle(record))}</strong><span>${escapeHtml(unitLabel(record.sourceUnit))} · ${total} ekip</span></div>
+      <div class="team-code"><strong>${escapeHtml(summaryTitle(record))}</strong><span>${escapeHtml(unitLabel(record.sourceUnit))} · ${sourceRecordCount} ekip kaydı</span></div>
       <div class="team-meta"><strong>${escapeHtml(TRANSFER_KIND_LABELS[record.packetKind])}</strong><span>${escapeHtml(displayDateTime(record.startEpochMillis))}</span><span>${escapeHtml(displayDateTime(record.endEpochMillis))}</span></div>
     </article>
   </div>`;

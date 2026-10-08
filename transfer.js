@@ -4,7 +4,7 @@ import { ensurePayload } from './domain.js';
 export const TRANSFER_KINDS = Object.freeze({ TEAM: 'E', DAY: 'G', UNIT: 'B' });
 export const TRANSFER_KIND_LABELS = Object.freeze({ E: 'Ekip', G: 'Gündüz toplamı', B: 'Birim toplamı' });
 
-const VERSION = 2;
+const VERSION = 3;
 const UNIT_CODES = ['MERKEZ', 'CORLU', 'MALKARA'];
 const DUTIES = ['GUNDUZ', 'GECE', 'ARA_EKIP', 'RADAR'];
 const CONTROLS = ['K1_A', 'K2_A', 'K2_B', 'K4_A', 'K5', 'K6'];
@@ -67,6 +67,14 @@ function normalizedRegularTeamCodes(source, packetKind, teamCode, summary) {
   const regularCount = add(summary.teamCounts.GUNDUZ, summary.teamCounts.GECE);
   if (unique.length > regularCount) throw new Error('12/36 ekip kodları ekip sayısıyla uyuşmuyor.');
   return unique;
+}
+
+function normalizedSourceRecordCount(source, packetKind, summary) {
+  const supplied = source?.sourceRecordCount;
+  const fallback = packetKind === TRANSFER_KINDS.TEAM ? 1 : summary.teamTotal;
+  const count = integer(supplied ?? fallback, 'Kaynak icraat sayısı');
+  if (count < 1) throw new Error('Kaynak icraat sayısı en az 1 olmalıdır.');
+  return count;
 }
 
 function summaryToVector(summary) {
@@ -145,7 +153,8 @@ export function createTeamTransfer(evk) {
     startEpochMillis: report.earliest,
     endEpochMillis: report.latest,
     summary,
-    regularTeamCodes: ['GUNDUZ', 'GECE'].includes(evk.dutyType) ? [String(evk.teamCode)] : []
+    regularTeamCodes: ['GUNDUZ', 'GECE'].includes(evk.dutyType) ? [String(evk.teamCode)] : [],
+    sourceRecordCount: 1
   });
 }
 
@@ -160,7 +169,8 @@ export function aggregateTransfers(records, packetKind) {
     startEpochMillis: combined.startEpochMillis,
     endEpochMillis: combined.endEpochMillis,
     summary: combined.summary,
-    regularTeamCodes: combined.regularTeamCodes
+    regularTeamCodes: combined.regularTeamCodes,
+    sourceRecordCount: combined.sourceRecordCount
   });
 }
 
@@ -170,11 +180,13 @@ export function combineTransferSummaries(records) {
   const result = emptySummary();
   const regularTeamKeys = new Set();
   let unidentifiedRegularTeams = 0;
+  let sourceRecordCount = 0;
   for (const record of normalized) {
     const value = record.summary;
     const regularCount = add(value.teamCounts.GUNDUZ, value.teamCounts.GECE);
     record.regularTeamCodes.forEach(code => regularTeamKeys.add(`${record.sourceUnit}:${code}`));
     unidentifiedRegularTeams = add(unidentifiedRegularTeams, regularCount - record.regularTeamCodes.length);
+    sourceRecordCount = add(sourceRecordCount, record.sourceRecordCount);
     result.teamCounts.ARA_EKIP = add(result.teamCounts.ARA_EKIP, value.teamCounts.ARA_EKIP);
     result.teamCounts.RADAR = add(result.teamCounts.RADAR, value.teamCounts.RADAR);
     CONTROLS.forEach(key => { result.controlCounts[key] = add(result.controlCounts[key], value.controlCounts[key]); });
@@ -189,6 +201,7 @@ export function combineTransferSummaries(records) {
     startEpochMillis: Math.min(...normalized.map(record => record.startEpochMillis)),
     endEpochMillis: Math.max(...normalized.map(record => record.endEpochMillis)),
     summary: normalizedSummary(result),
+    sourceRecordCount,
     regularTeamCodes: sourceUnits.length === 1
       ? [...regularTeamKeys]
         .map(key => key.slice(key.indexOf(':') + 1))
@@ -208,6 +221,7 @@ export function normalizeTransfer(record) {
   if (record.packetKind === TRANSFER_KINDS.TEAM && !/^\d+$/.test(teamCode)) throw new Error('Ekip kodu geçersiz.');
   const summary = normalizedSummary(record.summary);
   const regularTeamCodes = normalizedRegularTeamCodes(record, record.packetKind, teamCode, summary);
+  const sourceRecordCount = normalizedSourceRecordCount(record, record.packetKind, summary);
   return {
     recordType: 'ICRAAT_SUMMARY',
     packetKind: record.packetKind,
@@ -216,7 +230,8 @@ export function normalizeTransfer(record) {
     startEpochMillis,
     endEpochMillis,
     summary,
-    regularTeamCodes
+    regularTeamCodes,
+    sourceRecordCount
   };
 }
 
@@ -233,6 +248,7 @@ export function encodeTransfer(record) {
     Math.floor(value.endEpochMillis / 60000).toString(36),
     value.teamCode ? decimalToBase36(value.teamCode) : '-',
     regularTeamCodes,
+    value.sourceRecordCount.toString(36),
     ...summaryToVector(value.summary).map(number => number.toString(36))
   ];
   const body = fields.join('.');
@@ -247,12 +263,13 @@ export function decodeTransfer(encoded) {
   const body = fields.join('.');
   if (checksum(body) !== receivedChecksum) throw new Error('Bağlantıdaki icraat özeti bozulmuş.');
   const version = base36Integer(fields[0], 'Sürüm');
-  if (![1, VERSION].includes(version)) throw new Error('Bu icraat bağlantısının sürümü desteklenmiyor.');
-  const expectedLength = (version === 1 ? 6 : 7) + TOTAL_FIELDS;
+  if (![1, 2, VERSION].includes(version)) throw new Error('Bu icraat bağlantısının sürümü desteklenmiyor.');
+  const expectedLength = (version === 1 ? 6 : version === 2 ? 7 : 8) + TOTAL_FIELDS;
   if (fields.length !== expectedLength) throw new Error('Bağlantıdaki icraat özeti eksik.');
   const [versionField, packetKind, unitIndex, startMinute, endMinute, teamCode, ...remainder] = fields;
   void versionField;
   const regularCodesField = version === 1 ? null : remainder.shift();
+  const sourceRecordCountField = version < 3 ? null : remainder.shift();
   const vector = remainder;
   const decodedTeamCode = teamCode === '-' ? '' : base36ToDecimal(teamCode);
   const regularTeamCodes = regularCodesField === null
@@ -267,7 +284,10 @@ export function decodeTransfer(encoded) {
     startEpochMillis: base36Integer(startMinute, 'Başlama zamanı') * 60000,
     endEpochMillis: base36Integer(endMinute, 'Bitiş zamanı') * 60000,
     summary: vectorToSummary(vector.map((value, index) => base36Integer(value, `Özet alanı ${index + 1}`))),
-    ...(regularTeamCodes === undefined ? {} : { regularTeamCodes })
+    ...(regularTeamCodes === undefined ? {} : { regularTeamCodes }),
+    ...(sourceRecordCountField === null
+      ? {}
+      : { sourceRecordCount: base36Integer(sourceRecordCountField, 'Kaynak icraat sayısı') })
   });
   return { ...record, encoded: text, summaryId: `ozet-${checksum(text)}-${text.length}` };
 }

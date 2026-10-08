@@ -28,6 +28,7 @@ test('ekip özeti kısa bağlantı koduna çevrilip kayıpsız çözülür', () 
   assert.equal(decoded.summary.accidentCounts.injuredCount, 2);
   assert.equal(decoded.summary.driverArticles, 3);
   assert.equal(decoded.summary.belt, 3);
+  assert.equal(decoded.sourceRecordCount, 1);
 });
 
 test('ekip, gündüz ve birim paketleri aynı sayısal yapıyla kademeli toplanır', () => {
@@ -40,6 +41,8 @@ test('ekip, gündüz ve birim paketleri aynı sayısal yapıyla kademeli toplan�
   assert.equal(day.summary.teamCounts.RADAR, 1);
   assert.equal(unit.summary.teamCounts.GUNDUZ, 2);
   assert.equal(unit.summary.teamCounts.GECE, 0);
+  assert.equal(day.sourceRecordCount, 2);
+  assert.equal(unit.sourceRecordCount, 3);
   assert.equal(unit.summary.controlCounts.K1_A, 9);
   assert.equal(transferAction([first, second]), TRANSFER_KINDS.DAY);
   assert.equal(transferAction([day, night]), TRANSFER_KINDS.UNIT);
@@ -58,6 +61,7 @@ test('aynı ekip kodunun gündüz ve gece kayıtları kademeli toplamda bir kez 
   assert.deepEqual(day.regularTeamCodes.sort(), ['59634', '59635']);
   assert.equal(decoded.summary.teamCounts.GUNDUZ + decoded.summary.teamCounts.GECE, 2);
   assert.deepEqual(decoded.regularTeamCodes.sort(), ['59634', '59635']);
+  assert.equal(decoded.sourceRecordCount, 3);
 });
 
 test('önceki sürüm ekip bağlantıları açılır ve ekip kodu korunur', () => {
@@ -65,6 +69,13 @@ test('önceki sürüm ekip bağlantıları açılır ve ekip kodu korunur', () =
   assert.equal(legacy.teamCode, '59634');
   assert.deepEqual(legacy.regularTeamCodes, ['59634']);
   assert.equal(legacy.summary.controlCounts.K1_A, 3);
+  assert.equal(legacy.sourceRecordCount, 1);
+});
+
+test('sürüm 2 toplu bağlantıda kaynak kayıt sayısı mevcut ekip toplamından türetilir', () => {
+  const legacyDay = decodeTransfer('2.G.2.hry0c.hrykc.-.1a0i_1a0j.2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1j7ayns');
+  assert.equal(legacyDay.sourceRecordCount, 2);
+  assert.deepEqual(legacyDay.regularTeamCodes, ['59634', '59635']);
 });
 
 test('birim özeti mevcut PDF rapor özetleyicisi tarafından doğrudan kullanılır', () => {
@@ -94,6 +105,7 @@ test('görüntüleme toplamı farklı birimlerdeki alınan icraatları birlikte 
   assert.equal(combined.summary.plateArticles, 3);
   assert.equal(combined.summary.belt, 2);
   assert.equal(combined.summary.alcohol, 3);
+  assert.equal(combined.sourceRecordCount, 2);
 });
 
 test('bozulmuş bağlantı özeti kabul edilmez', () => {
