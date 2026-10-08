@@ -1093,7 +1093,7 @@ function showSummaryDialog(title, meta, summary, share = null, includeTeamCounts
   $('#summaryDialogTitle').textContent = title;
   $('#summaryDialogMeta').textContent = meta;
   $('#summaryDialogContent').innerHTML = receivedSummaryGroups(summary, includeTeamCounts)
-    .map(group => detailGroup(group.title, group.rows)).join('');
+    .map(group => detailGroup(Number.isSafeInteger(group.total) ? `${group.title}: ${group.total}` : group.title, group.rows)).join('');
   $('#shareSummaryText').hidden = !share;
   $('#summaryDialog').showModal();
 }

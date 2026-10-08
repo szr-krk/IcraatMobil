@@ -38,11 +38,33 @@ test('ekip, gündüz ve birim paketleri aynı sayısal yapıyla kademeli toplan�
   const unit = aggregateTransfers([day, night], TRANSFER_KINDS.UNIT);
   assert.equal(day.summary.teamCounts.GUNDUZ, 1);
   assert.equal(day.summary.teamCounts.RADAR, 1);
-  assert.equal(unit.summary.teamCounts.GECE, 1);
+  assert.equal(unit.summary.teamCounts.GUNDUZ, 2);
+  assert.equal(unit.summary.teamCounts.GECE, 0);
   assert.equal(unit.summary.controlCounts.K1_A, 9);
   assert.equal(transferAction([first, second]), TRANSFER_KINDS.DAY);
   assert.equal(transferAction([day, night]), TRANSFER_KINDS.UNIT);
   assert.equal(transferAction([unit]), 'PDF');
+});
+
+test('aynı ekip kodunun gündüz ve gece kayıtları kademeli toplamda bir kez sayılır', () => {
+  const day = aggregateTransfers([
+    createTeamTransfer(evk('59634', 'GUNDUZ')),
+    createTeamTransfer(evk('59635', 'GUNDUZ'))
+  ], TRANSFER_KINDS.DAY);
+  const night = createTeamTransfer(evk('59634', 'GECE'));
+  const unit = aggregateTransfers([day, night], TRANSFER_KINDS.UNIT);
+  const decoded = decodeTransfer(encodeTransfer(unit));
+  assert.equal(day.summary.teamCounts.GUNDUZ, 2);
+  assert.deepEqual(day.regularTeamCodes.sort(), ['59634', '59635']);
+  assert.equal(decoded.summary.teamCounts.GUNDUZ + decoded.summary.teamCounts.GECE, 2);
+  assert.deepEqual(decoded.regularTeamCodes.sort(), ['59634', '59635']);
+});
+
+test('önceki sürüm ekip bağlantıları açılır ve ekip kodu korunur', () => {
+  const legacy = decodeTransfer('1.E.2.hry0c.hrykc.1a0i.1.0.0.0.3.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1x0gsk9');
+  assert.equal(legacy.teamCode, '59634');
+  assert.deepEqual(legacy.regularTeamCodes, ['59634']);
+  assert.equal(legacy.summary.controlCounts.K1_A, 3);
 });
 
 test('birim özeti mevcut PDF rapor özetleyicisi tarafından doğrudan kullanılır', () => {

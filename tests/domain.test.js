@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   buildEnvelope, buildJsonFileName, buildPerformanceReport, buildReceivedSummaryText, buildSharePerformanceText, calculateKeyboardInset, compareIncoming, ensurePayload, exportRecord, normalizeEvk,
-  mergeDirectoryItems, mergePenaltyRecord, penaltySummary, sameLogicalShift, sortPersonnelByRegistry, toIstanbulIso, validateEnvelope
+  mergeDirectoryItems, mergePenaltyRecord, penaltySummary, receivedSummaryGroups, sameLogicalShift, sortPersonnelByRegistry, toIstanbulIso, validateEnvelope
 } from '../domain.js';
 
 function record(overrides = {}) {
@@ -153,18 +153,23 @@ test('ceza türü veya ek işlemi farklıysa ayrı satır korunur', () => {
 });
 
 test('birleşik alınan icraat özeti ekrandaki bütün grupları metne dönüştürür', () => {
-  const text = buildReceivedSummaryText('Tüm İcraatlar', 'Malkara · 24.09.2026', {
+  const summary = {
     teamCounts: { GUNDUZ: 2, GECE: 3, ARA_EKIP: 4, RADAR: 5 },
     controlCounts: { K1_A: 1, K2_A: 2, K2_B: 3, K4_A: 4, K5: 5, K6: 6 },
     accidentCounts: { fatalAccidentCount: 7, deathCount: 8, injuryAccidentCount: 9, injuredCount: 10 },
     driverArticles: 11, plateArticles: 12, speed: 13, belt: 14, alcohol: 15
-  });
+  };
+  const text = buildReceivedSummaryText('Tüm İcraatlar', 'Malkara · 24.09.2026', summary);
+  const groups = receivedSummaryGroups(summary, true);
   assert.match(text, /^\*Tüm İcraatlar\*\nMalkara/);
-  assert.match(text, /\*Ekip sayıları\*\n12\/36 Ekip Sayısı: 5\nAra Ekip Sayısı: 4\nRadar Sayısı: 5/);
-  assert.match(text, /\*Kontroller\*\nK1: 1[\s\S]*K6: 6/);
+  assert.match(text, /\*Ekip sayıları\*\n12\/36 Ekip Sayısı: 5\nAra Ekip Sayısı: 4\nRadar Sayısı: 5\nToplam: 14/);
+  assert.match(text, /\*Kontroller\*\nK1: 1[\s\S]*K6: 6\nToplam: 21/);
   assert.match(text, /\*Kazalar\*[\s\S]*Yaralı: 10/);
-  assert.match(text, /\*Ceza adetleri\*[\s\S]*Tescil plakasına: 12/);
+  assert.match(text, /\*Ceza adetleri\*[\s\S]*Tescil plakasına: 12\nToplam: 23/);
   assert.match(text, /\*Ceza türleri\*[\s\S]*Alkol: 15$/);
+  assert.deepEqual(groups.filter(group => Number.isSafeInteger(group.total)).map(group => `${group.title}: ${group.total}`), [
+    'Ekip sayıları: 14', 'Kontroller: 21', 'Ceza adetleri: 23'
+  ]);
 });
 
 test('icraat özeti kurum başlığı ile hız, kemer, alkol ve not satırlarını üretir', () => {

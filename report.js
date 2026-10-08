@@ -101,6 +101,8 @@ function validatePenalty(record, teamLabel) {
 export function summarizeDailyReport(evks) {
   if (!Array.isArray(evks) || !evks.length) throw new Error('PDF için ekip kaydı bulunamadı.');
   const units = Object.fromEntries(REPORT_UNITS.map(unit => [unit, emptyUnitSummary()]));
+  const regularTeamCodes = Object.fromEntries(REPORT_UNITS.map(unit => [unit, new Set()]));
+  const unidentifiedRegularTeams = Object.fromEntries(REPORT_UNITS.map(unit => [unit, 0]));
   let earliest = Number.POSITIVE_INFINITY;
   let latest = Number.NEGATIVE_INFINITY;
 
@@ -117,7 +119,19 @@ export function summarizeDailyReport(evks) {
 
     const unit = units[evk.sourceUnit];
     if (evk.recordType === 'ICRAAT_SUMMARY') {
-      REPORT_DUTIES.forEach(key => {
+      const regularCount = safeAdd(
+        integerValue(evk.summary?.teamCounts?.GUNDUZ ?? 0, `${teamLabel} GUNDUZ`),
+        integerValue(evk.summary?.teamCounts?.GECE ?? 0, `${teamLabel} GECE`)
+      );
+      const codes = Array.isArray(evk.regularTeamCodes)
+        ? [...new Set(evk.regularTeamCodes.map(code => String(code || '').trim()).filter(Boolean))]
+        : [];
+      codes.forEach(code => regularTeamCodes[evk.sourceUnit].add(code));
+      unidentifiedRegularTeams[evk.sourceUnit] = safeAdd(
+        unidentifiedRegularTeams[evk.sourceUnit],
+        Math.max(0, regularCount - codes.length)
+      );
+      ['ARA_EKIP', 'RADAR'].forEach(key => {
         unit.teamCounts[key] = safeAdd(unit.teamCounts[key], integerValue(evk.summary?.teamCounts?.[key] ?? 0, `${teamLabel} ${key}`));
       });
       REPORT_CONTROL_KEYS.forEach(key => {
@@ -132,7 +146,13 @@ export function summarizeDailyReport(evks) {
       continue;
     }
     if (!REPORT_DUTIES.includes(evk?.dutyType)) throw new Error(`${teamLabel}: bilinmeyen görev türü.`);
-    unit.teamCounts[evk.dutyType] = safeAdd(unit.teamCounts[evk.dutyType], 1);
+    if (['GUNDUZ', 'GECE'].includes(evk.dutyType)) {
+      const code = String(evk.teamCode || '').trim();
+      if (code) regularTeamCodes[evk.sourceUnit].add(code);
+      else unidentifiedRegularTeams[evk.sourceUnit] = safeAdd(unidentifiedRegularTeams[evk.sourceUnit], 1);
+    } else {
+      unit.teamCounts[evk.dutyType] = safeAdd(unit.teamCounts[evk.dutyType], 1);
+    }
     const payload = ensurePayload(evk);
     REPORT_CONTROL_KEYS.forEach((key, index) => {
       const value = countFromSection(payload.controls, key, LEGACY_CONTROL_KEYS[index], `${teamLabel} ${key}`);
@@ -158,7 +178,10 @@ export function summarizeDailyReport(evks) {
     }
   }
 
-  Object.values(units).forEach(unit => {
+  REPORT_UNITS.forEach(unitCode => {
+    const unit = units[unitCode];
+    unit.teamCounts.GUNDUZ = safeAdd(regularTeamCodes[unitCode].size, unidentifiedRegularTeams[unitCode]);
+    unit.teamCounts.GECE = 0;
     unit.teamTotal = Object.values(unit.teamCounts).reduce((total, value) => safeAdd(total, value), 0);
   });
   return { units, earliest, latest };

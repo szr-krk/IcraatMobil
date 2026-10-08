@@ -2,12 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildDailyReportData, reportPeriodLabel, summarizeDailyReport } from '../report.js';
 
-function evk(unit = 'MERKEZ', duty = 'GUNDUZ', start = '2026-09-21T08:00:00+03:00', end = '2026-09-21T20:00:00+03:00') {
+function evk(unit = 'MERKEZ', duty = 'GUNDUZ', start = '2026-09-21T08:00:00+03:00', end = '2026-09-21T20:00:00+03:00', teamCode = '44') {
   return {
     evkId: `${unit}-${duty}-${start}-${Math.random()}`,
     sourceUnit: unit,
     dutyType: duty,
-    teamCode: '44',
+    teamCode,
     startDateTime: start,
     endDateTime: end,
     startEpochMillis: Date.parse(start),
@@ -54,15 +54,19 @@ test('rapor dönemi en erken başlangıç ve en geç bitişten hesaplanır', () 
   assert.equal(report.cells.F11, '(08.15-08.30)');
 });
 
-test('12/36 gündüz ve geceyi birleştirir, diğer ekip türlerini ayrı tutar', () => {
+test('12/36 aynı ekip kodunun gündüz ve gece kayıtlarını bir kez sayar', () => {
   const rows = [
-    evk('MERKEZ', 'GUNDUZ'), evk('MERKEZ', 'GUNDUZ'), evk('MERKEZ', 'GECE'),
-    evk('MERKEZ', 'ARA_EKIP'), evk('MERKEZ', 'RADAR'), evk('CORLU', 'GECE')
+    evk('MERKEZ', 'GUNDUZ', undefined, undefined, '59634'),
+    evk('MERKEZ', 'GUNDUZ', undefined, undefined, '59635'),
+    evk('MERKEZ', 'GECE', undefined, undefined, '59634'),
+    evk('MERKEZ', 'ARA_EKIP', undefined, undefined, '59640'),
+    evk('MERKEZ', 'RADAR', undefined, undefined, '59641'),
+    evk('CORLU', 'GECE', undefined, undefined, '59634')
   ];
   const report = buildDailyReportData(rows, accidents(), reference());
-  assert.deepEqual([report.cells.C23, report.cells.C26, report.cells.C29, report.cells.C32], [3, 1, 1, 5]);
+  assert.deepEqual([report.cells.C23, report.cells.C26, report.cells.C29, report.cells.C32], [2, 1, 1, 4]);
   assert.deepEqual([report.cells.G23, report.cells.G26, report.cells.G29, report.cells.G32], [1, 0, 0, 1]);
-  assert.deepEqual([report.cells.O23, report.cells.O26, report.cells.O29, report.cells.O32], [4, 1, 1, 6]);
+  assert.deepEqual([report.cells.O23, report.cells.O26, report.cells.O29, report.cells.O32], [3, 1, 1, 5]);
 });
 
 test('kontroller hedef, gerçekleşen, toplam ve oran hücrelerine doğru yerleşir', () => {

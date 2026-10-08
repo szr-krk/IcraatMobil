@@ -243,14 +243,18 @@ export function penaltySummary(record) {
 export function receivedSummaryGroups(summary, includeTeamCounts = false) {
   const value = summary || {};
   const number = input => Number.isSafeInteger(Number(input)) && Number(input) >= 0 ? Number(input) : 0;
+  const total = values => values.reduce((sum, item) => sum + number(item), 0);
+  const controlRows = [
+    ['K1', number(value.controlCounts?.K1_A)], ['K2-A', number(value.controlCounts?.K2_A)],
+    ['K2-B', number(value.controlCounts?.K2_B)], ['K4', number(value.controlCounts?.K4_A)],
+    ['K5', number(value.controlCounts?.K5)], ['K6', number(value.controlCounts?.K6)]
+  ];
+  const penaltyRows = [['Sürücü belgesine', number(value.driverArticles)], ['Tescil plakasına', number(value.plateArticles)]];
   const groups = [
     {
       title: 'Kontroller',
-      rows: [
-        ['K1', number(value.controlCounts?.K1_A)], ['K2-A', number(value.controlCounts?.K2_A)],
-        ['K2-B', number(value.controlCounts?.K2_B)], ['K4', number(value.controlCounts?.K4_A)],
-        ['K5', number(value.controlCounts?.K5)], ['K6', number(value.controlCounts?.K6)]
-      ]
+      rows: controlRows,
+      ...(includeTeamCounts ? { total: total(controlRows.map(([, count]) => count)) } : {})
     },
     {
       title: 'Kazalar',
@@ -258,7 +262,8 @@ export function receivedSummaryGroups(summary, includeTeamCounts = false) {
     },
     {
       title: 'Ceza adetleri',
-      rows: [['Sürücü belgesine', number(value.driverArticles)], ['Tescil plakasına', number(value.plateArticles)]]
+      rows: penaltyRows,
+      ...(includeTeamCounts ? { total: total(penaltyRows.map(([, count]) => count)) } : {})
     },
     {
       title: 'Ceza türleri',
@@ -266,13 +271,15 @@ export function receivedSummaryGroups(summary, includeTeamCounts = false) {
     }
   ];
   if (includeTeamCounts) {
+    const teamRows = [
+      ['12/36 Ekip Sayısı', number(value.teamCounts?.GUNDUZ) + number(value.teamCounts?.GECE)],
+      ['Ara Ekip Sayısı', number(value.teamCounts?.ARA_EKIP)],
+      ['Radar Sayısı', number(value.teamCounts?.RADAR)]
+    ];
     groups.unshift({
       title: 'Ekip sayıları',
-      rows: [
-        ['12/36 Ekip Sayısı', number(value.teamCounts?.GUNDUZ) + number(value.teamCounts?.GECE)],
-        ['Ara Ekip Sayısı', number(value.teamCounts?.ARA_EKIP)],
-        ['Radar Sayısı', number(value.teamCounts?.RADAR)]
-      ]
+      rows: teamRows,
+      total: total(teamRows.map(([, count]) => count))
     });
   }
   return groups;
@@ -283,6 +290,7 @@ export function buildReceivedSummaryText(title, meta, summary) {
   if (String(meta || '').trim()) lines.push(String(meta).trim());
   receivedSummaryGroups(summary, true).forEach(group => {
     lines.push('', `*${group.title}*`, ...group.rows.map(([label, value]) => `${label}: ${value}`));
+    if (Number.isSafeInteger(group.total)) lines.push(`Toplam: ${group.total}`);
   });
   return lines.join('\n');
 }
